@@ -187,8 +187,9 @@ def find_training_NPC():
 
     # vt.play_frame((121, 236, 239), 15, 15)
 
-    x, y, tx, ty = vt.find_postion((121, 236, 239), 15, 15)
-    print(x, y, tx, ty)
+    x, y, tx, ty = vt.play_frame((121, 236, 239), 15, 15)
+
+    
 
     # if(not (x == tx and y == ty)):
     #     mc.move(x, y, tx, ty)
