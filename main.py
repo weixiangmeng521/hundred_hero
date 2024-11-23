@@ -174,25 +174,26 @@ def main():
 def check_position():
     # 聚拢
     mc.move_left_down(.6)
-    x, y, tx, ty = vt.find_postion((121, 236, 239), 15, 15)
+    x, y, tx, ty = vt.find_position((0xc7, 0xd4, 0xb1), 5, 5)
     print(x, y, tx, ty)
     mc.move(x, y, tx, ty)
 
 
 # 找到训练营
 def find_training_NPC():
-    # x, y, tx, ty = vt.find_postion((0xc4, 0xcd, 0xd6), 15, 15)
-    # print(f"===[{x},{y}]")
-    # print(f"===[{tx},{ty}]")
+    x, y, tx, ty = vt.find_position((205, 196, 214), 0, 0)
+    # 如果没有找到目标就重新定位。
+    if((x == tx and y == ty)):
+        time.sleep(1)
+        find_training_NPC()
+        print("没有找到训练营，重新定位...")
 
-    # vt.play_frame((121, 236, 239), 15, 15)
+    if(not (x == tx and y == ty)):
+        tolerate_distance = vt.get_point_distance(x, y, tx, ty)
+        print(tolerate_distance)
+        # mc.move(x, y, tx, ty)
 
-    x, y, tx, ty = vt.play_frame((121, 236, 239), 15, 15)
-
-    
-
-    # if(not (x == tx and y == ty)):
-    #     mc.move(x, y, tx, ty)
+    # x, y, tx, ty = vt.play_frame((205, 196, 214), 0, 0)
 
 
 
