@@ -419,16 +419,9 @@ class VisualTrack:
         lower_bound = np.array([target_hsv[0], target_hsv[1], target_hsv[2] - lower_bound])  # lower bound (with some tolerance)
         upper_bound = np.array([target_hsv[0], target_hsv[1], target_hsv[2] + upper_bound])  # upper bound
 
-
         # 取色
         mask = cv2.inRange(hsv_image, lower_bound, upper_bound)
         result = cv2.bitwise_and(mat_image, mat_image, mask=mask)
-        
-        cv2.imshow("result", result)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
-
 
         # # 膨胀
         _, binary_image = cv2.threshold(result, 127, 255, cv2.THRESH_BINARY)
@@ -440,7 +433,8 @@ class VisualTrack:
 
         # 检测图像中的轮廓
         contours, _ = cv2.findContours(binary_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
+        height, width, _ = dilated_result.shape
+        center = (width // 2, height // 2)
 
         # 假设我们只关注第一个轮廓（即 contours[0]）
         if(len(contours) >= 1):
@@ -455,15 +449,11 @@ class VisualTrack:
                 cY = int(M['m01'] / M['m00'])
             else:
                 # 如果区域面积为零，则默认中心为 (0, 0)
-                cX, cY = 0, 0
+                cX, cY = width // 2, height // 2
         except Exception as e:
             height, width, _ = dilated_result.shape
             cX = width // 2
             cY = height // 2
-        # 画十字架
-        height, width, _ = dilated_result.shape
-        center = (width // 2, height // 2)    
-
         return (center[0], center[1], cX, cY) 
     
 
