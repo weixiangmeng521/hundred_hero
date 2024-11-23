@@ -399,7 +399,7 @@ class VisualTrack:
     # target_color = (121, 236, 239)
     # lower_bound: number
     # upper_bound: number
-    def find_postion(self, target_color, lower_bound, upper_bound):
+    def find_position(self, target_color, lower_bound, upper_bound):
         # Get window region
         winX, winY, winWidth, winHeight = self.get_win_info()
         screenshot = pyautogui.screenshot(region=(int(winX), int(winY), int(winWidth), int(winHeight)))
@@ -568,7 +568,7 @@ class VisualTrack:
         # # 转化为rgb 
         rgb_img = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2RGB)
 
-        x, y, cX, cY = self.find_postion(target_color, lower_bound, upper_bound)
+        x, y, cX, cY = self.find_position(target_color, lower_bound, upper_bound)
 
         # 设置红色的RGB值
         red_color = (255, 0, 0)
@@ -617,7 +617,7 @@ class VisualTrack:
 
 
 # # display analysis
-# def find_postion(winX, winY, winWidth, winHeight):    
+# def find_position(winX, winY, winWidth, winHeight):    
 #     # frame draw
 #     screenshot = pyautogui.screenshot(region=(int(winX), int(winY), int(winWidth), int(winHeight)))
 #     mat_image = np.array(screenshot)
@@ -693,7 +693,7 @@ class VisualTrack:
 #     # # 转化为rgb 
 #     rgb_img = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2RGB)
 
-#     x, y, cX, cY = find_postion(winX, winY, winWidth, winHeight)
+#     x, y, cX, cY = find_position(winX, winY, winWidth, winHeight)
 
 #     # 设置红色的RGB值
 #     red_color = (255, 0, 0)
