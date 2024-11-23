@@ -12,7 +12,7 @@ import math
 from lib.controll_wechat import ControllWechat
 
 
-cPos = [262 , 696]
+cPos = [222 , 696]
 back2TownPos = [425, 786]
 yesBtnPos = [302, 540]
 challengePopPos = [282, 400]
@@ -79,8 +79,7 @@ class ChallengeSelect():
         point = vt.get_shortest_point(_list)
         if(len(point) == 0):
             return
-        pyautogui.click(point[0], point[1] + 20)       
-        
+        pyautogui.click(point[0], point[1] + 20)
 
     # 刷经验
     def selectExpeirenceInstance(self):
@@ -348,16 +347,21 @@ class MoveControll():
         # 计算移动时间
         speed = 50 / 0.27      
         # 移动所需要的时间
+
+        dx = cPos[0] - x
+        dy = cPos[1] - y
+        dX = tX + dx
+        dY = tY + dy
+
         sec = distance / speed
-        pyautogui.moveTo(int(x), int(y))
-        pyautogui.dragTo(int(tX), int(tY), sec, button='left')
+        pyautogui.moveTo(cPos[0], cPos[1])
+        pyautogui.dragTo(int(dX), int(dY), sec, button='left')
+
 
 
     def pointer_move_to(self, x, y):
-        self.move_before_check()       
+        self.move_before_check()
         pyautogui.moveTo(int(x), int(y))
-
-
 
 
 

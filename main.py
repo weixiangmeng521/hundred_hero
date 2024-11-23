@@ -1,4 +1,6 @@
 import math
+
+import pyautogui
 from instance.guild_quest import GuildQuest
 from lib import ChallengeSelect, MoveControll, VisualTrack
 from instance import GameStatusEror, black_rock, forest, snow_zone, hell_of_fire
@@ -130,16 +132,21 @@ def earnMoney():
     print("完成中")
 
 
-# TODO 无限升级训练营
+# 无限升级训练营
 def improveAbility():
-    # 识别训练营小人的位置
+    # 流水线速度
+    waitSec = 3.3    
+    _, isMineFull = reader.read_screen()
 
+    if(isMineFull == True):
+        find_training_NPC()        
 
+    if(isMineFull == False):
+        print("刷一刷蓝矿")
+        work4Diamond()
 
-    # 然后移动到小人的位置
-
-    # 然后点击绿色泡泡
-    print("完成中")
+    time.sleep(waitSec)
+    improveAbility()
 
 
 
@@ -179,6 +186,19 @@ def check_position():
     mc.move(x, y, tx, ty)
 
 
+# 提升能力
+def upgrade_ability():
+    x, y, tx, ty = vt.find_position((106, 204, 66), 10, 10)
+    # 无视资源区域
+    if(ty < 100): return
+    
+    pyautogui.click(tx - 25, ty + 40)
+    time.sleep(.3)
+    pyautogui.click(tx - 25, ty)
+    time.sleep(1)
+
+
+
 # 找到训练营
 def find_training_NPC():
     x, y, tx, ty = vt.find_position((205, 196, 214), 0, 0)
@@ -190,10 +210,20 @@ def find_training_NPC():
 
     if(not (x == tx and y == ty)):
         tolerate_distance = vt.get_point_distance(x, y, tx, ty)
-        print(tolerate_distance)
-        # mc.move(x, y, tx, ty)
+        # 如果小于10像素，就算是移动到指定目的地了
+        if(tolerate_distance >= 10):
+            mc.move(x, y, tx, ty)
 
-    # x, y, tx, ty = vt.play_frame((205, 196, 214), 0, 0)
+    # 点击绿泡泡
+    cs.clickGreenPop()
+    time.sleep(.3)
+    upgrade_ability()
+    reader.close_task_menu()
+    time.sleep(.3)
+
+    # 返回
+    mc.move(tx, ty, x, y)
+    time.sleep(.3)
 
 
 
@@ -212,8 +242,8 @@ if(WAKE_UP_FLAG): wake_up_window()
 if(FARM_UNION_TASK_FLAG): work4Task()
 
 
-find_training_NPC()
+
 
 
 # main()
-
+improveAbility()
