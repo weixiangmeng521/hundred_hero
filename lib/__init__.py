@@ -400,62 +400,67 @@ class VisualTrack:
     # lower_bound: number
     # upper_bound: number
     def find_postion(self, target_color, lower_bound, upper_bound):
+        # Get window region
         winX, winY, winWidth, winHeight = self.get_win_info()
-        # frame draw
         screenshot = pyautogui.screenshot(region=(int(winX), int(winY), int(winWidth), int(winHeight)))
         mat_image = np.array(screenshot)
 
-        # 创建新的空白图像   
-        mat_image = mat_image.copy()  
+        # Remove advertisements
+        cv2.rectangle(mat_image, (340, 110), (460, 170), (0, 0, 0), -1)
 
-        # 清除广告干扰
-        cv2.rectangle(mat_image, (340, 110), (460,170), (0, 0, 0), -1)
-
-        # 转变格式
+        # Convert to HSV color space
         hsv_image = cv2.cvtColor(mat_image, cv2.COLOR_BGR2HSV)
 
+        # Convert target BGR color to HSV
         target_hsv = cv2.cvtColor(np.uint8([[target_color]]), cv2.COLOR_BGR2HSV)[0][0]
-        # Define the color range to extract the color (a tolerance can be added)
-        lower_bound = np.array([target_hsv[0], target_hsv[1], target_hsv[2] - lower_bound])  # lower bound (with some tolerance)
-        upper_bound = np.array([target_hsv[0], target_hsv[1], target_hsv[2] + upper_bound])  # upper bound
 
-        # 取色
+        # Define HSV bounds using tolerance
+        lower_bound = np.array([
+            max(0, target_hsv[0] - lower_bound),  # Hue lower bound
+            max(0, target_hsv[1] - lower_bound),  # Saturation lower bound
+            max(0, target_hsv[2] - lower_bound)   # Value lower bound
+        ], dtype=np.uint8)
+
+        upper_bound = np.array([
+            min(179, target_hsv[0] + upper_bound),  # Hue upper bound
+            min(255, target_hsv[1] + upper_bound),  # Saturation upper bound
+            min(255, target_hsv[2] + upper_bound)   # Value upper bound
+        ], dtype=np.uint8)
+
+        # Mask the image to isolate the target color
         mask = cv2.inRange(hsv_image, lower_bound, upper_bound)
         result = cv2.bitwise_and(mat_image, mat_image, mask=mask)
 
-        # # 膨胀
-        _, binary_image = cv2.threshold(result, 127, 255, cv2.THRESH_BINARY)
-        kernel = np.ones((9, 9), np.uint8)
-        dilated_result = cv2.dilate(binary_image, kernel, iterations=1)
-
-        gray_img = cv2.cvtColor(binary_image, cv2.COLOR_RGB2GRAY)
+        # Convert to grayscale for binary thresholding
+        gray_img = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
         _, binary_image = cv2.threshold(gray_img, 127, 255, cv2.THRESH_BINARY)
 
-        # 检测图像中的轮廓
-        contours, _ = cv2.findContours(binary_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        height, width, _ = dilated_result.shape
-        center = (width // 2, height // 2)
+        # Dilate the binary image to merge nearby features
+        kernel = np.ones((9, 9), np.uint8)
+        dilated_image = cv2.dilate(binary_image, kernel, iterations=1)
 
-        # 假设我们只关注第一个轮廓（即 contours[0]）
-        if(len(contours) >= 1):
-            cnt = contours[0]
+        # Find contours in the binary image
+        contours, _ = cv2.findContours(dilated_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        # 计算轮廓的几何矩
-        try:
-            M = cv2.moments(cnt)
-            # 计算质心（中心点）的坐标
-            if M['m00'] != 0:  # 确保区域面积非零，防止除零错误
-                cX = int(M['m10'] / M['m00'])
-                cY = int(M['m01'] / M['m00'])
-            else:
-                # 如果区域面积为零，则默认中心为 (0, 0)
-                cX, cY = width // 2, height // 2
-        except Exception as e:
-            height, width, _ = dilated_result.shape
-            cX = width // 2
-            cY = height // 2
-        return (center[0], center[1], cX, cY) 
-    
+        # Calculate the center of the window
+        height, width = binary_image.shape
+        window_center = (width // 2, height // 2)
+
+        # Default values for the target centroid
+        target_x, target_y = window_center
+
+        if contours:
+            # Get the largest contour by area
+            largest_contour = max(contours, key=cv2.contourArea)
+
+            # Calculate moments of the largest contour
+            moments = cv2.moments(largest_contour)
+            if moments['m00'] != 0:  # Avoid division by zero
+                target_x = int(moments['m10'] / moments['m00'])
+                target_y = int(moments['m01'] / moments['m00'])
+
+        return window_center[0], window_center[1], target_x, target_y
+
 
     # 计算两点距离
     def get_point_distance(self, x1, y1, x2, y2):
