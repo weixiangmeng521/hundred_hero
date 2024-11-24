@@ -29,6 +29,8 @@ IS_LOADING_ADS = False
 FARM_UNION_TASK_FLAG = False
 # 无限训练营
 UPGRADE_ABILITY_FOREVER = False
+# 无限抽卡
+IS_AUTO_GACHA = True
 
 
 # wake up
@@ -238,7 +240,7 @@ def get_pop_list():
 
 
 # 打金
-def farmWithRest():
+def farmingCoin():
     total = 0
     while True:
         # 唤醒屏幕
@@ -257,7 +259,7 @@ def farmWithRest():
 def autoCard():
     while True:
         gc.click_recruit_btn()
-        time.sleep(3.4)
+        time.sleep(3)
 
 
 
@@ -268,11 +270,11 @@ if(WAKE_UP_FLAG): wake_up_window()
 if(FARM_UNION_TASK_FLAG): work4Union()
 # 训练营
 if(UPGRADE_ABILITY_FOREVER): improveAbility()
-
+# 抽卡
+if(IS_AUTO_GACHA): autoCard()
 
 # main()
 
+# farmingCoin()
 
-# farmWithRest()
 
-autoCard()
