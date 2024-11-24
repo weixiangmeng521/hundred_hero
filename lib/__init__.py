@@ -32,6 +32,7 @@ snowRingBtnPos = [302, 290]
 forestMapBtnPos = [121, 380]
 decayedSwampBtnPos = [302, 360]
 pollutionOutpostBtnPos = [302, 300]
+coldWindCampBtnPos = [302, 450]
 
 
 # 地狱火副本
@@ -116,6 +117,16 @@ class ChallengeSelect():
         time.sleep(self.waitTime)
         pyautogui.click(pollutionOutpostBtnPos[0], pollutionOutpostBtnPos[1])
         
+
+    # 刷寒风营地的副本
+    def selectColdWindCamp(self):
+        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        self.clickGreenPop()
+        time.sleep(self.waitTime)
+        pyautogui.click(forestMapBtnPos[0], forestMapBtnPos[1])        
+        time.sleep(self.waitTime)
+        pyautogui.click(coldWindCampBtnPos[0], coldWindCampBtnPos[1])
+
 
     # 刷水晶
     def selectDiamondInstance(self):
@@ -301,6 +312,13 @@ class MoveControll():
         self.move_before_check()
         pyautogui.moveTo(self.xPos, self.yPos)
         pyautogui.dragTo(int(self.xPos), int(self.yPos) - 50, sec, button='left')
+
+
+    def move_top(self, sec):
+        self.move_before_check()
+        pyautogui.moveTo(self.xPos, self.yPos)
+        pyautogui.dragTo(int(self.xPos), int(self.yPos) - 50, sec, button='left')
+
 
     def move_down(self, sec):
         self.move_before_check()

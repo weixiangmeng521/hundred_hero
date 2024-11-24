@@ -22,6 +22,8 @@ GuildTask = GuildQuest()
 WAKE_UP_FLAG = True
 # 需不需要刷工会副本
 FARM_UNION_TASK_FLAG = False
+# 无限训练营
+UPGRADE_ABILITY_FOREVER = True
 
 
 # wake up
@@ -101,7 +103,7 @@ def work4Diamond():
 
 
 # 刷工会副本
-def work4Task():
+def work4Union():
     while True:
         # 检测是否完成工会副本
         if(reader.is_task_complete() == True):
@@ -120,7 +122,8 @@ def work4Task():
         print(f"工会任务没有完成，打工会任务。")
         
         # 刷副本
-        GuildTask.farmingPollutionOutpost()
+        time.sleep(1.2)
+        GuildTask.farmingColdWindCamp()
         
 
 
@@ -239,11 +242,11 @@ def get_pop_list():
 # 唤醒
 if(WAKE_UP_FLAG): wake_up_window()
 # 打工会
-if(FARM_UNION_TASK_FLAG): work4Task()
-
+if(FARM_UNION_TASK_FLAG): work4Union()
+# 训练营
+if(UPGRADE_ABILITY_FOREVER): improveAbility()
 
 
 
 
 # main()
-improveAbility()
