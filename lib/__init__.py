@@ -292,7 +292,7 @@ class ChallengeSelect():
             time.sleep(.3)
 
 
-    # TODO: 关闭游戏
+    # 关闭游戏
     def closeGame(self):
         window = self.get_specific_window_info()
         if(window == None): raise Exception('Err', f"{app_name}`s window is not found.")

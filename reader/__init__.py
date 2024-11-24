@@ -226,7 +226,6 @@ class InfoReader:
                 return
         
 
-
     # 是否游戏加载成功
     # 不弹广告版本
     def is_game_loaded_without_ads(self):
