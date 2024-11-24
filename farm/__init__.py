@@ -68,9 +68,6 @@ def farmCoin():
     killBullBoss()
     killSpiderBoss()
     killBigTreeBoss()
-    
-    # 循环打
-    farmCoin()
 
 
 
