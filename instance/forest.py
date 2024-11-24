@@ -319,3 +319,29 @@ class RottenSwamp:
         time.sleep(waitTime)
 
 
+    # 打蜘蛛
+    def killSpiderBoss(self):
+        mc = self.mc
+
+        mc.move_top(3.8)
+        time.sleep(.1)
+
+        mc.move_right(1.8)
+        time.sleep(.1)
+
+        mc.move_top(3.8)
+        time.sleep(.1)
+
+        mc.move_right(1.2)
+        time.sleep(4)
+
+
+    # 打树精
+    def killTreeSprite(self):
+        mc = self.mc
+
+        mc.move_right(1.8)
+        time.sleep(.1)
+
+        mc.move_up(1.6)
+        time.sleep(4)

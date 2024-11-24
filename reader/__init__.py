@@ -189,8 +189,7 @@ class InfoReader:
 
 
     # 是否游戏加载成功
-    # TODO: 有一种情况是，不弹广告。
-    def is_game_loaded(self):
+    def is_game_loaded(self, isContainsAds = False):
         print("等待游戏加载...")
         start_time = time.time()  # 记录开始时间
         timeout = 60  # 超时时间，单位为秒
@@ -212,7 +211,10 @@ class InfoReader:
             mat_image = np.array(screenshot)
             mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
 
-            target_rgb = (88,81,21)   # RGB 格式
+            target_rgb = (246,199,77)   # RGB 格式
+            if(isContainsAds): 
+                target_rgb = (88,81,21)
+
             target_bgr = target_rgb[::-1]      # 转换为 BGR 格式
 
             lower_bound = np.array(target_bgr)
@@ -224,3 +226,50 @@ class InfoReader:
                 return
         
 
+
+    # 是否游戏加载成功
+    # 不弹广告版本
+    def is_game_loaded_without_ads(self):
+        print("等待游戏加载...")
+        start_time = time.time()  # 记录开始时间
+        timeout = 60  # 超时时间，单位为秒
+
+        while True:
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError("加载超时: 游戏未在1分钟内加载完成。")
+
+            window = self.get_specific_window_info()
+            if(window == None): 
+                raise Exception('Err', f"{self.app_name}`s window is not found.")
+            
+            window_bounds = window.get('kCGWindowBounds', {})
+            winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
+            # 获取目标定位
+            flagPos = (int(287 + winX), int(53 + winY), 20, 20)
+            screenshot = pyautogui.screenshot(region=(flagPos))
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+
+            target_rgb = (246,199,77)   # RGB 格式
+            target_bgr = target_rgb[::-1]      # 转换为 BGR 格式
+
+            lower_bound = np.array(target_bgr) - 10
+            upper_bound = np.array(target_bgr) + 10
+            mask = cv2.inRange(mat_image, lower_bound, upper_bound)
+
+
+            # self.print_img_by_rgb(mat_image)
+            # cv2.imshow("123", mat_image)   
+            # # 设置刷新间隔，并检测按键退出
+            # key = cv2.waitKey(30)
+            # if key == ord('q') or key == 27:  # 27 是 ESC 的 ASCII 值
+            #     cv2.destroyAllWindows()
+            #     break
+
+
+            mask = cv2.inRange(mat_image, lower_bound, upper_bound)
+            if(cv2.countNonZero(mask) > 0):
+                print("加载完毕！")
+                return
+        

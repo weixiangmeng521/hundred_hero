@@ -1,6 +1,7 @@
 import math
 
 import pyautogui
+from farm import farmCoin
 from instance.guild_quest import GuildQuest
 from lib import ChallengeSelect, MoveControll, VisualTrack
 from instance import GameStatusEror, black_rock, forest, snow_zone, hell_of_fire
@@ -20,16 +21,18 @@ GuildTask = GuildQuest()
 
 # 需不需要唤醒
 WAKE_UP_FLAG = True
+# 是否有加载广告
+IS_LOADING_ADS = False
 # 需不需要刷工会副本
 FARM_UNION_TASK_FLAG = False
 # 无限训练营
-UPGRADE_ABILITY_FOREVER = True
+UPGRADE_ABILITY_FOREVER = False
 
 
 # wake up
 def wake_up_window():
     # 把窗口拖动到桌面顶端
-    cs.move2LeftTop(reader.is_game_loaded)
+    cs.move2LeftTop(reader.is_game_loaded, IS_LOADING_ADS)
 
 
 
@@ -126,13 +129,6 @@ def work4Union():
         GuildTask.farmingColdWindCamp()
         
 
-
-
-
-# TODO 刷金币
-def earnMoney():
-
-    print("完成中")
 
 
 # 无限升级训练营
@@ -239,6 +235,16 @@ def get_pop_list():
     mc.pointer_move_to(point[0], point[1] + 20)
 
 
+# 打金
+def farmWithRest():
+    wake_up_window()
+    time.sleep(3)
+    farmCoin()
+    cs.closeGame()
+
+
+
+
 # 唤醒
 if(WAKE_UP_FLAG): wake_up_window()
 # 打工会
@@ -247,6 +253,8 @@ if(FARM_UNION_TASK_FLAG): work4Union()
 if(UPGRADE_ABILITY_FOREVER): improveAbility()
 
 
-
-
 # main()
+
+
+# farmWithRest()
+
