@@ -2,6 +2,7 @@ import math
 
 import pyautogui
 from farm import farmCoin
+from gacha import Gacha
 from instance.guild_quest import GuildQuest
 from lib import ChallengeSelect, MoveControll, VisualTrack
 from instance import GameStatusEror, black_rock, forest, snow_zone, hell_of_fire
@@ -18,6 +19,7 @@ mc = MoveControll()
 reader = InfoReader()
 vt = VisualTrack()
 GuildTask = GuildQuest()
+gc = Gacha()
 
 # 需不需要唤醒
 WAKE_UP_FLAG = True
@@ -27,6 +29,8 @@ IS_LOADING_ADS = False
 FARM_UNION_TASK_FLAG = False
 # 无限训练营
 UPGRADE_ABILITY_FOREVER = False
+# 无限抽卡
+IS_AUTO_GACHA = True
 
 
 # wake up
@@ -236,7 +240,7 @@ def get_pop_list():
 
 
 # 打金
-def farmWithRest():
+def farmingCoin():
     total = 0
     while True:
         # 唤醒屏幕
@@ -251,6 +255,14 @@ def farmWithRest():
         time.sleep(.3)
 
 
+# 自动抽卡
+def autoCard():
+    while True:
+        gc.click_recruit_btn()
+        time.sleep(3)
+
+
+
 
 # 唤醒
 if(WAKE_UP_FLAG): wake_up_window()
@@ -258,10 +270,11 @@ if(WAKE_UP_FLAG): wake_up_window()
 if(FARM_UNION_TASK_FLAG): work4Union()
 # 训练营
 if(UPGRADE_ABILITY_FOREVER): improveAbility()
-
+# 抽卡
+if(IS_AUTO_GACHA): autoCard()
 
 # main()
 
+# farmingCoin()
 
-farmWithRest()
 
