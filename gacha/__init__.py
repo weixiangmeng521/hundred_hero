@@ -108,17 +108,18 @@ class Gacha:
 
 
     # 是否不能继续
+    # 如果需要消耗绿砖，就不能继续
     def is_cannot_contine(self):
         winX, winY, winWidth, winHeight = self.reader.get_win_info()
         screenshot = pyautogui.screenshot(region=(int(winX), int(winY), int(winWidth), int(winHeight)))
         mat_image = np.array(screenshot)
         mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
-        x1, y1, x2, y2 = 327 - 94, 283 + 380, 357 - 94, 300 + 380
+        x1, y1, x2, y2 = 327 - 124, 280 + 380, 357 - 124, 305 + 380
         clip = mat_image[y1:y2, x1:x2]
 
-        lower_bound, upper_bound= self.conver((237,51,35))
+        lower_bound, upper_bound= self.conver((251,226,76))
         mask = cv2.inRange(clip, lower_bound, upper_bound)
-        if cv2.countNonZero(mask) > 0:
+        if cv2.countNonZero(mask) <= 0:
             return True
         return False
 
@@ -141,7 +142,7 @@ class Gacha:
 
         # 收否可继续
         is_contine = self.is_cannot_contine()
-
+        
         # 点击招募
         if(is_contine == False):
             pyautogui.click(250, 690)
