@@ -17,6 +17,17 @@ back2TownPos = [425, 786]
 yesBtnPos = [302, 540]
 challengePopPos = [282, 400]
 
+# 平原系
+flatlandBtnPos = [142, 280]
+chorchHillBtnPos = [302, 365]
+
+
+# 荒芜之地
+poorZoneBtnPos = [142, 330]
+poorCampPosBtnPos = [302, 285]
+twoPeakPosBtnPos = [302, 365]
+
+
 # 黑石系
 blackRockBtnPos = [142, 630]
 centerHallBtnPos = [302, 440]
@@ -24,9 +35,7 @@ centerHallBtnPos = [302, 440]
 # 严寒地带系
 snwoMapBtnPos = [121, 440]
 snowBtnPos = [302, 360]
-
 snowRingBtnPos = [302, 290]
-
 
 # 污染之森系列
 forestMapBtnPos = [121, 380]
@@ -117,6 +126,38 @@ class ChallengeSelect():
         time.sleep(self.waitTime)
         pyautogui.click(pollutionOutpostBtnPos[0], pollutionOutpostBtnPos[1])
         
+    
+    # [打金]刷前哨平原的副本
+    def selectFrontFlatland(self):
+        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        self.clickGreenPop()
+        time.sleep(self.waitTime)
+        pyautogui.click(flatlandBtnPos[0], flatlandBtnPos[1])        
+        time.sleep(self.waitTime)
+        pyautogui.click(chorchHillBtnPos[0], chorchHillBtnPos[1])
+
+
+    # [打金]贫瘠营地
+    def selectPoorCamp(self):
+        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        self.clickGreenPop()
+        time.sleep(self.waitTime)
+        pyautogui.click(poorZoneBtnPos[0], poorZoneBtnPos[1])        
+        time.sleep(self.waitTime)
+        pyautogui.click(poorCampPosBtnPos[0], poorCampPosBtnPos[1])
+
+
+    # [打金]双峰峡谷
+    def selectTwoPeak(self):
+        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        self.clickGreenPop()
+        time.sleep(self.waitTime)
+        pyautogui.click(poorZoneBtnPos[0], poorZoneBtnPos[1])        
+        time.sleep(self.waitTime)
+        pyautogui.click(twoPeakPosBtnPos[0], twoPeakPosBtnPos[1])
+
+    
+
 
     # 刷寒风营地的副本
     def selectColdWindCamp(self):
@@ -214,7 +255,7 @@ class ChallengeSelect():
 
 
     # 把窗口移动到（0，0）
-    def move2LeftTop(self, waitFn):
+    def move2LeftTop(self, waitFn, isContainAds):
         win = self.get_specific_window_info()
         wechat = ControllWechat()
 
@@ -223,7 +264,7 @@ class ChallengeSelect():
         time.sleep(.3)
         # 没启动游戏
         if(win == None): 
-            if(waitFn): waitFn()
+            if(waitFn): waitFn(isContainAds)
 
         win = self.get_specific_window_info()
         bounds = win.get('kCGWindowBounds', {})  # 窗口边界
@@ -234,7 +275,9 @@ class ChallengeSelect():
         pyautogui.moveTo(x + 10, y + 10, .1)
         pyautogui.dragTo(10, 30, duration=.1, button='left')
         time.sleep(.3)
-        self.clearAds(5)
+
+        if(isContainAds):
+            self.clearAds(5)
 
 
     # 清除广告
