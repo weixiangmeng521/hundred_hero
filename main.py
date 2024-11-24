@@ -237,10 +237,15 @@ def get_pop_list():
 
 # 打金
 def farmWithRest():
+    # 唤醒屏幕
     wake_up_window()
     time.sleep(3)
+    # 刷副本
     farmCoin()
+    # 关闭游戏
     cs.closeGame()
+    time.sleep(1)
+    farmWithRest()
 
 
 
@@ -256,5 +261,5 @@ if(UPGRADE_ABILITY_FOREVER): improveAbility()
 # main()
 
 
-# farmWithRest()
+farmWithRest()
 

@@ -299,6 +299,7 @@ class ChallengeSelect():
         window_bounds = window.get('kCGWindowBounds', {})
         winWidth, _ = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
         pyautogui.click(winWidth - 30, 40)
+        print("关闭游戏")
         time.sleep(.1)
         
 
