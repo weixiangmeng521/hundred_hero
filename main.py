@@ -237,16 +237,18 @@ def get_pop_list():
 
 # 打金
 def farmWithRest():
-    # 唤醒屏幕
-    wake_up_window()
-    time.sleep(3)
-    # 刷副本
-    farmCoin()
-    # 关闭游戏
-    cs.closeGame()
-    time.sleep(1)
-    farmWithRest()
-
+    total = 0
+    while True:
+        # 唤醒屏幕
+        wake_up_window()
+        time.sleep(3)
+        # 刷副本
+        earned = farmCoin()
+        total += earned
+        print(f"💰总打金：{ total }")
+        # 关闭游戏
+        cs.closeGame()
+        time.sleep(.3)
 
 
 

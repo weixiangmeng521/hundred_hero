@@ -21,7 +21,7 @@ class PoorZone:
         time.sleep(.1)
 
         mc.move_right(.6)
-        time.sleep(3)
+        time.sleep(1)
 
 
 
@@ -38,7 +38,7 @@ class PoorZone:
         time.sleep(.1)
 
         mc.move_left(2.1)
-        time.sleep(4)
+        time.sleep(2)
 
         mc.move_top(6.4)
-        time.sleep(4)
+        time.sleep(2)
