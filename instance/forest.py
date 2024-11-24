@@ -266,3 +266,56 @@ class RottenSwamp:
 
         mc.move_down(1.2)
         time.sleep(waitTime)      
+
+
+    # 进入寒风营地
+    def crossColdWindCamp(self):
+        mc = self.mc
+        waitTime = 3
+
+        mc.move_right(1.8)
+        time.sleep(waitTime * 0)
+
+        mc.move_up(1.6)
+        time.sleep(waitTime)
+
+        mc.move_right(2.8)
+        time.sleep(waitTime)
+
+        mc.move_up(1.6)
+        time.sleep(waitTime)
+
+        mc.move_left(1.2)
+        time.sleep(waitTime)
+
+        mc.move_up(1.6)
+        time.sleep(waitTime)
+
+        mc.move_right(2.4)
+        time.sleep(waitTime)
+
+        mc.move_up(1.2)
+        time.sleep(waitTime)
+
+        mc.move_left(1.8)
+        time.sleep(waitTime)
+
+        mc.move_top(1.2)
+        time.sleep(waitTime)
+
+        mc.move_left(2.6)
+        time.sleep(waitTime)
+
+        mc.move_left_down(1.6)
+        time.sleep(waitTime)
+
+        mc.move_down(2)
+        time.sleep(waitTime)
+
+        mc.move_left(2)
+        time.sleep(waitTime)
+
+        mc.move_left(2.3)
+        time.sleep(waitTime)
+
+

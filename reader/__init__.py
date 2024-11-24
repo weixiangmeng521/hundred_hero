@@ -189,6 +189,7 @@ class InfoReader:
 
 
     # 是否游戏加载成功
+    # TODO: 有一种情况是，不弹广告。
     def is_game_loaded(self):
         print("等待游戏加载...")
         start_time = time.time()  # 记录开始时间

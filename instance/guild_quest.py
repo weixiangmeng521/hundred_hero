@@ -68,4 +68,15 @@ class GuildQuest:
         # 循环走圈
         instance.crossRoom3Loop()
 
-        
+    
+    # 刷寒风营地
+    def farmingColdWindCamp(self):
+        # 如果在城镇，就选择副本并且进入副本
+        if(self.reader.is_show_back2town_btn() == False):
+            # 选择并进入副本
+            self.cs.selectColdWindCamp()
+            time.sleep(10)
+            
+        # 刷副本
+        instance = forest.RottenSwamp()
+        instance.crossColdWindCamp()
