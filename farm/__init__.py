@@ -15,60 +15,66 @@ def killBossGiant():
     # 打第一个boss
     cs.selectFrontFlatland()
     instance = FrontFlatland()
-    time.sleep(9)
+    time.sleep(8)
     instance.killBoss()
     cs.back2Town()
-    time.sleep(9) 
+    time.sleep(8) 
 
 
 # 打树精
 def killTreeSpirit():
     cs.selectPoorCamp()
     instance = PoorZone()
-    time.sleep(9)
+    time.sleep(8)
     instance.killTreeBoss()
     cs.back2Town()
-    time.sleep(9) 
+    time.sleep(8) 
 
 
 # 打牛魔王
 def killBullBoss():
     cs.selectTwoPeak()
     instance = PoorZone()
-    time.sleep(9)
+    time.sleep(8)
     instance.killBullBoos()
     cs.back2Town()
-    time.sleep(9) 
+    time.sleep(8) 
 
 
 # 打蜘蛛boss
 def killSpiderBoss():
     cs.selectWoodInstance()
     instance = RottenSwamp()
-    time.sleep(9)
+    time.sleep(8)
     instance.killSpiderBoss()
     cs.back2Town()
-    time.sleep(9) 
+    time.sleep(8) 
 
 
 # 打大树boss
 def killBigTreeBoss():
     cs.selectColdWindCamp()
     instance = RottenSwamp()
-    time.sleep(9)
+    time.sleep(8)
     instance.killTreeSprite()
     cs.back2Town()
-    time.sleep(9) 
+    time.sleep(8) 
 
 
 # 打金
 def farmCoin():
+    gold = 0
     killBossGiant()
+    gold += 10
     killTreeSpirit()
+    gold += 10
     killBullBoss()
+    gold += 20
     killSpiderBoss()
+    gold += 10
     killBigTreeBoss()
-
+    gold += 10
+    return gold
 
 
 

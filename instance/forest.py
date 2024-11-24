@@ -333,7 +333,7 @@ class RottenSwamp:
         time.sleep(.1)
 
         mc.move_right(1.2)
-        time.sleep(4)
+        time.sleep(2)
 
 
     # 打树精
@@ -344,4 +344,4 @@ class RottenSwamp:
         time.sleep(.1)
 
         mc.move_up(1.6)
-        time.sleep(4)
+        time.sleep(3)
