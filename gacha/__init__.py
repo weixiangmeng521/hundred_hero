@@ -47,8 +47,8 @@ class Gacha:
         type_list = []
         coords = [
             (65, 283, 95, 320),            # 卡1区域
-            (65 + 262, 283, 95 + 262, 320),  # 卡2区域
-            (65 + 127, 283 + 33, 95 + 127, 320 + 33),  # 卡3区域
+            (65 + 127, 283 + 33, 95 + 127, 320 + 33),  # 卡2区域
+            (65 + 262, 283, 95 + 262, 320),  # 卡3区域
         ]
         for x1, y1, x2, y2 in coords:
             card = mat_image[y1:y2, x1:x2]
@@ -142,7 +142,7 @@ class Gacha:
 
         # 收否可继续
         is_contine = self.is_cannot_contine()
-        
+
         # 点击招募
         if(is_contine == False):
             pyautogui.click(250, 690)
