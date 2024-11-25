@@ -191,7 +191,7 @@ def check_position():
 
 # 提升能力
 def upgrade_ability():
-    x, y, tx, ty = vt.find_position((106, 204, 66), 10, 10)
+    _, _, tx, ty = vt.find_position((106, 204, 66), 10, 10)
     # 无视资源区域
     if(ty < 100): return
     
@@ -256,10 +256,38 @@ def farmingCoin():
 
 
 # 自动抽卡
-def autoCard():
+def auto_card():
+    is_entered_interface = gc.is_entered()
+
+    # 判断是否已经进入抽卡界面
+    if(not is_entered_interface):
+        x, y, tx, ty = vt.find_position((210, 174, 109), 0, 0)
+        # 如果没有找到目标就重新定位。
+        if((x == tx and y == ty)):
+            time.sleep(1)
+            print("没有找到抽卡中心，重新定位...")
+            auto_card()
+
+        if(not (x == tx and y == ty)):
+            tolerate_distance = vt.get_point_distance(x, y, tx, ty)
+            # 如果小于10像素，就算是移动到指定目的地了
+            if(tolerate_distance >= 10):
+                mc.move(x, y, tx, ty)
+
+        cs.clickGreenPop()
+        time.sleep(.3)
+
     while True:
-        gc.click_recruit_btn()
-        time.sleep(3)
+        # 如果不能点击了，就结束
+        if(gc.auto_recruit_btn()): 
+            break
+    
+    # 判断是否已经进入抽卡界面
+    if(not is_entered_interface):
+        # 关闭抽卡，返回
+        reader.close_task_menu()
+        time.sleep(.1)
+        mc.move(tx, ty, x, y)
 
 
 
@@ -271,7 +299,7 @@ if(FARM_UNION_TASK_FLAG): work4Union()
 # 训练营
 if(UPGRADE_ABILITY_FOREVER): improveAbility()
 # 抽卡
-if(IS_AUTO_GACHA): autoCard()
+if(IS_AUTO_GACHA): auto_card()
 
 # main()
 
