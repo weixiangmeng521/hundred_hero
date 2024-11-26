@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 import pyautogui
 from instance import GameStatusEror
+from lib import ChallengeSelect
 from reader import InfoReader
 
 
@@ -25,6 +26,8 @@ class Gacha:
     }
 
     def __init__(self):
+        self.reader = InfoReader()
+        self.cs = ChallengeSelect()
         self.reader = InfoReader()
 
 
@@ -180,7 +183,7 @@ class Gacha:
         x1, y1, x2, y2 = 327 - 91, 285 + 380, 357 - 91, 300 + 380
         clip = mat_image[y1:y2, x1:x2]
 
-        lower_bound, upper_bound= self.conver((237,51,35))
+        lower_bound, upper_bound= self.conver((237,51,35), 15)
         mask = cv2.inRange(clip, lower_bound, upper_bound)
         is_no_more_money = cv2.countNonZero(mask) > 0
 

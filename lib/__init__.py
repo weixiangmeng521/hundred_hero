@@ -364,10 +364,23 @@ class MoveControll():
         pyautogui.dragTo(int(self.xPos), int(self.yPos) - 50, sec, button='left')
 
 
+    def move_top_fast(self, sec):
+        self.move_before_check()
+        pyautogui.moveTo(self.xPos, self.yPos)
+        pyautogui.dragTo(int(self.xPos), int(self.yPos) - 150, sec, button='left')
+
+
     def move_down(self, sec):
         self.move_before_check()
         pyautogui.moveTo(self.xPos, self.yPos)
         pyautogui.dragTo(int(self.xPos), int(self.yPos) + 50, sec, button='left')
+
+
+    def move_down_fast(self, sec):
+        self.move_before_check()
+        pyautogui.moveTo(self.xPos, self.yPos)
+        pyautogui.dragTo(int(self.xPos), int(self.yPos) + 150, sec, button='left')
+
 
     def move_left(self, sec):
         self.move_before_check()
