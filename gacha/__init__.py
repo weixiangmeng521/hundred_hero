@@ -4,6 +4,7 @@ import time
 import cv2
 import numpy as np
 import pyautogui
+from instance import GameStatusEror
 from reader import InfoReader
 
 
@@ -191,15 +192,13 @@ class Gacha:
         card_list = self.read_three_cards()
         # 如果有未知卡，就重新读
         if(-1 in card_list):
-            self.auto_recruit_btn()
             time.sleep(.6)
-            return False
+            return
 
         # 如果没有钱了，就退出循环
         if(self.is_use_up_money()):
-            print("没钱了，不抽了")
-            return True
-
+            raise GameStatusEror("没钱了，不抽了")
+            
         # 输出
         self.print_colored_cards(card_list)
         # 判断是否三倍
@@ -210,16 +209,13 @@ class Gacha:
         # 是否消耗绿矿
         is_contine = self.is_cost_green_mine()
 
+        # 自动放弃
+        if(is_contine == True):
+            self.click_give_up()
+
         # 不消耗绿矿，招募
         if(is_contine == False):
             pyautogui.click(250, 690)
-            time.sleep(.1)
-
-        # 自动放弃
-        if(is_contine):
-            self.click_give_up()
-        
-        return False
 
 
     # 放弃按钮点击

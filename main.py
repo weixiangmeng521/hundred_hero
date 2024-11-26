@@ -24,14 +24,15 @@ gc = Gacha()
 # 需不需要唤醒
 WAKE_UP_FLAG = True
 # 是否有加载广告
-IS_LOADING_ADS = False
+IS_LOADING_ADS = True
 # 需不需要刷工会副本
 FARM_UNION_TASK_FLAG = False
 # 无限训练营
 UPGRADE_ABILITY_FOREVER = False
 # 无限抽卡
 IS_AUTO_GACHA = True
-
+# 无限打钱
+IS_AUTO_FARM = False
 
 # wake up
 def wake_up_window():
@@ -279,9 +280,11 @@ def auto_card():
 
     while True:
         # 如果不能点击了，就结束
-        if(gc.auto_recruit_btn()): 
+        try:
+            gc.auto_recruit_btn()
+        except GameStatusEror as e:
             break
-    
+
     # 判断是否已经进入抽卡界面
     if(not is_entered_interface):
         # 关闭抽卡，返回
@@ -300,6 +303,10 @@ if(FARM_UNION_TASK_FLAG): work4Union()
 if(UPGRADE_ABILITY_FOREVER): improveAbility()
 # 抽卡
 if(IS_AUTO_GACHA): auto_card()
+# 打钱
+if(IS_AUTO_FARM): farmingCoin()
+
+
 
 # main()
 
