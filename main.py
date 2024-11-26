@@ -25,14 +25,14 @@ gc = Gacha()
 WAKE_UP_FLAG = True
 # 是否有加载广告
 IS_LOADING_ADS = True
-# 需不需要刷工会副本
+# 刷工会副本
 FARM_UNION_TASK_FLAG = False
 # 无限训练营
 UPGRADE_ABILITY_FOREVER = False
 # 无限抽卡
 IS_AUTO_GACHA = True
 # 无限打钱
-IS_AUTO_FARM = False
+IS_AUTO_FARM = True
 
 # wake up
 def wake_up_window():
@@ -131,7 +131,15 @@ def work4Union():
         
         # 刷副本
         time.sleep(1.2)
-        GuildTask.farmingColdWindCamp()
+        
+        GuildTask.farmingMagicRing()
+
+        # GuildTask.farmingSnowfield()
+
+        # GuildTask.farmingPollutionOutpost()
+
+        # GuildTask.farmingColdWindCamp()
+
         
 
 
@@ -311,5 +319,4 @@ if(IS_AUTO_FARM): farmingCoin()
 # main()
 
 # farmingCoin()
-
 
