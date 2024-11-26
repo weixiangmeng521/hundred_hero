@@ -4,10 +4,18 @@ import time
 import cv2
 import numpy as np
 import pyautogui
+from instance import GameStatusEror
 from reader import InfoReader
 
 
 class Gacha:
+    color_map = {
+        0: "\033[47m",  # 黑色背景
+        1: "\033[44m",  # 蓝色背景
+        2: "\033[45m",  # 紫色背景
+        3: "\033[43m",  # 黄色背景（替代橙色）
+        4: "\033[41m",  # 红色背景
+    }    
     card_map = {
         0: "垃圾卡",
         1: "蓝卡",
@@ -33,6 +41,26 @@ class Gacha:
         cv2.imshow('Merged Image', result)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+
+
+    # 是否进入界面
+    def is_entered(self):
+        winX, winY, winWidth, winHeight = self.reader.get_win_info()
+        screenshot = pyautogui.screenshot(region=(int(winX), int(winY), int(winWidth), int(winHeight)))
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
+        x1, y1, x2, y2 = 55, 795, 105, 845
+        clip = mat_image[y1:y2, x1:x2]
+
+        lower_bound, upper_bound= self.conver((43,55,66), 0)
+        mask = cv2.inRange(clip, lower_bound, upper_bound)
+        gray_color = cv2.countNonZero(mask) > 0
+    
+        lower_bound, upper_bound= self.conver((230,232,236), 0)
+        mask = cv2.inRange(clip, lower_bound, upper_bound)
+        white_color = cv2.countNonZero(mask) > 0        
+
+        return gray_color and white_color
 
 
     # 定位三个坐标
@@ -62,9 +90,8 @@ class Gacha:
 
 
     # 获取两个bound
-    def conver(self, target_rgb):
+    def conver(self, target_rgb, offset = 5):
         target_bgr = target_rgb[::-1]  # 转换为 BGR 格式
-        offset = 20
         lower_bound = np.clip(np.array(target_bgr) - offset, 0, 255)
         upper_bound = np.clip(np.array(target_bgr) + offset, 0, 255)
         return lower_bound, upper_bound
@@ -99,17 +126,17 @@ class Gacha:
 
 
     # 收否有红卡
-    def is_contains_red_cards(self):
+    def is_contains_high_level_card(self):
         cards_list = self.read_three_cards()
         # 判断是否有橙卡（3）或红卡（4）
-        if 4 in cards_list:
+        if 4 in cards_list or 3 in cards_list:
             return True
         return False
 
 
     # 是否不能继续
     # 如果需要消耗绿砖，就不能继续
-    def is_cannot_contine(self):
+    def is_cost_green_mine(self):
         winX, winY, winWidth, winHeight = self.reader.get_win_info()
         screenshot = pyautogui.screenshot(region=(int(winX), int(winY), int(winWidth), int(winHeight)))
         mat_image = np.array(screenshot)
@@ -130,36 +157,74 @@ class Gacha:
         time.sleep(.3)
 
 
-    # 点击招募
-    def click_recruit_btn(self):
-        card_list = self.read_three_cards()
-        mapped_list = [self.card_map.get(card, "未知卡") for card in card_list]
-        print(f"当前卡为：{mapped_list}")
+
+    # 打印带颜色的卡牌列表
+    def print_colored_cards(self, card_list):
+        mapped_list = [
+            f"{self.color_map.get(card, '\033[40m')}{self.card_map.get(card, '未知卡')}\033[0m"
+            for card in card_list
+        ]
+        print(f"当前卡为：{' '.join(mapped_list)}")
+
+
+
+    # 是否抽完
+    def is_use_up_money(self):
+        is_cost_green = self.is_cost_green_mine()
         
-        if(self.is_contains_red_cards()):
-            self.click_max_btn()
-            time.sleep(.3)
+        # 是否有红字
+        winX, winY, winWidth, winHeight = self.reader.get_win_info()
+        screenshot = pyautogui.screenshot(region=(int(winX), int(winY), int(winWidth), int(winHeight)))
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
+        x1, y1, x2, y2 = 327 - 91, 285 + 380, 357 - 91, 300 + 380
+        clip = mat_image[y1:y2, x1:x2]
 
-        # 收否可继续
-        is_contine = self.is_cannot_contine()
+        lower_bound, upper_bound= self.conver((237,51,35))
+        mask = cv2.inRange(clip, lower_bound, upper_bound)
+        is_no_more_money = cv2.countNonZero(mask) > 0
 
-        # 点击招募
-        if(is_contine == False):
-            pyautogui.click(250, 690)
+        return (not is_cost_green and is_no_more_money)
+        
+
+    # 点击招募
+    def auto_recruit_btn(self):
+        card_list = self.read_three_cards()
+        # 如果有未知卡，就重新读
+        if(-1 in card_list):
             time.sleep(.6)
+            return
+
+        # 如果没有钱了，就退出循环
+        if(self.is_use_up_money()):
+            raise GameStatusEror("没钱了，不抽了")
+            
+        # 输出
+        self.print_colored_cards(card_list)
+        # 判断是否三倍
+        if(self.is_contains_high_level_card()):
+            self.click_max_btn()
+            time.sleep(.1)
+
+        # 是否消耗绿矿
+        is_contine = self.is_cost_green_mine()
 
         # 自动放弃
-        if(is_contine):
+        if(is_contine == True):
             self.click_give_up()
+
+        # 不消耗绿矿，招募
+        if(is_contine == False):
+            pyautogui.click(250, 690)
 
 
     # 放弃按钮点击
     def click_give_up(self):
         pyautogui.click(235, 745)
-        time.sleep(.3)
+        time.sleep(.1)
         # 点击确认
         pyautogui.click(295, 545)
-        time.sleep(.3)
+        time.sleep(.1)
 
 
 
