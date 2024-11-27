@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 import pyautogui
 from instance import GameStatusEror
+from lib import ChallengeSelect
 from reader import InfoReader
 
 
@@ -25,6 +26,8 @@ class Gacha:
     }
 
     def __init__(self):
+        self.reader = InfoReader()
+        self.cs = ChallengeSelect()
         self.reader = InfoReader()
 
 
@@ -180,19 +183,54 @@ class Gacha:
         x1, y1, x2, y2 = 327 - 91, 285 + 380, 357 - 91, 300 + 380
         clip = mat_image[y1:y2, x1:x2]
 
-        lower_bound, upper_bound= self.conver((237,51,35))
+        lower_bound, upper_bound= self.conver((237,51,35), 15)
         mask = cv2.inRange(clip, lower_bound, upper_bound)
         is_no_more_money = cv2.countNonZero(mask) > 0
 
         return (not is_cost_green and is_no_more_money)
         
+    
+    # 判断是不是能正常抽卡，判断是不是进入了在抽卡结束后，进入下一轮抽卡的垃圾时间里
+    def is_avaliable_click(self):
+        start_time = time.time()  # 记录开始时间
+        timeout = 60  # 超时时间，单位为秒
+
+        while True:
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError("加载超时: 未能识别抽卡")
+
+            window = self.reader.get_specific_window_info()
+            if(window == None): 
+                raise Exception('Err', f"{self.app_name}`s window is not found.")
+            
+            window_bounds = window.get('kCGWindowBounds', {})
+            winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
+            # 获取目标定位
+            flagPos = (int(287 + winX), int(53 + winY), 20, 20)
+            screenshot = pyautogui.screenshot(region=(flagPos))
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+
+            target_rgb = (246,199,77)   # RGB 格式
+            target_bgr = target_rgb[::-1]      # 转换为 BGR 格式
+            lower_bound = np.array(target_bgr)
+            upper_bound = np.array(target_bgr)
+
+            mask = cv2.inRange(mat_image, lower_bound, upper_bound)
+            if(cv2.countNonZero(mask) > 0):
+                return        
+
 
     # 点击招募
     def auto_recruit_btn(self):
+        # 同步阻塞
+        self.is_avaliable_click()
+
         card_list = self.read_three_cards()
         # 如果有未知卡，就重新读
         if(-1 in card_list):
-            time.sleep(.6)
+            time.sleep(.3)
             return
 
         # 如果没有钱了，就退出循环
