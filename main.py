@@ -305,12 +305,12 @@ def auto_card():
 def screen_shot():
     screenshot = pyautogui.screenshot()
     img = np.array(screenshot)
-    img = cv2.setColor(img, cv2.COLOR_RGB2BGR)
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 
     timestamp = time.strftime("%Y%m%d_%H%M%S")
     path = f"evidence/{timestamp}.png"
     cv2.imwrite(path, img)
-    print(f"已经保存截图到：${path}")
+    print(f"已经保存截图到：{path}")
 
 
 def __init__():
@@ -331,6 +331,7 @@ def __init__():
 try:
     __init__()
 
+# TODO: 捕捉异常
 except Exception as e:
     print(e)
     screen_shot()
@@ -344,4 +345,3 @@ except Exception as e:
 # main()
 
 # farmingCoin()
-
