@@ -1,4 +1,4 @@
-from instance import GameStatusEror
+from instance import GameStatusError
 from lib import MoveControll
 import time
 
@@ -12,7 +12,7 @@ class RottenSwamp:
         
     def check_handle(self):
         isWoodFull, _ = self.reader.read_screen()
-        if(isWoodFull): raise GameStatusEror("木头满了")
+        if(isWoodFull): raise GameStatusError("木头满了")
 
     # 腐烂沼泽上圈
     def crossRoom1(self):

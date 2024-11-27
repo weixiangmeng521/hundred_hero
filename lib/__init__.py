@@ -303,6 +303,26 @@ class ChallengeSelect():
         time.sleep(.1)
         
 
+    # 关闭游戏无视报错的那种
+    def closeGameWithoutException(self):
+        window = None
+        # 获取所有在屏幕上的窗口信息
+        options = Quartz.kCGWindowListOptionOnScreenOnly
+        window_list = Quartz.CGWindowListCopyWindowInfo(options, Quartz.kCGNullWindowID)
+        # 查找指定窗口
+        for _window in window_list:
+            window_name = _window.get('kCGWindowName', '')
+            if app_name in window_name:
+                window = _window  # 返回指定窗口的信息
+        if(window == None): return
+        window_bounds = window.get('kCGWindowBounds', {})
+        winWidth, _ = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
+        pyautogui.click(winWidth - 30, 40)
+        print("关闭游戏")
+        time.sleep(.1)
+    
+
+
 
 
 # 控制类

@@ -1,5 +1,5 @@
 # __init__.py
-class GameStatusEror(Exception):
+class GameStatusError(Exception):
 
     def __init__(self, ErrorInfo):
         super().__init__(self)

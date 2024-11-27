@@ -1,11 +1,13 @@
 import math
 
+import cv2
+import numpy as np
 import pyautogui
 from farm import farmCoin
 from gacha import Gacha
 from instance.guild_quest import GuildQuest
 from lib import ChallengeSelect, MoveControll, VisualTrack
-from instance import GameStatusEror, black_rock, forest, snow_zone, hell_of_fire
+from instance import GameStatusError, black_rock, forest, snow_zone, hell_of_fire
 import time
 from reader import InfoReader
 
@@ -30,7 +32,7 @@ FARM_UNION_TASK_FLAG = False
 # 无限训练营
 UPGRADE_ABILITY_FOREVER = False
 # 无限抽卡
-IS_AUTO_GACHA = True
+IS_AUTO_GACHA = False
 # 无限打钱
 IS_AUTO_FARM = True
 
@@ -62,7 +64,7 @@ def work4Expeirence2():
     instance = hell_of_fire.HellOfFire()
     try:
         instance.crossRoom1()
-    except GameStatusEror as e:
+    except GameStatusError as e:
         print(f"{e}\n准备到附近传送点。")
         cs.clickGiveUpRebornBtn()
         time.sleep(8)
@@ -84,7 +86,7 @@ def work4Wood():
         while True:
             instance.crossRoom1()
             instance.crossRoom2()
-    except GameStatusEror as e:
+    except GameStatusError as e:
         print(e)
 
     cs.back2Town()
@@ -99,7 +101,7 @@ def work4Diamond():
     try:
         instance = snow_zone.SnowZone()
         instance.crossRoom1Loop()
-    except GameStatusEror as e:
+    except GameStatusError as e:
         print(e)
 
     cs.back2Town()
@@ -252,16 +254,14 @@ def get_pop_list():
 def farmingCoin():
     total = 0
     while True:
-        # 唤醒屏幕
-        wake_up_window()
-        time.sleep(3)
         # 刷副本
         earned = farmCoin()
         total += earned
         print(f"💰总打金：{ total }")
         # 关闭游戏
         cs.closeGame()
-        time.sleep(.3)
+        # 启动游戏
+        wake_up_window()
 
 
 # 自动抽卡
@@ -290,7 +290,7 @@ def auto_card():
         # 如果不能点击了，就结束
         try:
             gc.auto_recruit_btn()
-        except GameStatusEror as e:
+        except GameStatusError as e:
             break
 
     # 判断是否已经进入抽卡界面
@@ -301,18 +301,43 @@ def auto_card():
         mc.move(tx, ty, x, y)
 
 
+# 截屏，查看bug信息
+def screen_shot():
+    screenshot = pyautogui.screenshot()
+    img = np.array(screenshot)
+    img = cv2.setColor(img, cv2.COLOR_RGB2BGR)
+
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    path = f"evidence/{timestamp}.png"
+    cv2.imwrite(path, img)
+    print(f"已经保存截图到：${path}")
 
 
-# 唤醒
-if(WAKE_UP_FLAG): wake_up_window()
-# 打工会
-if(FARM_UNION_TASK_FLAG): work4Union()
-# 训练营
-if(UPGRADE_ABILITY_FOREVER): improveAbility()
-# 抽卡
-if(IS_AUTO_GACHA): auto_card()
-# 打钱
-if(IS_AUTO_FARM): farmingCoin()
+def __init__():
+    # 唤醒
+    if(WAKE_UP_FLAG): wake_up_window()
+    # 打工会
+    if(FARM_UNION_TASK_FLAG): work4Union()
+    # 训练营
+    if(UPGRADE_ABILITY_FOREVER): improveAbility()
+    # 抽卡
+    if(IS_AUTO_GACHA): auto_card()
+    # 打钱
+    if(IS_AUTO_FARM): farmingCoin()
+
+
+
+
+try:
+    __init__()
+
+except Exception as e:
+    print(e)
+    screen_shot()
+    cs.closeGameWithoutException()
+    time.sleep(.3)
+    __init__()
+
 
 
 
