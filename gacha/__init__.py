@@ -202,7 +202,7 @@ class Gacha:
 
             window = self.reader.get_specific_window_info()
             if(window == None): 
-                raise Exception('Err', f"{self.app_name}`s window is not found.")
+                raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
             
             window_bounds = window.get('kCGWindowBounds', {})
             winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
