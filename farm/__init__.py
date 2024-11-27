@@ -6,69 +6,70 @@ from instance.front_flatland import FrontFlatland
 from instance.poor_zone import PoorZone
 from instance.snow_zone import SnowZone
 from lib import ChallengeSelect
+from reader import InfoReader
 
 
 cs = ChallengeSelect()
-
+reader = InfoReader()
 
 # 打第一个巨人boss
 def killBossGiant():
     # 打第一个boss
     cs.selectFrontFlatland()
     instance = FrontFlatland()
-    time.sleep(8)
+    reader.wait_tranported()
     instance.killBoss()
     cs.back2Town()
-    time.sleep(8) 
+    reader.wait_tranported()
 
 
 # 打树精
 def killTreeSpirit():
     cs.selectPoorCamp()
     instance = PoorZone()
-    time.sleep(8)
+    reader.wait_tranported()
     instance.killTreeBoss()
     cs.back2Town()
-    time.sleep(8) 
+    reader.wait_tranported()
 
 
 # 打牛魔王
 def killBullBoss():
     cs.selectTwoPeak()
     instance = PoorZone()
-    time.sleep(8)
+    reader.wait_tranported()
     instance.killBullBoos()
     cs.back2Town()
-    time.sleep(8) 
+    reader.wait_tranported()
 
 
 # 打蜘蛛boss
 def killSpiderBoss():
     cs.selectWoodInstance()
     instance = RottenSwamp()
-    time.sleep(8)
+    reader.wait_tranported()
     instance.killSpiderBoss()
     cs.back2Town()
-    time.sleep(8) 
+    reader.wait_tranported()
 
 
 # 打大树boss
 def killBigTreeBoss():
     cs.selectColdWindCamp()
     instance = RottenSwamp()
-    time.sleep(8)
+    reader.wait_tranported()
     instance.killTreeSprite()
     cs.back2Town()
-    time.sleep(8) 
+    reader.wait_tranported()
 
 # 打雪人boss
 def killSnowmanBoss():
     cs.selectSnowInstance()
     instance = SnowZone()
-    time.sleep(8)
+    reader.wait_tranported()
     instance.killSnowManBoss()
     cs.back2Town()
-    time.sleep(8) 
+    reader.wait_tranported()
 
 
 # 打金

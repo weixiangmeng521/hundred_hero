@@ -4,7 +4,7 @@ import time
 import cv2
 import numpy as np
 import pyautogui
-from instance import GameStatusEror
+from instance import GameStatusError
 from lib import ChallengeSelect
 from reader import InfoReader
 
@@ -235,7 +235,7 @@ class Gacha:
 
         # 如果没有钱了，就退出循环
         if(self.is_use_up_money()):
-            raise GameStatusEror("没钱了，不抽了")
+            raise GameStatusError("没钱了，不抽了")
             
         # 输出
         self.print_colored_cards(card_list)

@@ -1,6 +1,6 @@
 
 import time
-from instance import GameStatusEror
+from instance import GameStatusError
 from lib import MoveControll
 
 
@@ -9,7 +9,7 @@ class FrontFlatland:
 
     def check_handle(self):
         if(self.reader.is_dead()):
-            raise GameStatusEror("泼街了，准备复活。")
+            raise GameStatusError("泼街了，准备复活。")
         
 
     def killBoss(self):

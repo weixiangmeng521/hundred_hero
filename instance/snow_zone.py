@@ -1,4 +1,4 @@
-from instance import GameStatusEror
+from instance import GameStatusError
 from lib import MoveControll
 import time
 from reader import InfoReader
@@ -11,7 +11,7 @@ class SnowZone:
 
     def check_handle(self):
         _, isMineFull = self.reader.read_screen()
-        if(isMineFull): raise GameStatusEror("蓝矿满了")
+        if(isMineFull): raise GameStatusError("蓝矿满了")
 
     def recur(self):
         mc = self.mc

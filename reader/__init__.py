@@ -187,6 +187,42 @@ class InfoReader:
 
         return is_contain_reborn_btn and is_contain_give_up_btn
 
+    # 等待传送完成
+    def wait_tranported(self):
+        start_time = time.time()  # 记录开始时间
+        timeout = 60  # 超时时间，单位为秒
+
+        while True:
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError("加载超时: 未在一分钟内传送完成。")
+
+            window = self.get_specific_window_info()
+            if(window == None): 
+                raise Exception('Err', f"{self.app_name}`s window is not found.")
+            
+            window_bounds = window.get('kCGWindowBounds', {})
+            winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
+            winWidth, winHeight = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
+            # 获取目标定位
+            flagPos = (int((winWidth // 2) - 150 + winX), int((winHeight // 2) - 150 + winY), 300, 300)
+            screenshot = pyautogui.screenshot(region=(flagPos))
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+            target_rgb = (102, 193, 82)   # RGB 格式
+
+            # cv2.imshow("123", mat_image)
+            # cv2.waitKey(0)
+            # cv2.destroyAllWindows()
+
+            target_bgr = target_rgb[::-1]      # 转换为 BGR 格式
+            lower_bound = np.array(target_bgr)
+            upper_bound = np.array(target_bgr)
+            mask = cv2.inRange(mat_image, lower_bound, upper_bound)
+            if(cv2.countNonZero(mask) > 0):
+                return
+
+
 
     # 是否游戏加载成功
     def is_game_loaded(self, isContainsAds = False):
