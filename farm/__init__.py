@@ -4,6 +4,7 @@ import time
 from instance.forest import RottenSwamp
 from instance.front_flatland import FrontFlatland
 from instance.poor_zone import PoorZone
+from instance.snow_zone import SnowZone
 from lib import ChallengeSelect
 
 
@@ -60,6 +61,15 @@ def killBigTreeBoss():
     cs.back2Town()
     time.sleep(8) 
 
+# 打雪人boss
+def killSnowmanBoss():
+    cs.selectSnowInstance()
+    instance = SnowZone()
+    time.sleep(8)
+    instance.killSnowManBoss()
+    cs.back2Town()
+    time.sleep(8) 
+
 
 # 打金
 def farmCoin():
@@ -73,6 +83,8 @@ def farmCoin():
     killSpiderBoss()
     gold += 10
     killBigTreeBoss()
+    gold += 10
+    killSnowmanBoss()
     gold += 10
     return gold
 
