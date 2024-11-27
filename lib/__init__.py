@@ -85,15 +85,22 @@ class ChallengeSelect():
     # 点击最近的绿色冒泡
     def clickGreenPop(self):
         vt = VisualTrack()
-        _list = vt.get_targets_list((0x66,0xc1,0x52), 20, 20)
+        green = (0x66,0xc1,0x52)
+        _list = vt.get_targets_list(green, 20, 20)
         point = vt.get_shortest_point(_list)
         if(len(point) == 0):
             return
         pyautogui.click(point[0], point[1] + 20)
+        # 检查是否点击成功
+        x, y, tx, ty = vt.find_position(green, 0, 0)
+        if(x != tx and y != ty):
+            raise RuntimeError("位置偏移...")
+
+
 
     # 刷经验
     def selectExpeirenceInstance(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
         # print(f"副本选择被点击")
         time.sleep(self.waitTime)
@@ -106,7 +113,7 @@ class ChallengeSelect():
 
     # 刷木头
     def selectWoodInstance(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
         # print(f"副本选择被点击")
         time.sleep(self.waitTime)
@@ -119,7 +126,7 @@ class ChallengeSelect():
 
     # 污染之林的污染前哨
     def selectPollutionOutpost(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
         time.sleep(self.waitTime)
         pyautogui.click(forestMapBtnPos[0], forestMapBtnPos[1])        
@@ -129,7 +136,7 @@ class ChallengeSelect():
     
     # [打金]刷前哨平原的副本
     def selectFrontFlatland(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
         time.sleep(self.waitTime)
         pyautogui.click(flatlandBtnPos[0], flatlandBtnPos[1])        
@@ -139,7 +146,7 @@ class ChallengeSelect():
 
     # [打金]贫瘠营地
     def selectPoorCamp(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
         time.sleep(self.waitTime)
         pyautogui.click(poorZoneBtnPos[0], poorZoneBtnPos[1])        
@@ -149,7 +156,7 @@ class ChallengeSelect():
 
     # [打金]双峰峡谷
     def selectTwoPeak(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
         time.sleep(self.waitTime)
         pyautogui.click(poorZoneBtnPos[0], poorZoneBtnPos[1])        
@@ -161,7 +168,7 @@ class ChallengeSelect():
 
     # 刷寒风营地的副本
     def selectColdWindCamp(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
         time.sleep(self.waitTime)
         pyautogui.click(forestMapBtnPos[0], forestMapBtnPos[1])        
@@ -171,7 +178,7 @@ class ChallengeSelect():
 
     # 刷水晶
     def selectDiamondInstance(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
         # print(f"副本选择被点击")
         time.sleep(self.waitTime)
@@ -184,7 +191,7 @@ class ChallengeSelect():
 
     # 选择雪原副本
     def selectSnowInstance(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
         # print(f"副本选择被点击")
         time.sleep(self.waitTime)
@@ -197,7 +204,7 @@ class ChallengeSelect():
     
     # 查看任务栏的任务
     def openTaskList(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         pyautogui.click(taskListBtnPos[0], taskListBtnPos[1])
         time.sleep(self.waitTime)
         pyautogui.click(unionTaskTabPos[0], unionTaskTabPos[1])
@@ -205,7 +212,7 @@ class ChallengeSelect():
 
     # 选择炎火之狱副本
     def selectHellOfHell(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
         time.sleep(self.waitTime)
         pyautogui.click(hellInstanceTabPos[0], hellInstanceTabPos[1])
@@ -217,7 +224,7 @@ class ChallengeSelect():
 
     # 选择炎火之狱副本
     def selectHellOfHell(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
         time.sleep(self.waitTime)
         pyautogui.click(hellInstanceTabPos[0], hellInstanceTabPos[1])
@@ -229,25 +236,25 @@ class ChallengeSelect():
 
     # 放弃
     def clickGiveUpRebornBtn(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         pyautogui.click(giveUpRebornBtn[0], giveUpRebornBtn[1])
 
 
     # 完成Task
     def completeUnionTask(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         pyautogui.click(completeUnionTaskTabPos[0], completeUnionTaskTabPos[1])
 
 
     # 关闭窗口
     def closeWin(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         pyautogui.click(closeBtnPos[0], closeBtnPos[1])
 
 
     # 打道回府
     def back2Town(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         pyautogui.click(back2TownPos[0], back2TownPos[1])
         time.sleep(self.waitTime)
         pyautogui.click(yesBtnPos[0], yesBtnPos[1])
@@ -284,7 +291,7 @@ class ChallengeSelect():
     def clearAds(self, times):
         print("关闭广告。")
         window = self.get_specific_window_info()
-        if(window == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(window == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         window_bounds = window.get('kCGWindowBounds', {})
         winWidth, winHeight = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
         for _ in range(int(times)):
@@ -295,7 +302,7 @@ class ChallengeSelect():
     # 关闭游戏
     def closeGame(self):
         window = self.get_specific_window_info()
-        if(window == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(window == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         window_bounds = window.get('kCGWindowBounds', {})
         winWidth, _ = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
         pyautogui.click(winWidth - 30, 40)
@@ -363,7 +370,7 @@ class MoveControll():
 
 
     def move_before_check(self):
-        if(self.get_specific_window_info() == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
 
 
     def get_window_info(self):
@@ -487,7 +494,7 @@ class VisualTrack:
     # 获得窗口的信息
     def get_win_info(self):
         window = self.get_specific_window_info()
-        if(window == None): raise Exception('Err', f"{self.app_name}`s window is not found.")
+        if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
         window_bounds = window.get('kCGWindowBounds', {})
         winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
         winWidth, winHeight = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
@@ -694,7 +701,7 @@ class VisualTrack:
         img_win_name = "ImageAnalysis"  
 
         window = self.get_specific_window_info()
-        if(window == None): raise Exception('Err', f"{app_name}`s window is not found.")
+        if(window == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         window_bounds = window.get('kCGWindowBounds', {})
         winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
         winWidth, _ = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
@@ -823,7 +830,7 @@ class VisualTrack:
 #     img_win_name = "ImageAnalysis"  
 
 #     window = get_specific_window_info(app_name)
-#     if(window == None): raise Exception('Err', f"{app_name}`s window is not found.")
+#     if(window == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
 #     window_bounds = window.get('kCGWindowBounds', {})
 #     winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
 #     winWidth, winHeight = window_bounds.get('Width', 0), window_bounds.get('Height', 0)

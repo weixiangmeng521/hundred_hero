@@ -313,6 +313,15 @@ def screen_shot():
     print(f"已经保存截图到：{path}")
 
 
+# 错误处理
+def error_handle():
+    screen_shot()
+    cs.closeGameWithoutException()
+    time.sleep(.3)
+    __init__()
+
+
+
 def __init__():
     # 唤醒
     if(WAKE_UP_FLAG): wake_up_window()
@@ -331,13 +340,17 @@ def __init__():
 try:
     __init__()
 
-# TODO: 捕捉异常
+except RuntimeError:
+    error_handle()
+
+except GameStatusError:
+    error_handle()
+
+except TimeoutError:
+    error_handle()
+
 except Exception as e:
     print(e)
-    screen_shot()
-    cs.closeGameWithoutException()
-    time.sleep(.3)
-    __init__()
 
 
 

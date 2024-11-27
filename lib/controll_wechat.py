@@ -30,7 +30,7 @@ class ControllWechat():
     # 唤醒app
     def wake_up(self):
         window = self.get_specific_window_info(self.app_name)
-        if(window == None): raise Exception('Err', f"{self.app_name}`s window is not found.")
+        if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
         script = f"""
         tell application "WeChat"
             activate
@@ -42,7 +42,7 @@ class ControllWechat():
     # 启动游戏
     def wake_up_game(self):
         window = self.get_specific_window_info(self.app_name)
-        if(window == None): raise Exception('Err', f"{self.app_name}`s window is not found.")   
+        if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")   
 
         game_window = self.get_specific_window_info(self.game_name)
         if(game_window): return
