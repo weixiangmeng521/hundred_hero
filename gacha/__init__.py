@@ -6,6 +6,7 @@ import numpy as np
 import pyautogui
 from instance import GameStatusError
 from lib import ChallengeSelect
+from lib.logger import init_logger
 from reader import InfoReader
 
 
@@ -25,10 +26,12 @@ class Gacha:
         4: "红卡",
     }
 
-    def __init__(self):
+    def __init__(self, app_name):
+        self.app_name = app_name
         self.reader = InfoReader()
         self.cs = ChallengeSelect()
         self.reader = InfoReader()
+        self.logger = init_logger(app_name)
 
 
     # 显示三张图片
@@ -163,11 +166,19 @@ class Gacha:
 
     # 打印带颜色的卡牌列表
     def print_colored_cards(self, card_list):
+        # 颜色输出
         mapped_list = [
             f"{self.color_map.get(card, '\033[40m')}{self.card_map.get(card, '未知卡')}\033[0m"
             for card in card_list
         ]
         print(f"当前卡为：{' '.join(mapped_list)}")
+
+        # 记录到日志
+        cards_list = [
+            f"{self.card_map.get(card, '未知卡')}"
+            for card in card_list
+        ]
+        self.logger.info(f"当前卡为: {', '.join(cards_list)}")
 
 
 
