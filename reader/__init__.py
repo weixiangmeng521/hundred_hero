@@ -96,7 +96,7 @@ class InfoReader:
     # 判断工会任务是否完成, false的情况下是完成了，true的情况下是没完成
     def is_task_complete(self):
         self.cs.openTaskList()
-        time.sleep(.3)
+        time.sleep(1)
 
         btnPos = (320, 365, 90, 37)
         # 读取指定位置

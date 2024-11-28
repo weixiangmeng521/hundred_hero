@@ -83,7 +83,7 @@ class ChallengeSelect():
     
 
     # 点击最近的绿色冒泡
-    def clickGreenPop(self):
+    def clickGreenPop(self, is_ga_cha = False):
         vt = VisualTrack()
         green = (0x66,0xc1,0x52)
         _list = vt.get_targets_list(green, 20, 20)
@@ -92,6 +92,9 @@ class ChallengeSelect():
             return
         pyautogui.click(point[0], point[1] + 20)
         # 检查是否点击成功
+        # 抽卡模式下五十：目前是这样
+        if(is_ga_cha):
+                return        
         x, y, tx, ty = vt.find_position(green, 0, 0)
         if(x != tx and y != ty):
             raise RuntimeError("位置偏移...")

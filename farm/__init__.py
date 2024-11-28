@@ -68,8 +68,6 @@ def killSnowmanBoss():
     instance = SnowZone()
     reader.wait_tranported()
     instance.killSnowManBoss()
-    cs.back2Town()
-    reader.wait_tranported()
 
 
 # 打金
