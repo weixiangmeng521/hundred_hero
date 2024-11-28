@@ -1,3 +1,4 @@
+import logging
 import os
 import pygetwindow
 from pynput.mouse import Controller
@@ -61,7 +62,7 @@ closeBtnPos = [85, 840]
 giveUpRebornBtn = [315, 740]
 
 app_name = "百炼英雄"
-
+logger = logging.getLogger(app_name)
 
 
 # 选择关卡
@@ -105,26 +106,26 @@ class ChallengeSelect():
     def selectExpeirenceInstance(self):
         if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
-        # print(f"副本选择被点击")
+        # logger.info(f"副本选择被点击")
         time.sleep(self.waitTime)
         pyautogui.click(blackRockBtnPos[0], blackRockBtnPos[1])
-        # print(f"黑石堡垒被点击")
+        # logger.info(f"黑石堡垒被点击")
         time.sleep(self.waitTime)
         pyautogui.click(centerHallBtnPos[0], centerHallBtnPos[1])
-        # print(f"中央走廊被点击")
+        # logger.info(f"中央走廊被点击")
 
 
     # 刷木头
     def selectWoodInstance(self):
         if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
-        # print(f"副本选择被点击")
+        # logger.info(f"副本选择被点击")
         time.sleep(self.waitTime)
         pyautogui.click(forestMapBtnPos[0], forestMapBtnPos[1])
-        # print(f"污染之森点击")
+        # logger.info(f"污染之森点击")
         time.sleep(self.waitTime)
         pyautogui.click(decayedSwampBtnPos[0], decayedSwampBtnPos[1])
-        # print(f"污染之森点击")
+        # logger.info(f"污染之森点击")
 
 
     # 污染之林的污染前哨
@@ -183,26 +184,26 @@ class ChallengeSelect():
     def selectDiamondInstance(self):
         if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
-        # print(f"副本选择被点击")
+        # logger.info(f"副本选择被点击")
         time.sleep(self.waitTime)
         pyautogui.click(snwoMapBtnPos[0], snwoMapBtnPos[1])
-        # print(f"严寒地带点击")
+        # logger.info(f"严寒地带点击")
         time.sleep(self.waitTime)
         pyautogui.click(snowBtnPos[0], snowBtnPos[1])
-        # print(f"北风营地点击")
+        # logger.info(f"北风营地点击")
 
 
     # 选择雪原副本
     def selectSnowInstance(self):
         if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
-        # print(f"副本选择被点击")
+        # logger.info(f"副本选择被点击")
         time.sleep(self.waitTime)
         pyautogui.click(snwoMapBtnPos[0], snwoMapBtnPos[1])
-        # print(f"严寒地带点击")
+        # logger.info(f"严寒地带点击")
         time.sleep(self.waitTime)
         pyautogui.click(snowRingBtnPos[0], snowRingBtnPos[1])
-        # print(f"北风营地点击")
+        # logger.info(f"北风营地点击")
 
     
     # 查看任务栏的任务
@@ -261,7 +262,7 @@ class ChallengeSelect():
         pyautogui.click(back2TownPos[0], back2TownPos[1])
         time.sleep(self.waitTime)
         pyautogui.click(yesBtnPos[0], yesBtnPos[1])
-        print(f"打道回府！")
+        logger.info(f"打道回府！")
 
 
     # 把窗口移动到（0，0）
@@ -281,9 +282,9 @@ class ChallengeSelect():
         x = int(bounds.get('X', 0))  # X 坐标
         y = int(bounds.get('Y', 0))  # Y 坐标
 
-        # pyautogui.moveTo(x + 10, y + 10, .1)
-        # pyautogui.dragTo(10, 30, duration=.1, button='left')
-        # time.sleep(.3)
+        pyautogui.moveTo(x + 10, y + 10, .1)
+        pyautogui.dragTo(10, 30, duration=.1, button='left')
+        time.sleep(.3)
 
         if(isContainAds):
             self.clearAds(5)
@@ -291,7 +292,7 @@ class ChallengeSelect():
 
     # 清除广告
     def clearAds(self, times):
-        print("关闭广告。")
+        logger.info("关闭广告。")
         window = self.get_specific_window_info()
         if(window == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         window_bounds = window.get('kCGWindowBounds', {})
@@ -307,10 +308,10 @@ class ChallengeSelect():
         window = self.get_specific_window_info()
         if(window == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         window_bounds = window.get('kCGWindowBounds', {})
-        winWidth, _ = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
         winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
+        winWidth, _ = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
         pyautogui.click(winX + winWidth - 30, winY + 20)
-        print("关闭游戏")
+        logger.info("关闭游戏")
         time.sleep(.1)
         
 
@@ -330,7 +331,7 @@ class ChallengeSelect():
         winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
         winWidth, _ = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
         pyautogui.click(winX + winWidth - 30, winY + 20)
-        print("关闭游戏")
+        logger.info("关闭游戏")
         time.sleep(.1)
     
 
@@ -371,7 +372,7 @@ class MoveControll():
 
     def recover(self):
         pyautogui.moveTo(self.curPos[0], self.curPos[1])
-        print(f"x = {self.curPos[0]}, y = {self.curPos[1]}")
+        logger.info(f"x = {self.curPos[0]}, y = {self.curPos[1]}")
 
 
     def move_before_check(self):
@@ -694,8 +695,8 @@ class VisualTrack:
         cv2.line(rgb_img, (cX, cY), (x, y), (255, 0, 0), 1)
 
 
-        print(f"图像大小 {winWidth} x {winHeight}; 中心点:({x},{y})")
-        print(f"目标点:({cX},{cY})")
+        logger.info(f"图像大小 {winWidth} x {winHeight}; 中心点:({x},{y})")
+        logger.info(f"目标点:({cX},{cY})")
         # return (center[1], center[0], cX, cY)
         bgr_image = cv2.cvtColor(rgb_img, cv2.COLOR_RGBA2BGR)
         return bgr_image
@@ -716,7 +717,7 @@ class VisualTrack:
             cv2.imshow(img_win_name, frame)
             cv2.moveWindow(img_win_name, int(winX + winWidth), - 100)        
             
-            print(winX, winY)
+            logger.info(winX, winY)
 
             # 设置刷新间隔，并检测按键退出
             key = cv2.waitKey(30)
@@ -819,8 +820,8 @@ class VisualTrack:
 #     cv2.line(rgb_img, (cX, cY), (x, y), (255, 0, 0), 1)
 
 
-#     print(f"图像大小 {winWidth} x {winHeight}; 中心点:({x},{y})")
-#     print(f"目标点:({cX},{cY})")
+#     logger.info(f"图像大小 {winWidth} x {winHeight}; 中心点:({x},{y})")
+#     logger.info(f"目标点:({cX},{cY})")
 
 #     # return (center[1], center[0], cX, cY)
 
@@ -845,7 +846,7 @@ class VisualTrack:
 #         cv2.imshow(img_win_name, frame)
 #         cv2.moveWindow(img_win_name, int(winX + winWidth), - 100)        
         
-#         print(winX, winY)
+#         logger.info(winX, winY)
 
 #         # 设置刷新间隔，并检测按键退出
 #         key = cv2.waitKey(30)

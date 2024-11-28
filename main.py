@@ -8,6 +8,8 @@ from instance.guild_quest import GuildQuest
 from lib import ChallengeSelect, MoveControll, VisualTrack
 from instance import GameStatusError, black_rock, forest, snow_zone, hell_of_fire
 import time
+from lib import logger
+from lib.logger import init_logger
 from reader import InfoReader
 
 
@@ -21,6 +23,7 @@ reader = InfoReader()
 vt = VisualTrack()
 GuildTask = GuildQuest()
 gc = Gacha()
+logger = init_logger(app_name)
 
 # 需不需要唤醒
 WAKE_UP_FLAG = True
@@ -64,12 +67,12 @@ def work4Expeirence2():
     try:
         instance.crossRoom1()
     except GameStatusError as e:
-        print(f"{e}\n准备到附近传送点。")
+        logger.info(f"{e}\n准备到附近传送点。")
         cs.clickGiveUpRebornBtn()
         time.sleep(8)
-        print("已到达复活传送点，准备回城。")
+        logger.info("已到达复活传送点，准备回城。")
         cs.back2Town()
-        print("已经回到城镇。")
+        logger.info("已经回到城镇。")
         time.sleep(10)
         # 循环
         work4Expeirence2()
@@ -86,7 +89,7 @@ def work4Wood():
             instance.crossRoom1()
             instance.crossRoom2()
     except GameStatusError as e:
-        print(e)
+        logger.error(e)
 
     cs.back2Town()
     time.sleep(6)
@@ -101,7 +104,7 @@ def work4Diamond():
         instance = snow_zone.SnowZone()
         instance.crossRoom1Loop()
     except GameStatusError as e:
-        print(e)
+        logger.error(e)
 
     cs.back2Town()
     time.sleep(6)
@@ -119,7 +122,7 @@ def work4Union():
             reader.close_task_menu(True)
             time.sleep(1.2)
             cs.clearAds(1)
-            print("工会任务已完成，无需再打")
+            logger.info("工会任务已完成，无需再打")
             if(reader.is_show_back2town_btn()): 
                 cs.back2Town()
                 GuildTask.refresh()
@@ -128,7 +131,7 @@ def work4Union():
         
         reader.close_task_menu()
         # 工会副本任务没有完成，准备打工会副本
-        print(f"工会任务没有完成，打工会任务。")
+        logger.info(f"工会任务没有完成，打工会任务。")
         
         # 刷副本
         time.sleep(1.2)
@@ -155,7 +158,7 @@ def improveAbility():
         find_training_NPC()        
 
     if(isMineFull == False):
-        print("刷一刷蓝矿")
+        logger.info("刷一刷蓝矿")
         work4Diamond()
 
     time.sleep(waitSec)
@@ -171,21 +174,21 @@ def main():
     waitSec = 3.3
 
     isWoodFull, isMineFull = reader.read_screen()
-    print(f"木头:{isWoodFull}, 蓝矿:{isMineFull}")
+    logger.info(f"木头:{isWoodFull}, 蓝矿:{isMineFull}")
 
     if(isWoodFull == False):
-        print("刷一刷木头副本")
+        logger.info("刷一刷木头副本")
         work4Wood()
 
     elif(isMineFull == False):
-        print("刷一刷蓝矿")
+        logger.info("刷一刷蓝矿")
         work4Diamond()
 
     else:
-        print("刷一刷经验")
+        logger.info("刷一刷经验")
         work4Expeirence2()
 
-    print(f"本轮打金结束。{waitSec}s 后自动进入下一轮。")
+    logger.info(f"本轮打金结束。{waitSec}s 后自动进入下一轮。")
     time.sleep(waitSec)
     main()
 
@@ -195,7 +198,6 @@ def check_position():
     # 聚拢
     mc.move_left_down(.6)
     x, y, tx, ty = vt.find_position((0xc7, 0xd4, 0xb1), 5, 5)
-    print(x, y, tx, ty)
     mc.move(x, y, tx, ty)
 
 
@@ -219,7 +221,7 @@ def find_training_NPC():
     if((x == tx and y == ty)):
         time.sleep(1)
         find_training_NPC()
-        print("没有找到训练营，重新定位...")
+        logger.info("没有找到训练营，重新定位...")
 
     if(not (x == tx and y == ty)):
         tolerate_distance = vt.get_point_distance(x, y, tx, ty)
@@ -245,20 +247,34 @@ def find_training_NPC():
 def get_pop_list():
     _list = vt.get_targets_list((0x66,0xc1,0x52), 20, 20)
     point = vt.get_shortest_point(_list)
-    print(point)
+    logger.info(point)
     mc.pointer_move_to(point[0], point[1] + 20)
+
+
+# 时间格式输出
+def record_time_formate(execution_time):
+        # 转换为分钟和秒
+    minutes = int(execution_time // 60)
+    seconds = execution_time % 60
+    logger.debug(f"打金耗时: {minutes} 分 {seconds:.2f} 秒")
+
 
 
 # 打金
 def farmingCoin():
     total = 0
     while True:
+        # 开始计时
+        start_time = time.time()
         # 刷副本
         earned = farmCoin()
         total += earned
-        print(f"💰总打金：{ total }")
+        logger.info(f"💰总打金：{ total }")
         # 关闭游戏
         cs.closeGame()
+        # 结束计时
+        end_time = time.time()
+        record_time_formate(end_time - start_time)
         # 启动游戏
         wake_up_window()
 
@@ -273,7 +289,7 @@ def auto_card():
         # 如果没有找到目标就重新定位。
         if((x == tx and y == ty)):
             time.sleep(1)
-            print("没有找到抽卡中心，重新定位...")
+            logger.debug("没有找到抽卡中心，重新定位...")
             auto_card()
 
         if(not (x == tx and y == ty)):
@@ -302,14 +318,18 @@ def auto_card():
 
 # 截屏，查看bug信息
 def screen_shot():
+    log_dir = "screenshot"  # 子文件夹名称
+    if not os.path.exists(log_dir):  # 如果文件夹不存在，则创建
+        os.makedirs(log_dir)
+
     screenshot = pyautogui.screenshot()
     img = np.array(screenshot)
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 
     timestamp = time.strftime("%Y%m%d_%H%M%S")
-    path = f"evidence/{timestamp}.png"
+    path = f"screenshot/{timestamp}.png"
     cv2.imwrite(path, img)
-    print(f"已经保存截图到：{path}")
+    logger.debug(f"已经保存截图到：{path}")
 
 
 # 错误处理
@@ -340,32 +360,26 @@ def __init__():
 
 
 
+try:
+    __init__()
 
-# try:
-#     __init__()
+except RuntimeError as e:
+    logger.error(f"Err: {e}")
+    error_handle()
 
-# except RuntimeError as e:
-#     print(e)
-#     error_handle()
+except GameStatusError as e:
+    logger.error(f"Err: {e}")
+    error_handle()
 
-# except GameStatusError as e:
-#     print(e)
-#     error_handle()
+except TimeoutError as e:
+    logger.error(f"Err: {e}")
+    error_handle()
 
-# except TimeoutError as e:
-#     print(e)
-#     error_handle()
-
-# except Exception as e:
-#     play_sound("Ping.aiff")
-#     print(e)
+except Exception as e:
+    play_sound("Ping.aiff")
+    logger.error(e)
 
 
 
 # main()
 
-# farmingCoin()
-
-
-wake_up_window()
-cs.closeGame()

@@ -1,9 +1,11 @@
 
 # 控制微信
+import logging
 import os
 import time
 import Quartz
 import pyautogui
+
 
 
 class ControllWechat():
@@ -11,6 +13,7 @@ class ControllWechat():
     def __init__(self):
         self.app_name = "微信"
         self.game_name = "百炼英雄"
+        self.logger = logging.getLogger(self.game_name)
 
     # 获取窗口信息
     def get_specific_window_info(self, win_name):
