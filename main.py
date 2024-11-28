@@ -1,5 +1,4 @@
-import math
-
+import os
 import cv2
 import numpy as np
 import pyautogui
@@ -283,7 +282,7 @@ def auto_card():
             if(tolerate_distance >= 10):
                 mc.move(x, y, tx, ty)
 
-        cs.clickGreenPop()
+        cs.clickGreenPop(True)
         time.sleep(.3)
 
     while True:
@@ -314,12 +313,17 @@ def screen_shot():
 
 
 # 错误处理
+# TODO：日志系统
 def error_handle():
+    play_sound("Glass.aiff")
     screen_shot()
     cs.closeGameWithoutException()
     time.sleep(.3)
     __init__()
 
+
+def play_sound(file_name):
+    os.system(f"afplay /System/Library/Sounds/{file_name}")
 
 
 def __init__():
@@ -340,18 +344,21 @@ def __init__():
 try:
     __init__()
 
-except RuntimeError:
+except RuntimeError as e:
+    print(e)
     error_handle()
 
-except GameStatusError:
+except GameStatusError as e:
+    print(e)
     error_handle()
 
-except TimeoutError:
+except TimeoutError as e:
+    print(e)
     error_handle()
 
 except Exception as e:
+    play_sound("Ping.aiff")
     print(e)
-
 
 
 
