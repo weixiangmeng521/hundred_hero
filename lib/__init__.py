@@ -1,4 +1,3 @@
-import logging
 import os
 import pygetwindow
 from pynput.mouse import Controller
@@ -11,6 +10,7 @@ from PIL import Image
 import numpy as np
 import math
 from lib.controll_wechat import ControllWechat
+from lib.logger import init_logger
 
 
 cPos = [222 , 696]
@@ -62,7 +62,7 @@ closeBtnPos = [85, 840]
 giveUpRebornBtn = [315, 740]
 
 app_name = "百炼英雄"
-logger = logging.getLogger(app_name)
+logger = init_logger(app_name)
 
 
 # 选择关卡

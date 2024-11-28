@@ -378,6 +378,7 @@ except TimeoutError as e:
 except Exception as e:
     play_sound("Ping.aiff")
     logger.error(e)
+    raise e
 
 
 
