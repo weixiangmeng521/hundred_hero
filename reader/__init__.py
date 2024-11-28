@@ -228,7 +228,8 @@ class InfoReader:
 
 
     # 是否游戏加载成功
-    def is_game_loaded(self, isContainsAds = False):
+    # TODO: 判断，登录失败，请重试
+    def wait_game_loaded(self, is_contains_ads = False):
         self.logger.debug("等待游戏加载...")
         start_time = time.time()  # 记录开始时间
         timeout = 60  # 超时时间，单位为秒
@@ -251,7 +252,7 @@ class InfoReader:
             mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
 
             target_rgb = (246,199,77)   # RGB 格式
-            if(isContainsAds): 
+            if(is_contains_ads): 
                 target_rgb = (88,81,21)
 
             target_bgr = target_rgb[::-1]      # 转换为 BGR 格式

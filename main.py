@@ -22,7 +22,7 @@ mc = MoveControll()
 reader = InfoReader()
 vt = VisualTrack()
 GuildTask = GuildQuest()
-gc = Gacha()
+gc = Gacha(app_name)
 logger = init_logger(app_name)
 
 # 是否允许截图
@@ -36,14 +36,16 @@ FARM_UNION_TASK_FLAG = False
 # 无限训练营
 UPGRADE_ABILITY_FOREVER = False
 # 无限抽卡
-IS_AUTO_GACHA = False
+IS_AUTO_GACHA = True
 # 无限打钱
 IS_AUTO_FARM = True
+
+
 
 # wake up
 def wake_up_window():
     # 把窗口拖动到桌面顶端
-    cs.move2LeftTop(reader.is_game_loaded, IS_LOADING_ADS)
+    cs.move2LeftTop(reader.wait_game_loaded, IS_LOADING_ADS)
 
 
 
@@ -258,7 +260,7 @@ def record_time_formate(execution_time):
         # 转换为分钟和秒
     minutes = int(execution_time // 60)
     seconds = execution_time % 60
-    _logger.debug(f"打金耗时: {minutes} 分 {seconds:.2f} 秒")
+    logger.debug(f"打金耗时: {minutes} 分 {seconds:.2f} 秒")
 
 
 
