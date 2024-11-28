@@ -1,4 +1,3 @@
-import logging
 import time
 from PIL import Image
 import pyautogui
@@ -6,6 +5,7 @@ import Quartz
 import cv2
 import numpy as np
 from lib import ChallengeSelect
+from lib.logger import init_logger
 
 
 
@@ -13,7 +13,7 @@ class InfoReader:
     def __init__(self):
         self.app_name = "百炼英雄"
         self.img_win_name = "ImageAnalysis"   
-        self.logger = logging.getLogger(self.game_name)
+        self.logger = init_logger(self.app_name)
         self.cs = ChallengeSelect()
 
     # 获取窗口信息

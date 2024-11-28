@@ -3,11 +3,19 @@ import logging
 import os
 
 
+# singleton
+is_initialized_logger = False
+
 def init_logger(app_name):
+    global is_initialized_logger
+
+    if(is_initialized_logger):
+        return logging.getLogger(app_name)
+    
     # 动态生成日志文件夹和文件名
     log_dir = "logs"  # 子文件夹名称
     if not os.path.exists(log_dir):  # 如果文件夹不存在，则创建
-        os.makedirs(log_dir)
+        os.makedirs(log_dir)    
     
     # 创建日志器
     logger = logging.getLogger(f"[{app_name}]")
@@ -33,4 +41,5 @@ def init_logger(app_name):
     # 添加处理器到日志器
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)
+    is_initialized_logger = True
     return logger
