@@ -341,27 +341,31 @@ def __init__():
 
 
 
-try:
-    __init__()
+# try:
+#     __init__()
 
-except RuntimeError as e:
-    print(e)
-    error_handle()
+# except RuntimeError as e:
+#     print(e)
+#     error_handle()
 
-except GameStatusError as e:
-    print(e)
-    error_handle()
+# except GameStatusError as e:
+#     print(e)
+#     error_handle()
 
-except TimeoutError as e:
-    print(e)
-    error_handle()
+# except TimeoutError as e:
+#     print(e)
+#     error_handle()
 
-except Exception as e:
-    play_sound("Ping.aiff")
-    print(e)
+# except Exception as e:
+#     play_sound("Ping.aiff")
+#     print(e)
 
 
 
 # main()
 
 # farmingCoin()
+
+
+wake_up_window()
+cs.closeGame()

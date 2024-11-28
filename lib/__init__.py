@@ -281,10 +281,9 @@ class ChallengeSelect():
         x = int(bounds.get('X', 0))  # X 坐标
         y = int(bounds.get('Y', 0))  # Y 坐标
 
-        print(f"postion:({x},{y})")
-        pyautogui.moveTo(x + 10, y + 10, .1)
-        pyautogui.dragTo(10, 30, duration=.1, button='left')
-        time.sleep(.3)
+        # pyautogui.moveTo(x + 10, y + 10, .1)
+        # pyautogui.dragTo(10, 30, duration=.1, button='left')
+        # time.sleep(.3)
 
         if(isContainAds):
             self.clearAds(5)
@@ -297,8 +296,9 @@ class ChallengeSelect():
         if(window == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         window_bounds = window.get('kCGWindowBounds', {})
         winWidth, winHeight = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
+        winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
         for _ in range(int(times)):
-            pyautogui.click(winWidth - 10, winHeight + 10)
+            pyautogui.click(winX + winWidth - 10, winY + winHeight - 10)
             time.sleep(.3)
 
 
@@ -308,7 +308,8 @@ class ChallengeSelect():
         if(window == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         window_bounds = window.get('kCGWindowBounds', {})
         winWidth, _ = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
-        pyautogui.click(winWidth - 30, 40)
+        winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
+        pyautogui.click(winX + winWidth - 30, winY + 20)
         print("关闭游戏")
         time.sleep(.1)
         
@@ -326,8 +327,9 @@ class ChallengeSelect():
                 window = _window  # 返回指定窗口的信息
         if(window == None): return
         window_bounds = window.get('kCGWindowBounds', {})
+        winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
         winWidth, _ = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
-        pyautogui.click(winWidth - 30, 40)
+        pyautogui.click(winX + winWidth - 30, winY + 20)
         print("关闭游戏")
         time.sleep(.1)
     
