@@ -231,7 +231,7 @@ class SnowZone:
         mc = self.mc
 
         pace = 3
-        mc.move_down(3.6)
+        mc.move_down(4.2)
         time.sleep(pace)
  
         
