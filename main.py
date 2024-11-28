@@ -1,3 +1,4 @@
+import datetime
 import os
 import cv2
 import numpy as np
@@ -8,7 +9,6 @@ from instance.guild_quest import GuildQuest
 from lib import ChallengeSelect, MoveControll, VisualTrack
 from instance import GameStatusError, black_rock, forest, snow_zone, hell_of_fire
 import time
-from lib import logger
 from lib.logger import init_logger
 from reader import InfoReader
 
@@ -25,6 +25,8 @@ GuildTask = GuildQuest()
 gc = Gacha()
 logger = init_logger(app_name)
 
+# 是否允许截图
+IS_ALLOW_SCREEN_SHOT = True
 # 需不需要唤醒
 WAKE_UP_FLAG = True
 # 是否有加载广告
@@ -256,7 +258,7 @@ def record_time_formate(execution_time):
         # 转换为分钟和秒
     minutes = int(execution_time // 60)
     seconds = execution_time % 60
-    logger.debug(f"打金耗时: {minutes} 分 {seconds:.2f} 秒")
+    _logger.debug(f"打金耗时: {minutes} 分 {seconds:.2f} 秒")
 
 
 
@@ -318,6 +320,9 @@ def auto_card():
 
 # 截屏，查看bug信息
 def screen_shot():
+    if(IS_ALLOW_SCREEN_SHOT == False): 
+        return
+
     log_dir = "screenshot"  # 子文件夹名称
     if not os.path.exists(log_dir):  # 如果文件夹不存在，则创建
         os.makedirs(log_dir)
@@ -326,14 +331,13 @@ def screen_shot():
     img = np.array(screenshot)
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 
-    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     path = f"screenshot/{timestamp}.png"
     cv2.imwrite(path, img)
-    logger.debug(f"已经保存截图到：{path}")
+    logger.debug(f"已经保存截图到:{path}")
 
 
 # 错误处理
-# TODO：日志系统
 def error_handle():
     play_sound("Glass.aiff")
     screen_shot()
@@ -363,22 +367,13 @@ def __init__():
 try:
     __init__()
 
-except RuntimeError as e:
-    logger.error(f"Err: {e}")
-    error_handle()
-
-except GameStatusError as e:
-    logger.error(f"Err: {e}")
-    error_handle()
-
-except TimeoutError as e:
-    logger.error(f"Err: {e}")
+except (RuntimeError, GameStatusError, TimeoutError) as e:
+    logger.error(e)
     error_handle()
 
 except Exception as e:
-    play_sound("Ping.aiff")
     logger.error(e)
-    raise e
+    play_sound("Ping.aiff")
 
 
 
