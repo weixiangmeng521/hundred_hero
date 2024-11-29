@@ -44,7 +44,7 @@ def init_logger(app_name):
     if not logger.handlers:  # 防止重复添加处理器
         logger.addHandler(console_handler)
         logger.addHandler(file_handler)
-        logger.addFilter(LoggerFilter())
+        # logger.addFilter(LoggerFilter())
         
     is_initialized_logger = True
     return logger

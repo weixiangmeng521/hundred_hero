@@ -36,7 +36,7 @@ FARM_UNION_TASK_FLAG = False
 # 无限训练营
 UPGRADE_ABILITY_FOREVER = False
 # 无限抽卡
-IS_AUTO_GACHA = True
+IS_AUTO_GACHA = False
 # 无限打钱
 IS_AUTO_FARM = True
 
@@ -273,7 +273,7 @@ def farmingCoin():
         # 刷副本
         earned = farmCoin()
         total += earned
-        logger.info(f"💰总打金：{ total }")
+        logger.info(f"💰总打金:{ total }")
         # 关闭游戏
         cs.closeGame()
         # 结束计时
@@ -310,6 +310,7 @@ def auto_card():
         try:
             gc.auto_recruit_btn()
         except GameStatusError as e:
+            logger.debug(e.get_error_info())
             break
 
     # 判断是否已经进入抽卡界面

@@ -7,3 +7,7 @@ class GameStatusError(Exception):
 
     def __str__(self):
         return self.error_info
+    
+    def get_error_info(self):
+        return self.error_info
+        

@@ -1,5 +1,6 @@
 
 # 抽卡
+import datetime
 import time
 import cv2
 import numpy as np
@@ -202,7 +203,7 @@ class Gacha:
         
     
     # 判断是不是能正常抽卡，判断是不是进入了在抽卡结束后，进入下一轮抽卡的垃圾时间里
-    def is_avaliable_click(self):
+    def wait_avaliable_click(self):
         start_time = time.time()  # 记录开始时间
         timeout = 60  # 超时时间，单位为秒
 
@@ -235,21 +236,15 @@ class Gacha:
 
     # 点击招募
     def auto_recruit_btn(self):
-        # 同步阻塞
-        self.is_avaliable_click()
-
         card_list = self.read_three_cards()
         # 如果有未知卡，就重新读
         if(-1 in card_list):
-            time.sleep(.3)
             return
 
         # 如果没有钱了，就退出循环
         if(self.is_use_up_money()):
             raise GameStatusError("没钱了，不抽了")
             
-        # 输出
-        self.print_colored_cards(card_list)
         # 判断是否三倍
         if(self.is_contains_high_level_card()):
             self.click_max_btn()
@@ -264,6 +259,8 @@ class Gacha:
 
         # 不消耗绿矿，招募
         if(is_contine == False):
+            # 输出
+            self.print_colored_cards(card_list)            
             pyautogui.click(250, 690)
 
 
