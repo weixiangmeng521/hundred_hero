@@ -341,7 +341,14 @@ class RottenSwamp:
         mc = self.mc
 
         mc.move_right(1.8)
-        time.sleep(.1)
 
-        mc.move_up(1.6)
-        time.sleep(3)
+        mc.move_up(1.2)
+
+        mc.move_right(.3)
+        time.sleep(.3)
+
+        def lamda():
+            mc.move_left(.3)
+            mc.move_down(1.2)
+            mc.move_left(1.8)
+        return lamda
