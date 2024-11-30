@@ -1,5 +1,6 @@
 import datetime
 import os
+import traceback
 import cv2
 import numpy as np
 import pyautogui
@@ -36,7 +37,7 @@ FARM_UNION_TASK_FLAG = False
 # 无限训练营
 UPGRADE_ABILITY_FOREVER = False
 # 无限抽卡
-IS_AUTO_GACHA = True
+IS_AUTO_GACHA = False
 # 无限打钱
 IS_AUTO_FARM = True
 # 无限刷资源
@@ -303,8 +304,8 @@ def auto_card():
             # 如果小于10像素，就算是移动到指定目的地了
             if(tolerate_distance >= 10):
                 mc.move(x, y, tx, ty)
-
-        cs.clickGreenPop(True)
+        # 定位到，点击绿色泡泡
+        cs.clickGreenPop()
         time.sleep(.3)
 
     while True:
@@ -315,13 +316,18 @@ def auto_card():
             logger.debug(e.get_error_info())
             break
 
+    # 关闭抽卡，返回
+    reader.close_task_menu()
+    time.sleep(.1)
+    
     # 判断是否已经进入抽卡界面
     if(not is_entered_interface):
-        # 关闭抽卡，返回
-        reader.close_task_menu()
-        time.sleep(.1)
         mc.move(tx, ty, x, y)
 
+    # 寻找蓝色传送台
+    if(is_entered_interface):
+        x, y, tx, ty = vt.find_position((0xc7, 0xd4, 0xb1), 5, 5)
+        mc.move(x, y, tx, ty)
 
 # 截屏，查看bug信息
 def screen_shot():
@@ -377,12 +383,13 @@ try:
     __init__()
 
 except (RuntimeError, GameStatusError, TimeoutError) as e:
-    logger.error(e)
+    stack_info = traceback.format_exc()
+    logger.error(f"{e}, {stack_info}")
     error_handle()
 
 except Exception as e:
-    logger.error(e)
-    print(e)
+    stack_info = traceback.format_exc()
+    logger.error(f"{e}, {stack_info}")
     play_sound("Ping.aiff")
 
 

@@ -84,28 +84,38 @@ class ChallengeSelect():
     
 
     # 点击最近的绿色冒泡
-    def clickGreenPop(self, is_ga_cha = False):
-        # 清除广告...
-        self.clearAds(5)
+    def clickGreenPop(self):
+        start_time = time.time()  # 记录开始时间
+        timeout = 30  # 超时时间，单位为秒
 
-        vt = VisualTrack(app_name)
-        green = (0x66,0xc1,0x52)
-        _list = vt.get_targets_list(green, 20, 20)
-        point = vt.get_shortest_point(_list)
-        if(len(point) == 0):
-            raise RuntimeError("未找到绿色对话框，位置可能偏移...")
-        
-        self.logger.info("点击绿色对话泡")
-        pyautogui.click(point[0], point[1] + 20)
-        
-        # 抽卡模式下五十：目前是这样
-        if(is_ga_cha):
-            return
-        
-        # 检查是否点击成功
-        x, y, tx, ty = vt.find_position(green, 0, 0)
-        if(x != tx and y != ty):
-            raise RuntimeError("点击对话框无效，位置可能偏移...")
+        while True:
+            # 寻找绿泡泡
+            vt = VisualTrack(app_name)
+            green = (0x66,0xc1,0x52)
+            _list = vt.get_targets_list(green, 20, 20)
+            point = vt.get_shortest_point(_list)
+            # 找到的绿泡泡
+            if(len(point) == 0):
+                elapsed_time = time.time() - start_time  # 计算已过去的时间
+                # 超时结算
+                if elapsed_time > timeout:
+                    raise TimeoutError(f"{timeout}s内未找到绿色泡泡, 位置可能偏移...")
+                
+                # 多次尝试
+                time.sleep(.6)
+                self.logger.debug(f"{30}s内,尝试寻找绿泡泡。")
+                continue
+            
+            self.logger.info("点击绿色对话泡")
+            pyautogui.click(point[0], point[1] + 20)
+
+            # 检查是否点击成功
+            x, y, tx, ty = vt.find_position(green, 0, 0)
+            if(x != tx and y != ty):
+                raise RuntimeError("点击对话框无效，位置可能偏移...")
+            
+            # 结束循环
+            break
 
 
 
@@ -153,7 +163,7 @@ class ChallengeSelect():
         pyautogui.click(flatlandBtnPos[0], flatlandBtnPos[1])        
         time.sleep(self.waitTime)
         pyautogui.click(chorchHillBtnPos[0], chorchHillBtnPos[1])
-        self.logger.info("进入[前哨平原的副本]")
+        self.logger.info("进入[前哨平原]")
 
 
     # [打金]贫瘠营地
@@ -186,7 +196,7 @@ class ChallengeSelect():
         pyautogui.click(forestMapBtnPos[0], forestMapBtnPos[1])        
         time.sleep(self.waitTime)
         pyautogui.click(coldWindCampBtnPos[0], coldWindCampBtnPos[1])
-        self.logger.info("进入[寒风营地的副本]")
+        self.logger.info("进入[寒风营地]")
 
 
     # 刷水晶
@@ -200,7 +210,7 @@ class ChallengeSelect():
         time.sleep(self.waitTime)
         pyautogui.click(snowBtnPos[0], snowBtnPos[1])
         # self.logger.info(f"北风营地点击")
-        self.logger.info("进入[北风营地点击]")
+        self.logger.info("进入[北风营地]")
 
 
     # 选择雪原副本
@@ -255,7 +265,7 @@ class ChallengeSelect():
     def closeWin(self):
         if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         pyautogui.click(closeBtnPos[0], closeBtnPos[1])
-        self.logger.info("关闭窗口")
+        self.logger.info("关闭对话窗")
 
 
     # 打道回府

@@ -240,15 +240,15 @@ class Gacha:
         # 如果有未知卡，就重新读
         if(-1 in card_list):
             return
-
-        # 如果没有钱了，就退出循环
-        if(self.is_use_up_money()):
-            raise GameStatusError("没钱了，不抽了")
             
         # 判断是否三倍
         if(self.is_contains_high_level_card()):
             self.click_max_btn()
             time.sleep(.1)
+
+        # 如果没有钱了，就退出循环
+        if(self.is_use_up_money()):
+            raise GameStatusError("没钱了，不抽了")
 
         # 是否消耗绿矿
         is_contine = self.is_cost_green_mine()
