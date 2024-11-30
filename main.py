@@ -4,18 +4,18 @@ import traceback
 import cv2
 import numpy as np
 import pyautogui
+from employee.bounty_hunter import BountyHunter
+from employee.cards_master import CardsMaster
 from exception.game_status import GameStatusError
-from gacha import Gacha
-from instance.boss_killer import BossKiller
-from instance.farmer import Farmer
+from employee.farmer import Farmer
 from instance.guild_quest import UnionTask
 import time
 from lib.challenge_select import ChallengeSelect
+from lib.info_reader import InfoReader
 from lib.logger import init_logger
 from lib.message import MessageService
 from lib.move_controller import MoveControll
 from lib.visual_track import VisualTrack
-from reader import InfoReader
 import configparser
 
 
@@ -28,10 +28,10 @@ cs = ChallengeSelect(config)
 mc = MoveControll(config)
 reader = InfoReader(config)
 vt = VisualTrack(config)
-GuildTask = UnionTask(config)
-gc = Gacha(config)
+unionTask = UnionTask(config)
+cardsMaster = CardsMaster(config)
 logger = init_logger(config)
-bossKiller = BossKiller(config)
+bountyHunter = BountyHunter(config)
 farmer = Farmer(config)
 
 # 配置twilio
@@ -51,9 +51,9 @@ FARM_UNION_TASK = False
 # 无限训练营
 UPGRADE_ABILITY_FOREVER = False
 # 无限抽卡
-IS_AUTO_GACHA = False
+IS_AUTO_GACHA = True
 # 无限打钱
-IS_AUTO_FARM = False
+IS_AUTO_FARM = True
 # 无限刷资源
 IS_AUTO_WOOD_AND_MINE = True
 
@@ -184,7 +184,7 @@ def farming_coin():
         # 开始计时
         start_time = time.time()
         # 刷副本
-        earned = bossKiller.work()
+        earned = bountyHunter.work()
         total += earned
         logger.info(f"💰总打金:{ total }")
         
@@ -199,7 +199,7 @@ def farming_coin():
 
 # 自动抽卡
 def auto_card():
-    is_entered_interface = gc.is_entered()
+    is_entered_interface = cardsMaster.is_entered()
 
     # 判断是否已经进入抽卡界面
     if(not is_entered_interface):
@@ -222,7 +222,7 @@ def auto_card():
     while True:
         # 如果不能点击了，就结束
         try:
-            gc.auto_recruit_btn()
+            cardsMaster.auto_recruit_btn()
         except GameStatusError as e:
             logger.debug(e.get_error_info())
             break
@@ -239,6 +239,7 @@ def auto_card():
     if(is_entered_interface):
         x, y, tx, ty = vt.find_position((0xc7, 0xd4, 0xb1), 5, 5)
         mc.move(x, y, tx, ty)
+
 
 # 截屏，查看bug信息
 def screen_shot():

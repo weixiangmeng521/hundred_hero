@@ -1,7 +1,7 @@
 from exception.game_status import GameStatusError
 import time
+from lib.info_reader import InfoReader
 from lib.move_controller import MoveControll
-from reader import InfoReader
 
 class HellOfFire:
 
