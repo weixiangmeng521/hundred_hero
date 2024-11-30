@@ -59,8 +59,8 @@ def killBigTreeBoss():
     instance = RottenSwamp()
     reader.wait_tranported()
     instance.killTreeSprite()
-    cs.back2Town()
-    reader.wait_tranported()
+    # cs.back2Town()
+    # reader.wait_tranported()
 
 # 打雪人boss
 def killSnowmanBoss():
@@ -84,8 +84,8 @@ def farmCoin():
     gold += 10
     killBigTreeBoss()
     gold += 10
-    killSnowmanBoss()
-    gold += 10
+    # killSnowmanBoss()
+    # gold += 10
     return gold
 
 
