@@ -44,6 +44,10 @@ decayedSwampBtnPos = [302, 360]
 pollutionOutpostBtnPos = [302, 300]
 coldWindCampBtnPos = [302, 450]
 
+# 冰冠堡垒
+IconcrownMapBtnPos = [121, 500]
+IconcrownThroneBtnPos = [302, 285]
+
 
 # 地狱火副本
 hellInstanceTabPos = [337, 750]
@@ -85,9 +89,11 @@ class ChallengeSelect():
 
     # 点击最近的绿色冒泡
     def clickGreenPop(self):
-        start_time = time.time()  # 记录开始时间
-        timeout = 30  # 超时时间，单位为秒
+        # 超时时间，单位为秒
+        timeout = 30
 
+        # 寻找绿泡泡
+        start_time = time.time()  # 记录开始时间
         while True:
             # 寻找绿泡泡
             vt = VisualTrack(app_name)
@@ -102,21 +108,36 @@ class ChallengeSelect():
                     raise TimeoutError(f"{timeout}s内未找到绿色泡泡, 位置可能偏移...")
                 
                 # 多次尝试
-                time.sleep(.6)
+                time.sleep(.3)
                 self.logger.debug(f"{30}s内,尝试寻找绿泡泡。")
                 continue
-            
+            # 结束循环
+            break
+        
+
+        # 点击绿泡泡
+        start_time = time.time()  # 记录开始时间
+        while True:
             self.logger.info("点击绿色对话泡")
             pyautogui.click(point[0], point[1] + 20)
-            time.sleep(.1)
 
             # 检查是否点击成功
             x, y, tx, ty = vt.find_position(green, 0, 0)
+            # 点击失败的情况
             if(x != tx and y != ty):
-                raise RuntimeError("点击对话框无效，位置可能偏移...")
-            
+                elapsed_time = time.time() - start_time  # 计算已过去的时间
+                # 超时结算
+                if elapsed_time > timeout:
+                    print(f"find_position: {x}, {y}, {tx}, {ty}")
+                    raise TimeoutError(f"{timeout}s内点击无效, 位置可能偏移...")
+                
+                # 多次尝试
+                time.sleep(.3)
+                self.logger.debug(f"{30}s内,尝试成功点击绿泡泡。")
+                continue
             # 结束循环
             break
+
 
 
 
@@ -215,7 +236,7 @@ class ChallengeSelect():
         self.logger.info("进入[北风营地]")
 
 
-    # 选择雪原副本
+    # 选择魔力之环
     def selectSnowInstance(self):
         if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
@@ -227,6 +248,17 @@ class ChallengeSelect():
         pyautogui.click(snowRingBtnPos[0], snowRingBtnPos[1])
         # self.logger.info(f"北风营地点击")
         self.logger.info("进入[魔力之环]")
+
+
+    # 冰冠堡垒的王座大厅
+    def selectIcecrownThrone(self):
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
+        self.clickGreenPop()
+        time.sleep(self.waitTime)
+        pyautogui.click(IconcrownMapBtnPos[0], IconcrownMapBtnPos[1])
+        time.sleep(self.waitTime)
+        pyautogui.click(IconcrownThroneBtnPos[0], IconcrownThroneBtnPos[1])
+        self.logger.info("进入[王座大厅]")
 
     
     # 查看任务栏的任务
@@ -572,7 +604,7 @@ class VisualTrack:
 
         # Calculate the center of the window
         height, width = binary_image.shape
-        window_center = (width // 2, height // 2)
+        window_center = np.array([width // 2, height // 2])
 
         # Default values for the target centroid
         target_x, target_y = window_center

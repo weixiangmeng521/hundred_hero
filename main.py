@@ -29,11 +29,11 @@ logger = init_logger(app_name)
 # 是否允许截图
 IS_ALLOW_SCREEN_SHOT = True
 # 需不需要唤醒
-WAKE_UP_FLAG = True
+IS_WAKE_UP_APP = True
 # 是否有加载广告
 IS_LOADING_ADS = True
 # 刷工会副本
-FARM_UNION_TASK_FLAG = False
+FARM_UNION_TASK = False
 # 无限训练营
 UPGRADE_ABILITY_FOREVER = False
 # 无限抽卡
@@ -272,6 +272,7 @@ def record_time_formate(execution_time, earned):
 # 打金
 def farming_coin():
     total = 0
+    
     while True:
         # 开始计时
         start_time = time.time()
@@ -279,13 +280,14 @@ def farming_coin():
         earned = farmCoin()
         total += earned
         logger.info(f"💰总打金:{ total }")
-        # 关闭游戏
-        cs.closeGame()
+        
+        # 进入5-1刷新
+        cs.selectIcecrownThrone()
+        reader.wait_tranported()
+        
         # 结束计时
         end_time = time.time()
         record_time_formate(end_time - start_time, earned)
-        # 启动游戏
-        wake_up_window()
 
 
 # 自动抽卡
@@ -367,9 +369,9 @@ def play_sound(file_name):
 # 初始函数
 def __init__():
     # 唤醒
-    if(WAKE_UP_FLAG): wake_up_window()
+    if(IS_WAKE_UP_APP): wake_up_window()
     # 打工会
-    if(FARM_UNION_TASK_FLAG): work_4_union()
+    if(FARM_UNION_TASK): work_4_union()
     # 训练营
     if(UPGRADE_ABILITY_FOREVER): improve_ability()
     # 抽卡
@@ -378,6 +380,8 @@ def __init__():
     if(IS_AUTO_FARM): farming_coin()
     # 刷资源
     if(IS_AUTO_WOOD_AND_MINE): main()
+
+
 
 
 

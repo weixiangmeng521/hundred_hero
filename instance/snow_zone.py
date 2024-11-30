@@ -226,11 +226,13 @@ class SnowZone:
         time.sleep(pace)
 
 
-
+    # 杀雪人boss
     def killSnowManBoss(self):
         mc = self.mc
 
         mc.move_down(4.2)
-        time.sleep(3)
+        time.sleep(1.8)
  
-        
+        def lamd():
+            mc.move_up(4.5)
+        return lamd
