@@ -52,7 +52,7 @@ FARM_UNION_TASK = False
 # 无限训练营
 UPGRADE_ABILITY_FOREVER = False
 # 无限抽卡
-IS_AUTO_GACHA = True
+IS_AUTO_GACHA = False
 # 无限打钱
 IS_AUTO_FARM = True
 # 无限刷资源
@@ -168,7 +168,7 @@ def get_pop_list():
 
 # 时间格式输出
 def record_time_formate(execution_time, earned):
-        # 转换为分钟和秒
+    # 转换为分钟和秒
     minutes = int(execution_time // 60)
     seconds = execution_time % 60
     rate =  earned / execution_time

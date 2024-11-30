@@ -20,12 +20,12 @@ class PoorZone:
 
         mc.move_top(.6)
 
-        # mc.move_right(.2)
-        time.sleep(.3)
+        mc.move_right(.2)
+        time.sleep(1)
         
         # back
         def lamda():
-            # mc.move_left(.2)
+            mc.move_left(.2)
             mc.move_down(.6)
             mc.move_left(1.2)
         return lamda

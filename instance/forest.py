@@ -348,7 +348,7 @@ class RottenSwamp:
         mc.move_up(1.2)
 
         mc.move_right(.3)
-        time.sleep(.3)
+        time.sleep(1.6)
 
         def lamda():
             mc.move_left(.3)
