@@ -1,16 +1,14 @@
-
-# 抽卡
-import datetime
 import time
 import cv2
 import numpy as np
 import pyautogui
-from instance import GameStatusError
-from lib import ChallengeSelect
+from exception.game_status import GameStatusError
+from lib.challenge_select import ChallengeSelect
 from lib.logger import init_logger
 from reader import InfoReader
 
 
+# 抽卡
 class Gacha:
     color_map = {
         0: "\033[47m",  # 黑色背景
@@ -27,12 +25,12 @@ class Gacha:
         4: "红卡",
     }
 
-    def __init__(self, app_name):
-        self.app_name = app_name
-        self.reader = InfoReader()
-        self.cs = ChallengeSelect()
-        self.reader = InfoReader()
-        self.logger = init_logger(app_name)
+    def __init__(self, config):
+        self.app_name = config["APP"]["Name"]
+        self.reader = InfoReader(config)
+        self.cs = ChallengeSelect(config)
+        self.reader = InfoReader(config)
+        self.logger = init_logger(config)
 
 
     # 显示三张图片

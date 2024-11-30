@@ -1,12 +1,13 @@
-from lib import MoveControll
 import time
+
+from lib.move_controller import MoveControll
 
 class CenterHall():
 
-    def __init__ (self):
-        self.mc = MoveControll()
+    def __init__ (self, config):
+        self.config = config
+        self.mc = MoveControll(config)
     
-
     # 一块地砖需要走 0.3s
 
     def crossRoom1(self):

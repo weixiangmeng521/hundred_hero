@@ -4,36 +4,40 @@ import traceback
 import cv2
 import numpy as np
 import pyautogui
-from farm import farmCoin
+from exception.game_status import GameStatusError
 from gacha import Gacha
-from instance.guild_quest import GuildQuest
-from lib import ChallengeSelect, MoveControll, VisualTrack
-from instance import GameStatusError, black_rock, forest, snow_zone, hell_of_fire
+from instance.boss_killer import BossKiller
+from instance.farmer import Farmer
+from instance.guild_quest import UnionTask
 import time
+from lib.challenge_select import ChallengeSelect
 from lib.logger import init_logger
 from lib.message import MessageService
+from lib.move_controller import MoveControll
+from lib.visual_track import VisualTrack
 from reader import InfoReader
 import configparser
 
 
-cPos = [262 , 696]
-app_name = "百炼英雄"
-
-# 选择关卡
-cs = ChallengeSelect()
-mc = MoveControll()
-reader = InfoReader()
-vt = VisualTrack(app_name)
-GuildTask = GuildQuest()
-gc = Gacha(app_name)
-logger = init_logger(app_name)
 # 读取配置文件
 config = configparser.ConfigParser()
-config.read("config.ini")
+config.read('config.ini')
+
+# 选择关卡
+cs = ChallengeSelect(config)
+mc = MoveControll(config)
+reader = InfoReader(config)
+vt = VisualTrack(config)
+GuildTask = UnionTask(config)
+gc = Gacha(config)
+logger = init_logger(config)
+bossKiller = BossKiller(config)
+farmer = Farmer(config)
+
 # 配置twilio
 pusher = MessageService(config)
 
-
+app_name = config["APP"]["Name"]
 # 是否允许截图
 IS_ALLOW_SCREEN_SHOT = True
 # 是否静音
@@ -49,9 +53,9 @@ UPGRADE_ABILITY_FOREVER = False
 # 无限抽卡
 IS_AUTO_GACHA = False
 # 无限打钱
-IS_AUTO_FARM = True
+IS_AUTO_FARM = False
 # 无限刷资源
-IS_AUTO_WOOD_AND_MINE = False
+IS_AUTO_WOOD_AND_MINE = True
 
 
 
@@ -59,110 +63,6 @@ IS_AUTO_WOOD_AND_MINE = False
 def wake_up_window():
     # 把窗口拖动到桌面顶端
     cs.move2LeftTop(reader.wait_game_loaded, IS_LOADING_ADS)
-
-
-
-# 刷经验
-def work4Expeirence1():
-    cs.selectExpeirenceInstance()
-    time.sleep(6)
-
-    time.sleep(3)
-    instance = black_rock.CenterHall()
-    instance.crossRoom1()
-    
-    cs.back2Town()
-    time.sleep(6)
-
-
-# 第二套刷经验
-def work4Expeirence2():
-    cs.selectHellOfHell()
-    time.sleep(6)
-
-    instance = hell_of_fire.HellOfFire()
-    try:
-        instance.crossRoom1()
-    except GameStatusError as e:
-        logger.info(f"{e}\n准备到附近传送点。")
-        cs.clickGiveUpRebornBtn()
-        time.sleep(8)
-        logger.info("已到达复活传送点，准备回城。")
-        cs.back2Town()
-        logger.info("已经回到城镇。")
-        time.sleep(10)
-        # 循环
-        work4Expeirence2()
-
-
-# 刷木头
-def work4Wood():
-    cs.selectWoodInstance()
-    instance = forest.RottenSwamp()
-    time.sleep(6)
-
-    try:
-        while True:
-            instance.crossRoom1()
-            instance.crossRoom2()
-    except GameStatusError as e:
-        logger.error(e)
-
-    cs.back2Town()
-    time.sleep(6)
-
-
-# 刷水晶
-def work4Diamond():
-    cs.selectDiamondInstance()
-    time.sleep(6)
-
-    try:
-        instance = snow_zone.SnowZone()
-        instance.crossRoom1Loop()
-    except GameStatusError as e:
-        logger.error(e)
-
-    cs.back2Town()
-    time.sleep(6)
-
-
-
-
-
-
-# 刷工会副本
-def work_4_union():
-    while True:
-        # 检测是否完成工会副本
-        if(reader.is_task_complete() == True):
-            reader.close_task_menu(True)
-            time.sleep(1.2)
-            cs.clearAds(1)
-            logger.info("工会任务已完成，无需再打")
-            if(reader.is_show_back2town_btn()): 
-                cs.back2Town()
-                GuildTask.refresh()
-                time.sleep(10)
-            return
-        
-        reader.close_task_menu()
-        # 工会副本任务没有完成，准备打工会副本
-        logger.info(f"工会任务没有完成，打工会任务。")
-        
-        # 刷副本
-        time.sleep(1.2)
-        
-        GuildTask.farmingMagicRing()
-
-        # GuildTask.farmingSnowfield()
-
-        # GuildTask.farmingPollutionOutpost()
-
-        # GuildTask.farmingColdWindCamp()
-
-        
-
 
 
 # 无限升级训练营
@@ -176,13 +76,10 @@ def improve_ability():
 
     if(isMineFull == False):
         logger.info("刷一刷蓝矿")
-        work4Diamond()
+        farmer.for_mine()
 
     time.sleep(waitSec)
     improve_ability()
-
-
-
 
 
 # 执行函数
@@ -195,15 +92,15 @@ def main():
 
     if(isWoodFull == False):
         logger.info("刷一刷木头副本")
-        work4Wood()
+        farmer.for_wood()
 
     elif(isMineFull == False):
         logger.info("刷一刷蓝矿")
-        work4Diamond()
+        farmer.for_mine()
 
     else:
         logger.info("刷一刷经验")
-        work4Expeirence2()
+        farmer.for_experience2()
 
     logger.info(f"本轮打金结束。{waitSec}s 后自动进入下一轮。")
     time.sleep(waitSec)
@@ -287,7 +184,7 @@ def farming_coin():
         # 开始计时
         start_time = time.time()
         # 刷副本
-        earned = farmCoin()
+        earned = bossKiller.work()
         total += earned
         logger.info(f"💰总打金:{ total }")
         
@@ -413,7 +310,4 @@ except Exception as e:
     stack_info = traceback.format_exc()
     logger.error(f"{e}, {stack_info}")
     play_sound("Ping.aiff")
-
-
-
 

@@ -1,10 +1,12 @@
 import time
-from instance import GameStatusError
-from lib import MoveControll
-
+from exception.game_status import GameStatusError
+from lib.move_controller import MoveControll
 
 class PoorZone:
-    mc = MoveControll()
+    
+    def __init__(self, config):
+        self.config = config
+        self.mc = MoveControll(config)
 
     def check_handle(self):
         if(self.reader.is_dead()):

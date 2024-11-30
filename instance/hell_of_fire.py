@@ -1,14 +1,15 @@
-from instance import GameStatusError
-from lib import ChallengeSelect, MoveControll
+from exception.game_status import GameStatusError
 import time
+from lib.move_controller import MoveControll
 from reader import InfoReader
 
 class HellOfFire:
 
-    def __init__ (self):
-        self.mc = MoveControll()
+    def __init__ (self, config):
+        self.config = config
+        self.mc = MoveControll(config)
         self.pace = 4
-        self.reader = InfoReader()
+        self.reader = InfoReader(config)
 
     def check_handle(self):
         if(self.reader.is_dead()):

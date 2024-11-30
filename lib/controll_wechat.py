@@ -8,13 +8,14 @@ import pyautogui
 from lib.logger import init_logger
 
 
-
-class ControllWechat():
-    
-    def __init__(self):
-        self.app_name = "微信"
-        self.game_name = "百炼英雄"
-        self.logger = init_logger(self.game_name)
+# 控制微信的类
+class ControllWechat:
+    # 初始化
+    def __init__(self, config):
+        self.config = config
+        self.app_name = config["APP"]["WechatName"]
+        self.game_name = config["APP"]["Name"]
+        self.logger = init_logger(config)
 
     # 获取窗口信息
     def get_specific_window_info(self, win_name):
