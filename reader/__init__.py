@@ -5,6 +5,7 @@ import Quartz
 import cv2
 import numpy as np
 from lib import ChallengeSelect
+from lib.logger import init_logger
 
 
 
@@ -12,6 +13,7 @@ class InfoReader:
     def __init__(self):
         self.app_name = "百炼英雄"
         self.img_win_name = "ImageAnalysis"   
+        self.logger = init_logger(self.app_name)
         self.cs = ChallengeSelect()
 
     # 获取窗口信息
@@ -30,7 +32,7 @@ class InfoReader:
     # 获得窗口的信息
     def get_win_info(self):
         window = self.get_specific_window_info()
-        if(window == None): raise Exception('Err', f"{self.app_name}`s window is not found.")
+        if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
         window_bounds = window.get('kCGWindowBounds', {})
         winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
         winWidth, winHeight = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
@@ -82,7 +84,7 @@ class InfoReader:
     def read_screen(self):
         window = self.get_specific_window_info()
         if(window == None):
-            raise Exception('Err', f"Window not found")
+            raise RuntimeError('Err', f"Window not found")
     
         meatPosList = (221, 113, 45, 13)
         isMeatFull = self.is_full_from_img(meatPosList)
@@ -96,7 +98,7 @@ class InfoReader:
     # 判断工会任务是否完成, false的情况下是完成了，true的情况下是没完成
     def is_task_complete(self):
         self.cs.openTaskList()
-        time.sleep(.3)
+        time.sleep(1)
 
         btnPos = (320, 365, 90, 37)
         # 读取指定位置
@@ -123,7 +125,7 @@ class InfoReader:
     def close_task_menu(self, is_click_complete = False):
         if(is_click_complete): 
             self.cs.completeUnionTask()
-            print(f"点击已完成工会副本按钮.")
+            self.logger.info(f"点击已完成工会副本按钮.")
         self.cs.closeWin()
         time.sleep(.3)
 
@@ -188,9 +190,53 @@ class InfoReader:
         return is_contain_reborn_btn and is_contain_give_up_btn
 
 
+    # 等待传送完成
+    def wait_tranported(self):
+        start_time = time.time()  # 记录开始时间
+        timeout = 60  # 超时时间，单位为秒
+
+        while True:
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError("加载超时: 未在一分钟内传送完成。")
+
+            window = self.get_specific_window_info()
+            if(window == None): 
+                raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+            
+            window_bounds = window.get('kCGWindowBounds', {})
+            winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
+            winWidth, winHeight = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
+            # 获取目标定位
+            flagPos = (
+                int((winWidth // 2) - 100 + winX), 
+                int((winHeight // 2) - 100 + winY), 
+                200, 
+                200,
+            )
+            screenshot = pyautogui.screenshot(region=(flagPos[0], flagPos[1], flagPos[2], flagPos[3]))
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+            target_rgb = (102, 193, 82)   # RGB 格式
+
+            # cv2.imshow("123", mat_image)
+            # cv2.waitKey(0)
+            # cv2.destroyAllWindows()
+
+            target_bgr = target_rgb[::-1]      # 转换为 BGR 格式
+            tolerance = 0  # 容差
+            lower_bound = np.array([max(0, c - tolerance) for c in target_bgr])
+            upper_bound = np.array([min(255, c + tolerance) for c in target_bgr])
+            mask = cv2.inRange(mat_image, lower_bound, upper_bound)
+            if(cv2.countNonZero(mask) > 0):
+                return
+
+
+
     # 是否游戏加载成功
-    def is_game_loaded(self, isContainsAds = False):
-        print("等待游戏加载...")
+    # TODO: 判断，登录失败，请重试
+    def wait_game_loaded(self, is_contains_ads = False):
+        self.logger.debug("等待游戏加载...")
         start_time = time.time()  # 记录开始时间
         timeout = 60  # 超时时间，单位为秒
 
@@ -201,7 +247,7 @@ class InfoReader:
 
             window = self.get_specific_window_info()
             if(window == None): 
-                raise Exception('Err', f"{self.app_name}`s window is not found.")
+                raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
             
             window_bounds = window.get('kCGWindowBounds', {})
             winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
@@ -212,7 +258,7 @@ class InfoReader:
             mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
 
             target_rgb = (246,199,77)   # RGB 格式
-            if(isContainsAds): 
+            if(is_contains_ads): 
                 target_rgb = (88,81,21)
 
             target_bgr = target_rgb[::-1]      # 转换为 BGR 格式
@@ -222,53 +268,6 @@ class InfoReader:
 
             mask = cv2.inRange(mat_image, lower_bound, upper_bound)
             if(cv2.countNonZero(mask) > 0):
-                print("加载完毕！")
-                return
-        
-
-    # 是否游戏加载成功
-    # 不弹广告版本
-    def is_game_loaded_without_ads(self):
-        print("等待游戏加载...")
-        start_time = time.time()  # 记录开始时间
-        timeout = 60  # 超时时间，单位为秒
-
-        while True:
-            elapsed_time = time.time() - start_time  # 计算已过去的时间
-            if elapsed_time > timeout:
-                raise TimeoutError("加载超时: 游戏未在1分钟内加载完成。")
-
-            window = self.get_specific_window_info()
-            if(window == None): 
-                raise Exception('Err', f"{self.app_name}`s window is not found.")
-            
-            window_bounds = window.get('kCGWindowBounds', {})
-            winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
-            # 获取目标定位
-            flagPos = (int(287 + winX), int(53 + winY), 20, 20)
-            screenshot = pyautogui.screenshot(region=(flagPos))
-            mat_image = np.array(screenshot)
-            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
-
-            target_rgb = (246,199,77)   # RGB 格式
-            target_bgr = target_rgb[::-1]      # 转换为 BGR 格式
-
-            lower_bound = np.array(target_bgr) - 10
-            upper_bound = np.array(target_bgr) + 10
-            mask = cv2.inRange(mat_image, lower_bound, upper_bound)
-
-
-            # self.print_img_by_rgb(mat_image)
-            # cv2.imshow("123", mat_image)   
-            # # 设置刷新间隔，并检测按键退出
-            # key = cv2.waitKey(30)
-            # if key == ord('q') or key == 27:  # 27 是 ESC 的 ASCII 值
-            #     cv2.destroyAllWindows()
-            #     break
-
-
-            mask = cv2.inRange(mat_image, lower_bound, upper_bound)
-            if(cv2.countNonZero(mask) > 0):
-                print("加载完毕！")
+                self.logger.debug("加载完毕！")
                 return
         

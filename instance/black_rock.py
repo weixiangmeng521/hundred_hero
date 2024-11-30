@@ -133,4 +133,3 @@ class CenterHall():
         time.sleep(6)
 
         mc.recover()
-        print("done")
