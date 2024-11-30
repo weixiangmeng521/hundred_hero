@@ -72,7 +72,9 @@ def killSnowmanBoss():
     cs.selectSnowInstance()
     instance = SnowZone()
     reader.wait_tranported()
-    instance.killSnowManBoss()
+    move_back = instance.killSnowManBoss()
+    move_back()
+    reader.wait_tranported()
     return 10
 
 
