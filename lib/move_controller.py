@@ -47,7 +47,7 @@ class MoveControll:
 
 
     def move_before_check(self):
-        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
+        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
 
 
     def get_window_info(self):

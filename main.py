@@ -281,7 +281,7 @@ def __init__():
     # 唤醒
     if(IS_WAKE_UP_APP): wake_up_window()
     # 打工会
-    if(FARM_UNION_TASK): work_4_union()
+    if(FARM_UNION_TASK): farmer.for_union_task()
     # 训练营
     if(UPGRADE_ABILITY_FOREVER): improve_ability()
     # 抽卡
