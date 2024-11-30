@@ -16,16 +16,16 @@ class FrontFlatland:
         mc = self.mc
         
         mc.move_right(.3)
+
+        mc.move_top(4)
         time.sleep(.1)
 
-        mc.move_top(2.4)
-        time.sleep(.1)
+        # back
+        def lamada():
+            mc.move_down(4)
+            mc.move_left(.3)
+        return lamada
+
         
-        mc.move_left(.6)
-        time.sleep(.1)
-
-        mc.move_top(1.6)
-        time.sleep(.1)
-
 
 

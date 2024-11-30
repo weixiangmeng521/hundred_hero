@@ -230,8 +230,7 @@ class SnowZone:
     def killSnowManBoss(self):
         mc = self.mc
 
-        pace = 3
         mc.move_down(4.2)
-        time.sleep(pace)
+        time.sleep(3)
  
         

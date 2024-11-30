@@ -21,16 +21,18 @@ def killBossGiant():
     instance.killBoss()
     cs.back2Town()
     reader.wait_tranported()
+    return 10
 
 
-# 打树精
+# 打小树精
 def killTreeSpirit():
     cs.selectPoorCamp()
     instance = PoorZone()
     reader.wait_tranported()
-    instance.killTreeBoss()
-    cs.back2Town()
+    move_back = instance.killTreeBoss()
+    move_back()
     reader.wait_tranported()
+    return 10
 
 
 # 打牛魔王
@@ -38,9 +40,10 @@ def killBullBoss():
     cs.selectTwoPeak()
     instance = PoorZone()
     reader.wait_tranported()
-    instance.killBullBoos()
-    cs.back2Town()
+    move_back = instance.killBullBoos()
+    move_back()
     reader.wait_tranported()
+    return 20
 
 
 # 打蜘蛛boss
@@ -51,6 +54,7 @@ def killSpiderBoss():
     instance.killSpiderBoss()
     cs.back2Town()
     reader.wait_tranported()
+    return 10
 
 
 # 打大树boss
@@ -58,9 +62,10 @@ def killBigTreeBoss():
     cs.selectColdWindCamp()
     instance = RottenSwamp()
     reader.wait_tranported()
-    instance.killTreeSprite()
-    # cs.back2Town()
-    # reader.wait_tranported()
+    move_back = instance.killTreeSprite()
+    move_back()
+    reader.wait_tranported()
+    return 10
 
 # 打雪人boss
 def killSnowmanBoss():
@@ -68,24 +73,18 @@ def killSnowmanBoss():
     instance = SnowZone()
     reader.wait_tranported()
     instance.killSnowManBoss()
-    time.sleep(1)
+    return 10
 
 
 # 打金
 def farmCoin():
     gold = 0
-    killBossGiant()
-    gold += 10
-    killTreeSpirit()
-    gold += 10
-    killBullBoss()
-    gold += 20
-    killSpiderBoss()
-    gold += 10
-    killBigTreeBoss()
-    gold += 10
-    # killSnowmanBoss()
-    # gold += 10
+    gold += killBossGiant()
+    gold += killTreeSpirit()
+    gold += killBullBoss()
+    # gold += killSpiderBoss()
+    gold += killBigTreeBoss()
+    gold += killSnowmanBoss()
     return gold
 
 

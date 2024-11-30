@@ -389,6 +389,9 @@ except (RuntimeError, GameStatusError, TimeoutError) as e:
     logger.error(f"{e}, {stack_info}")
     error_handle()
 
+except KeyboardInterrupt:
+    print("正常结束")
+
 except Exception as e:
     stack_info = traceback.format_exc()
     logger.error(f"{e}, {stack_info}")

@@ -108,6 +108,7 @@ class ChallengeSelect():
             
             self.logger.info("点击绿色对话泡")
             pyautogui.click(point[0], point[1] + 20)
+            time.sleep(.1)
 
             # 检查是否点击成功
             x, y, tx, ty = vt.find_position(green, 0, 0)
