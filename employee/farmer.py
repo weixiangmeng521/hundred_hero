@@ -86,6 +86,33 @@ class Farmer:
         time.sleep(6)
 
 
+    # 自动打工，根据资源需求来打工
+    def work(self):
+        # 流水线速度
+        waitSec = 3.3
+
+        isWoodFull, isMineFull = self.reader.read_screen()
+        self.logger.info(f"木头:{isWoodFull}, 蓝矿:{isMineFull}")
+
+        if(isWoodFull == False):
+            self.logger.info("刷一刷木头副本")
+            self.for_wood()
+
+        elif(isMineFull == False):
+            self.logger.info("刷一刷蓝矿")
+            self.for_mine()
+
+        else:
+            self.logger.info("刷一刷经验")
+            self.for_experience2()
+
+        self.logger.info(f"本轮打金结束。{waitSec}s 后自动进入下一轮。")
+        time.sleep(waitSec)
+        self.work()
+
+
+
+
     # 刷工会副本
     def for_union_task(self):
         while True:

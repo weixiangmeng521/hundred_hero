@@ -5,8 +5,10 @@ from instance.forest import RottenSwamp
 from instance.front_flatland import FrontFlatland
 from instance.poor_zone import PoorZone
 from instance.snow_zone import SnowZone
+from lib.app_trace import AppTrace
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
+from lib.logger import init_logger
 
 
 # BOSS杀手，专业打boss
@@ -16,6 +18,8 @@ class BountyHunter:
         self.config = config
         self.cs = ChallengeSelect(config)
         self.reader = InfoReader(config)
+        self.trace = AppTrace(config)
+        self.logger = init_logger(config)
 
 
     # 打第一个巨人boss
@@ -84,8 +88,8 @@ class BountyHunter:
         return 10
 
 
-    # 打金
-    def work(self):
+    # 单个打金任务
+    def task(self):
         gold = 0
         gold += self.killBossGiant()
         gold += self.killTreeSpirit()
@@ -96,4 +100,23 @@ class BountyHunter:
         return gold
 
 
+    # 循环打金
+    def work(self):
+        total = 0
+
+        while True:
+            # 开始计时
+            start_time = time.time()
+            # 秒杀boss
+            earned = self.task()
+            total += earned
+            self.logger.info(f"💰总打金:{ total }")
+            
+            # 进入5-1刷新
+            self.cs.selectIcecrownThrone()
+            self.reader.wait_tranported()
+            
+            # 结束计时
+            end_time = time.time()
+            self.trace.record_time_formate(end_time - start_time, earned)
 
