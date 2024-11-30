@@ -13,7 +13,7 @@ class MessageService:
         self.to_number = config["TWILIO"]["ToNumber"]
         self.app_name = config["APP"]["Name"]
         self.logger = logger.init_logger(config)
-        self.is_enable = config.getboolean('TWILIO', 'IsEnable')
+        self.is_enable = config.getboolean('TWILIO', 'Enable')
     
     # 发短信
     def push(self, message):
