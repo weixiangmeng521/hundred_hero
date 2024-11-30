@@ -34,6 +34,7 @@ logger = init_logger(config)
 bountyHunter = BountyHunter(config)
 farmer = Farmer(config)
 
+
 # 配置twilio
 pusher = MessageService(config)
 
@@ -197,48 +198,6 @@ def farming_coin():
         record_time_formate(end_time - start_time, earned)
 
 
-# 自动抽卡
-def auto_card():
-    is_entered_interface = cardsMaster.is_entered()
-
-    # 判断是否已经进入抽卡界面
-    if(not is_entered_interface):
-        x, y, tx, ty = vt.find_position((210, 174, 109), 0, 0)
-        # 如果没有找到目标就重新定位。
-        if((x == tx and y == ty)):
-            time.sleep(1)
-            logger.debug("没有找到抽卡中心，重新定位...")
-            auto_card()
-
-        if(not (x == tx and y == ty)):
-            tolerate_distance = vt.get_point_distance(x, y, tx, ty)
-            # 如果小于10像素，就算是移动到指定目的地了
-            if(tolerate_distance >= 10):
-                mc.move(x, y, tx, ty)
-        # 定位到，点击绿色泡泡
-        cs.clickGreenPop()
-        time.sleep(.3)
-
-    while True:
-        # 如果不能点击了，就结束
-        try:
-            cardsMaster.auto_recruit_btn()
-        except GameStatusError as e:
-            logger.debug(e.get_error_info())
-            break
-
-    # 关闭抽卡，返回
-    reader.close_task_menu()
-    time.sleep(.1)
-    
-    # 判断是否已经进入抽卡界面
-    if(not is_entered_interface):
-        mc.move(tx, ty, x, y)
-
-    # 寻找蓝色传送台
-    if(is_entered_interface):
-        x, y, tx, ty = vt.find_position((0xc7, 0xd4, 0xb1), 5, 5)
-        mc.move(x, y, tx, ty)
 
 
 # 截屏，查看bug信息
@@ -286,7 +245,7 @@ def __init__():
     # 训练营
     if(UPGRADE_ABILITY_FOREVER): improve_ability()
     # 抽卡
-    if(IS_AUTO_GACHA): auto_card()
+    if(IS_AUTO_GACHA): cardsMaster.work()
     # 打钱
     if(IS_AUTO_FARM): farming_coin()
     # 刷资源
