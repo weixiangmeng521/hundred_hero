@@ -11,7 +11,9 @@ from lib import ChallengeSelect, MoveControll, VisualTrack
 from instance import GameStatusError, black_rock, forest, snow_zone, hell_of_fire
 import time
 from lib.logger import init_logger
+from lib.message import MessageService
 from reader import InfoReader
+import configparser
 
 
 cPos = [262 , 696]
@@ -25,9 +27,17 @@ vt = VisualTrack(app_name)
 GuildTask = GuildQuest()
 gc = Gacha(app_name)
 logger = init_logger(app_name)
+# 读取配置文件
+config = configparser.ConfigParser()
+config.read("config.ini")
+# 配置twilio
+pusher = MessageService(config)
+
 
 # 是否允许截图
 IS_ALLOW_SCREEN_SHOT = True
+# 是否静音
+IS_MUTE = True
 # 需不需要唤醒
 IS_WAKE_UP_APP = True
 # 是否有加载广告
@@ -272,7 +282,7 @@ def record_time_formate(execution_time, earned):
 # 打金
 def farming_coin():
     total = 0
-    
+
     while True:
         # 开始计时
         start_time = time.time()
@@ -355,6 +365,7 @@ def screen_shot():
 # 错误处理
 def error_handle():
     play_sound("Glass.aiff")
+    pusher.push(f"[{app_name}]运行异常, 请查看错误日志.")
     screen_shot()
     cs.closeGameWithoutException()
     time.sleep(.3)
@@ -363,6 +374,8 @@ def error_handle():
 
 # 播放声音
 def play_sound(file_name):
+    # 静音
+    if(IS_MUTE): return
     os.system(f"afplay /System/Library/Sounds/{file_name}")
 
 
