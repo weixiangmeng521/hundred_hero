@@ -1,18 +1,21 @@
-from instance import GameStatusError
-from lib import MoveControll
+from exception.game_status import GameStatusError
 import time
-
+from lib.move_controller import MoveControll
 from reader import InfoReader
+
 
 class RottenSwamp:
 
-    def __init__ (self):
-        self.mc = MoveControll()
-        self.reader = InfoReader()
+    def __init__ (self, config):
+        self.config = config
+        self.mc = MoveControll(config)
+        self.reader = InfoReader(config)
         
+
     def check_handle(self):
         isWoodFull, _ = self.reader.read_screen()
         if(isWoodFull): raise GameStatusError("木头满了")
+
 
     # 腐烂沼泽上圈
     def crossRoom1(self):
