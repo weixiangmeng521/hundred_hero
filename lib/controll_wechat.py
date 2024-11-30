@@ -1,9 +1,12 @@
 
 # 控制微信
+import logging
 import os
 import time
 import Quartz
 import pyautogui
+from lib.logger import init_logger
+
 
 
 class ControllWechat():
@@ -11,6 +14,7 @@ class ControllWechat():
     def __init__(self):
         self.app_name = "微信"
         self.game_name = "百炼英雄"
+        self.logger = init_logger(self.game_name)
 
     # 获取窗口信息
     def get_specific_window_info(self, win_name):
@@ -30,7 +34,7 @@ class ControllWechat():
     # 唤醒app
     def wake_up(self):
         window = self.get_specific_window_info(self.app_name)
-        if(window == None): raise Exception('Err', f"{self.app_name}`s window is not found.")
+        if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
         script = f"""
         tell application "WeChat"
             activate
@@ -42,7 +46,7 @@ class ControllWechat():
     # 启动游戏
     def wake_up_game(self):
         window = self.get_specific_window_info(self.app_name)
-        if(window == None): raise Exception('Err', f"{self.app_name}`s window is not found.")   
+        if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")   
 
         game_window = self.get_specific_window_info(self.game_name)
         if(game_window): return

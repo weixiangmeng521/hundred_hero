@@ -1,11 +1,13 @@
 
 # 抽卡
+import datetime
 import time
 import cv2
 import numpy as np
 import pyautogui
-from instance import GameStatusEror
+from instance import GameStatusError
 from lib import ChallengeSelect
+from lib.logger import init_logger
 from reader import InfoReader
 
 
@@ -18,17 +20,19 @@ class Gacha:
         4: "\033[41m",  # 红色背景
     }    
     card_map = {
-        0: "垃圾卡",
+        0: "垃圾",
         1: "蓝卡",
         2: "紫卡",
         3: "橙卡",
         4: "红卡",
     }
 
-    def __init__(self):
+    def __init__(self, app_name):
+        self.app_name = app_name
         self.reader = InfoReader()
         self.cs = ChallengeSelect()
         self.reader = InfoReader()
+        self.logger = init_logger(app_name)
 
 
     # 显示三张图片
@@ -163,11 +167,19 @@ class Gacha:
 
     # 打印带颜色的卡牌列表
     def print_colored_cards(self, card_list):
+        # 颜色输出
         mapped_list = [
             f"{self.color_map.get(card, '\033[40m')}{self.card_map.get(card, '未知卡')}\033[0m"
             for card in card_list
         ]
         print(f"当前卡为：{' '.join(mapped_list)}")
+
+        # 记录到日志
+        cards_list = [
+            f"{self.card_map.get(card, '未知卡')}"
+            for card in card_list
+        ]
+        self.logger.info(f"当前卡为: {', '.join(cards_list)}")
 
 
 
@@ -191,7 +203,7 @@ class Gacha:
         
     
     # 判断是不是能正常抽卡，判断是不是进入了在抽卡结束后，进入下一轮抽卡的垃圾时间里
-    def is_avaliable_click(self):
+    def wait_avaliable_click(self):
         start_time = time.time()  # 记录开始时间
         timeout = 60  # 超时时间，单位为秒
 
@@ -202,7 +214,7 @@ class Gacha:
 
             window = self.reader.get_specific_window_info()
             if(window == None): 
-                raise Exception('Err', f"{self.app_name}`s window is not found.")
+                raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
             
             window_bounds = window.get('kCGWindowBounds', {})
             winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
@@ -224,25 +236,19 @@ class Gacha:
 
     # 点击招募
     def auto_recruit_btn(self):
-        # 同步阻塞
-        self.is_avaliable_click()
-
         card_list = self.read_three_cards()
         # 如果有未知卡，就重新读
         if(-1 in card_list):
-            time.sleep(.3)
             return
-
-        # 如果没有钱了，就退出循环
-        if(self.is_use_up_money()):
-            raise GameStatusEror("没钱了，不抽了")
             
-        # 输出
-        self.print_colored_cards(card_list)
         # 判断是否三倍
         if(self.is_contains_high_level_card()):
             self.click_max_btn()
             time.sleep(.1)
+
+        # 如果没有钱了，就退出循环
+        if(self.is_use_up_money()):
+            raise GameStatusError("没钱了，不抽了")
 
         # 是否消耗绿矿
         is_contine = self.is_cost_green_mine()
@@ -253,6 +259,8 @@ class Gacha:
 
         # 不消耗绿矿，招募
         if(is_contine == False):
+            # 输出
+            self.print_colored_cards(card_list)            
             pyautogui.click(250, 690)
 
 
