@@ -28,13 +28,13 @@ class PoorZone:
     def killBullBoos(self):
         mc = self.mc
         
-        mc.move_top(5)
+        mc.move_top(4.4)
         time.sleep(.1)
 
         mc.move_right(.8)
         time.sleep(.1)
 
-        mc.move_top(3.2)
+        mc.move_top(3.4)
         time.sleep(.1)
 
         mc.move_left(2.1)

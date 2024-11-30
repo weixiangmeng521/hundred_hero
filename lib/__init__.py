@@ -143,6 +143,7 @@ class ChallengeSelect():
         time.sleep(self.waitTime)
         pyautogui.click(decayedSwampBtnPos[0], decayedSwampBtnPos[1])
         # self.logger.info(f"污染之森点击")
+        self.logger.info("进入[污染之森]")
 
 
     # 污染之林的污染前哨
@@ -361,7 +362,6 @@ class MoveControll():
         self.xPos = cPos[0]
         self.yPos = cPos[1]
         # self.get_window_info()
-
 
     # 获取窗口信息
     def get_specific_window_info(self):
