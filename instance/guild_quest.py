@@ -3,7 +3,8 @@
 import time
 from instance import forest, snow_zone
 from lib.challenge_select import ChallengeSelect
-from reader import InfoReader
+from lib.info_reader import InfoReader
+
 
 # 工会任务
 class UnionTask:

@@ -6,8 +6,9 @@ from instance.guild_quest import UnionTask
 from instance.hell_of_fire import HellOfFire
 from instance.snow_zone import SnowZone
 from lib.challenge_select import ChallengeSelect
+from lib.info_reader import InfoReader
 from lib.logger import init_logger
-from reader import InfoReader
+
 
 
 # 作为苦逼的农民

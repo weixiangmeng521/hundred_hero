@@ -6,10 +6,11 @@ from instance.front_flatland import FrontFlatland
 from instance.poor_zone import PoorZone
 from instance.snow_zone import SnowZone
 from lib.challenge_select import ChallengeSelect
-from reader import InfoReader
+from lib.info_reader import InfoReader
+
 
 # BOSS杀手，专业打boss
-class BossKiller:
+class BountyHunter:
 
     def __init__(self, config):
         self.config = config
