@@ -2,13 +2,17 @@
 # 刷工会副本
 import time
 from instance import forest, snow_zone
-from lib import ChallengeSelect
+from lib.challenge_select import ChallengeSelect
 from reader import InfoReader
 
-class GuildQuest:
-    def __init__(self):
-        self.cs = ChallengeSelect()
-        self.reader = InfoReader()
+# 工会任务
+class UnionTask:
+
+    def __init__(self, config):
+        self.config = config
+        self.app_name = config["APP"]["Name"]
+        self.cs = ChallengeSelect(config)
+        self.reader = InfoReader(config)
         # 是否进入了雪原循环圈
         self.loop_lock = False
 

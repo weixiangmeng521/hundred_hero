@@ -1,17 +1,20 @@
-from instance import GameStatusError
-from lib import MoveControll
+from exception.game_status import GameStatusError
 import time
+from lib.move_controller import MoveControll
 from reader import InfoReader
 
 class SnowZone:
 
-    def __init__ (self):
-        self.mc = MoveControll()
-        self.reader = InfoReader()
+    def __init__ (self, config):
+        self.config = config
+        self.mc = MoveControll(config)
+        self.reader = InfoReader(config)
+
 
     def check_handle(self):
         _, isMineFull = self.reader.read_screen()
         if(isMineFull): raise GameStatusError("蓝矿满了")
+
 
     def recur(self):
         mc = self.mc
