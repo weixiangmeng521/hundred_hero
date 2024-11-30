@@ -62,12 +62,12 @@ closeBtnPos = [85, 840]
 giveUpRebornBtn = [315, 740]
 
 app_name = "百炼英雄"
-logger = init_logger(app_name)
 
 
 # 选择关卡
 class ChallengeSelect():
     waitTime = .3
+    logger = init_logger(app_name)
 
     # 获取窗口信息
     def get_specific_window_info(self):
@@ -85,20 +85,27 @@ class ChallengeSelect():
 
     # 点击最近的绿色冒泡
     def clickGreenPop(self, is_ga_cha = False):
-        vt = VisualTrack()
+        # 清除广告...
+        self.clearAds(5)
+
+        vt = VisualTrack(app_name)
         green = (0x66,0xc1,0x52)
         _list = vt.get_targets_list(green, 20, 20)
         point = vt.get_shortest_point(_list)
         if(len(point) == 0):
-            return
+            raise RuntimeError("未找到绿色对话框，位置可能偏移...")
+        
+        self.logger.info("点击绿色对话泡")
         pyautogui.click(point[0], point[1] + 20)
-        # 检查是否点击成功
+        
         # 抽卡模式下五十：目前是这样
         if(is_ga_cha):
-                return        
+            return
+        
+        # 检查是否点击成功
         x, y, tx, ty = vt.find_position(green, 0, 0)
         if(x != tx and y != ty):
-            raise RuntimeError("位置偏移...")
+            raise RuntimeError("点击对话框无效，位置可能偏移...")
 
 
 
@@ -106,26 +113,26 @@ class ChallengeSelect():
     def selectExpeirenceInstance(self):
         if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
-        # logger.info(f"副本选择被点击")
+        # self.logger.info(f"副本选择被点击")
         time.sleep(self.waitTime)
         pyautogui.click(blackRockBtnPos[0], blackRockBtnPos[1])
-        # logger.info(f"黑石堡垒被点击")
+        # self.logger.info(f"黑石堡垒被点击")
         time.sleep(self.waitTime)
         pyautogui.click(centerHallBtnPos[0], centerHallBtnPos[1])
-        # logger.info(f"中央走廊被点击")
+        # self.logger.info(f"中央走廊被点击")
 
 
     # 刷木头
     def selectWoodInstance(self):
         if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
-        # logger.info(f"副本选择被点击")
+        # self.logger.info(f"副本选择被点击")
         time.sleep(self.waitTime)
         pyautogui.click(forestMapBtnPos[0], forestMapBtnPos[1])
-        # logger.info(f"污染之森点击")
+        # self.logger.info(f"污染之森点击")
         time.sleep(self.waitTime)
         pyautogui.click(decayedSwampBtnPos[0], decayedSwampBtnPos[1])
-        # logger.info(f"污染之森点击")
+        # self.logger.info(f"污染之森点击")
 
 
     # 污染之林的污染前哨
@@ -146,6 +153,7 @@ class ChallengeSelect():
         pyautogui.click(flatlandBtnPos[0], flatlandBtnPos[1])        
         time.sleep(self.waitTime)
         pyautogui.click(chorchHillBtnPos[0], chorchHillBtnPos[1])
+        self.logger.info("进入[前哨平原的副本]")
 
 
     # [打金]贫瘠营地
@@ -156,6 +164,7 @@ class ChallengeSelect():
         pyautogui.click(poorZoneBtnPos[0], poorZoneBtnPos[1])        
         time.sleep(self.waitTime)
         pyautogui.click(poorCampPosBtnPos[0], poorCampPosBtnPos[1])
+        self.logger.info("进入[贫瘠营地]")
 
 
     # [打金]双峰峡谷
@@ -166,8 +175,7 @@ class ChallengeSelect():
         pyautogui.click(poorZoneBtnPos[0], poorZoneBtnPos[1])        
         time.sleep(self.waitTime)
         pyautogui.click(twoPeakPosBtnPos[0], twoPeakPosBtnPos[1])
-
-    
+        self.logger.info("进入[双峰峡谷]")
 
 
     # 刷寒风营地的副本
@@ -178,32 +186,35 @@ class ChallengeSelect():
         pyautogui.click(forestMapBtnPos[0], forestMapBtnPos[1])        
         time.sleep(self.waitTime)
         pyautogui.click(coldWindCampBtnPos[0], coldWindCampBtnPos[1])
+        self.logger.info("进入[寒风营地的副本]")
 
 
     # 刷水晶
     def selectDiamondInstance(self):
         if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
-        # logger.info(f"副本选择被点击")
+        # self.logger.info(f"副本选择被点击")
         time.sleep(self.waitTime)
         pyautogui.click(snwoMapBtnPos[0], snwoMapBtnPos[1])
-        # logger.info(f"严寒地带点击")
+        # self.logger.info(f"严寒地带点击")
         time.sleep(self.waitTime)
         pyautogui.click(snowBtnPos[0], snowBtnPos[1])
-        # logger.info(f"北风营地点击")
+        # self.logger.info(f"北风营地点击")
+        self.logger.info("进入[北风营地点击]")
 
 
     # 选择雪原副本
     def selectSnowInstance(self):
         if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         self.clickGreenPop()
-        # logger.info(f"副本选择被点击")
+        # self.logger.info(f"副本选择被点击")
         time.sleep(self.waitTime)
         pyautogui.click(snwoMapBtnPos[0], snwoMapBtnPos[1])
-        # logger.info(f"严寒地带点击")
+        # self.logger.info(f"严寒地带点击")
         time.sleep(self.waitTime)
         pyautogui.click(snowRingBtnPos[0], snowRingBtnPos[1])
-        # logger.info(f"北风营地点击")
+        # self.logger.info(f"北风营地点击")
+        self.logger.info("进入[魔力之环]")
 
     
     # 查看任务栏的任务
@@ -212,6 +223,7 @@ class ChallengeSelect():
         pyautogui.click(taskListBtnPos[0], taskListBtnPos[1])
         time.sleep(self.waitTime)
         pyautogui.click(unionTaskTabPos[0], unionTaskTabPos[1])
+        self.logger.info("进入[工会任务列表]")
 
 
     # 选择炎火之狱副本
@@ -224,18 +236,7 @@ class ChallengeSelect():
         pyautogui.click(fireOfHellLayerTabPos[0], fireOfHellLayerTabPos[1])
         time.sleep(self.waitTime)
         pyautogui.click(fireOfHellInstancePos[0], fireOfHellInstancePos[1])
-
-
-    # 选择炎火之狱副本
-    def selectHellOfHell(self):
-        if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
-        self.clickGreenPop()
-        time.sleep(self.waitTime)
-        pyautogui.click(hellInstanceTabPos[0], hellInstanceTabPos[1])
-        time.sleep(self.waitTime)
-        pyautogui.click(fireOfHellLayerTabPos[0], fireOfHellLayerTabPos[1])
-        time.sleep(self.waitTime)
-        pyautogui.click(fireOfHellInstancePos[0], fireOfHellInstancePos[1])
+        self.logger.info("进入[炎火之狱]")
 
 
     # 放弃
@@ -254,6 +255,7 @@ class ChallengeSelect():
     def closeWin(self):
         if(self.get_specific_window_info() == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         pyautogui.click(closeBtnPos[0], closeBtnPos[1])
+        self.logger.info("关闭窗口")
 
 
     # 打道回府
@@ -262,7 +264,7 @@ class ChallengeSelect():
         pyautogui.click(back2TownPos[0], back2TownPos[1])
         time.sleep(self.waitTime)
         pyautogui.click(yesBtnPos[0], yesBtnPos[1])
-        logger.info(f"打道回府！")
+        self.logger.info(f"打道回府！")
 
 
     # 把窗口移动到（0，0）
@@ -292,7 +294,7 @@ class ChallengeSelect():
 
     # 清除广告
     def clearAds(self, times):
-        logger.info("关闭广告。")
+        self.logger.info("关闭广告。")
         window = self.get_specific_window_info()
         if(window == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
         window_bounds = window.get('kCGWindowBounds', {})
@@ -311,7 +313,7 @@ class ChallengeSelect():
         winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
         winWidth, _ = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
         pyautogui.click(winX + winWidth - 30, winY + 20)
-        logger.info("关闭游戏")
+        self.logger.info("关闭游戏")
         time.sleep(.1)
         
 
@@ -331,7 +333,7 @@ class ChallengeSelect():
         winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
         winWidth, _ = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
         pyautogui.click(winX + winWidth - 30, winY + 20)
-        logger.info("关闭游戏")
+        self.logger.info("关闭游戏")
         time.sleep(.1)
     
 
@@ -341,6 +343,7 @@ class ChallengeSelect():
 # 控制类
 class MoveControll():
     mouse = Controller()
+    logger = init_logger(app_name)
 
     def __init__(self):
         curX, curY = pyautogui.position()
@@ -372,7 +375,7 @@ class MoveControll():
 
     def recover(self):
         pyautogui.moveTo(self.curPos[0], self.curPos[1])
-        logger.info(f"x = {self.curPos[0]}, y = {self.curPos[1]}")
+        self.logger.info(f"x = {self.curPos[0]}, y = {self.curPos[1]}")
 
 
     def move_before_check(self):
@@ -476,12 +479,14 @@ class MoveControll():
 
 # 视觉跟踪
 class VisualTrack:
-    
-    def __init__(self):
+    logger = init_logger(app_name)
+
+    def __init__(self, app_name):
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.font_scale = .5
         self.color = (255, 0, 0)  # 绿色
         self.thickness = 1
+        self.app_name = app_name
     
 
     # 获取窗口信息
@@ -695,8 +700,8 @@ class VisualTrack:
         cv2.line(rgb_img, (cX, cY), (x, y), (255, 0, 0), 1)
 
 
-        logger.info(f"图像大小 {winWidth} x {winHeight}; 中心点:({x},{y})")
-        logger.info(f"目标点:({cX},{cY})")
+        self.logger.info(f"图像大小 {winWidth} x {winHeight}; 中心点:({x},{y})")
+        self.logger.info(f"目标点:({cX},{cY})")
         # return (center[1], center[0], cX, cY)
         bgr_image = cv2.cvtColor(rgb_img, cv2.COLOR_RGBA2BGR)
         return bgr_image
@@ -717,7 +722,7 @@ class VisualTrack:
             cv2.imshow(img_win_name, frame)
             cv2.moveWindow(img_win_name, int(winX + winWidth), - 100)        
             
-            logger.info(winX, winY)
+            self.logger.info(winX, winY)
 
             # 设置刷新间隔，并检测按键退出
             key = cv2.waitKey(30)
@@ -820,8 +825,8 @@ class VisualTrack:
 #     cv2.line(rgb_img, (cX, cY), (x, y), (255, 0, 0), 1)
 
 
-#     logger.info(f"图像大小 {winWidth} x {winHeight}; 中心点:({x},{y})")
-#     logger.info(f"目标点:({cX},{cY})")
+#     self.logger.info(f"图像大小 {winWidth} x {winHeight}; 中心点:({x},{y})")
+#     self.logger.info(f"目标点:({cX},{cY})")
 
 #     # return (center[1], center[0], cX, cY)
 
@@ -846,7 +851,7 @@ class VisualTrack:
 #         cv2.imshow(img_win_name, frame)
 #         cv2.moveWindow(img_win_name, int(winX + winWidth), - 100)        
         
-#         logger.info(winX, winY)
+#         self.logger.info(winX, winY)
 
 #         # 设置刷新间隔，并检测按键退出
 #         key = cv2.waitKey(30)

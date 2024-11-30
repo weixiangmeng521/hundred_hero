@@ -208,8 +208,13 @@ class InfoReader:
             winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
             winWidth, winHeight = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
             # 获取目标定位
-            flagPos = (int((winWidth // 2) - 150 + winX), int((winHeight // 2) - 150 + winY), 300, 300)
-            screenshot = pyautogui.screenshot(region=(flagPos))
+            flagPos = (
+                int((winWidth // 2) - 150 + winX), 
+                int((winHeight // 2) - 150 + winY), 
+                300, 
+                300,
+            )
+            screenshot = pyautogui.screenshot(region=(flagPos[0], flagPos[1], flagPos[2], flagPos[3]))
             mat_image = np.array(screenshot)
             mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
             target_rgb = (102, 193, 82)   # RGB 格式
@@ -219,8 +224,9 @@ class InfoReader:
             # cv2.destroyAllWindows()
 
             target_bgr = target_rgb[::-1]      # 转换为 BGR 格式
-            lower_bound = np.array(target_bgr)
-            upper_bound = np.array(target_bgr)
+            tolerance = 10  # 容差
+            lower_bound = np.array([max(0, c - tolerance) for c in target_bgr])
+            upper_bound = np.array([min(255, c + tolerance) for c in target_bgr])
             mask = cv2.inRange(mat_image, lower_bound, upper_bound)
             if(cv2.countNonZero(mask) > 0):
                 return

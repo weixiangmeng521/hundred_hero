@@ -20,7 +20,7 @@ app_name = "百炼英雄"
 cs = ChallengeSelect()
 mc = MoveControll()
 reader = InfoReader()
-vt = VisualTrack()
+vt = VisualTrack(app_name)
 GuildTask = GuildQuest()
 gc = Gacha(app_name)
 logger = init_logger(app_name)
@@ -36,9 +36,11 @@ FARM_UNION_TASK_FLAG = False
 # 无限训练营
 UPGRADE_ABILITY_FOREVER = False
 # 无限抽卡
-IS_AUTO_GACHA = False
+IS_AUTO_GACHA = True
 # 无限打钱
 IS_AUTO_FARM = True
+# 无限刷资源
+IS_AUTO_WOOD_AND_MINE = False
 
 
 
@@ -119,7 +121,7 @@ def work4Diamond():
 
 
 # 刷工会副本
-def work4Union():
+def work_4_union():
     while True:
         # 检测是否完成工会副本
         if(reader.is_task_complete() == True):
@@ -153,7 +155,7 @@ def work4Union():
 
 
 # 无限升级训练营
-def improveAbility():
+def improve_ability():
     # 流水线速度
     waitSec = 3.3    
     _, isMineFull = reader.read_screen()
@@ -166,7 +168,7 @@ def improveAbility():
         work4Diamond()
 
     time.sleep(waitSec)
-    improveAbility()
+    improve_ability()
 
 
 
@@ -265,7 +267,7 @@ def record_time_formate(execution_time):
 
 
 # 打金
-def farmingCoin():
+def farming_coin():
     total = 0
     while True:
         # 开始计时
@@ -349,21 +351,25 @@ def error_handle():
     __init__()
 
 
+# 播放声音
 def play_sound(file_name):
     os.system(f"afplay /System/Library/Sounds/{file_name}")
 
 
+# 初始函数
 def __init__():
     # 唤醒
     if(WAKE_UP_FLAG): wake_up_window()
     # 打工会
-    if(FARM_UNION_TASK_FLAG): work4Union()
+    if(FARM_UNION_TASK_FLAG): work_4_union()
     # 训练营
-    if(UPGRADE_ABILITY_FOREVER): improveAbility()
+    if(UPGRADE_ABILITY_FOREVER): improve_ability()
     # 抽卡
     if(IS_AUTO_GACHA): auto_card()
     # 打钱
-    if(IS_AUTO_FARM): farmingCoin()
+    if(IS_AUTO_FARM): farming_coin()
+    # 刷资源
+    if(IS_AUTO_WOOD_AND_MINE): main()
 
 
 
@@ -376,9 +382,9 @@ except (RuntimeError, GameStatusError, TimeoutError) as e:
 
 except Exception as e:
     logger.error(e)
+    print(e)
     play_sound("Ping.aiff")
 
 
 
-# main()
 
