@@ -1,13 +1,14 @@
 import datetime
 import logging
 import os
-from lib.logger_filter import LoggerFilter
 
 
 # singleton
 is_initialized_logger = False
 
-def init_logger(app_name):
+# 初始化日志管理器
+def init_logger(config):
+    app_name = config["APP"]["Name"]
     logger_name = f"[{app_name}]"
     global is_initialized_logger
 

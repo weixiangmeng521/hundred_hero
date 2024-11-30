@@ -4,17 +4,19 @@ import pyautogui
 import Quartz
 import cv2
 import numpy as np
-from lib import ChallengeSelect
+from lib.challenge_select import ChallengeSelect
 from lib.logger import init_logger
 
 
-
+# 读取屏幕信息
 class InfoReader:
-    def __init__(self):
-        self.app_name = "百炼英雄"
+
+    def __init__(self, config):
+        self.config = config
+        self.app_name = config["APP"]["Name"]
         self.img_win_name = "ImageAnalysis"   
-        self.logger = init_logger(self.app_name)
-        self.cs = ChallengeSelect()
+        self.logger = init_logger(config)
+        self.cs = ChallengeSelect(config)
 
     # 获取窗口信息
     def get_specific_window_info(self):
