@@ -243,7 +243,7 @@ class VisualTrack:
         img_win_name = "ImageAnalysis"  
 
         window = self.get_specific_window_info()
-        if(window == None): raise RuntimeError('Err', f"{app_name}`s window is not found.")
+        if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
         window_bounds = window.get('kCGWindowBounds', {})
         winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
         winWidth, _ = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
