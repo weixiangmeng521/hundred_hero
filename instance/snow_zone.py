@@ -231,7 +231,7 @@ class SnowZone:
         mc = self.mc
 
         mc.move_down(4.2)
-        time.sleep(1.8)
+        time.sleep(2.4)
  
         def lamd():
             mc.move_up(4.5)

@@ -86,7 +86,7 @@ def farmCoin():
     gold += killBullBoss()
     # gold += killSpiderBoss()
     gold += killBigTreeBoss()
-    gold += killSnowmanBoss()
+    # gold += killSnowmanBoss()
     return gold
 
 
