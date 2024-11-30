@@ -259,11 +259,13 @@ def get_pop_list():
 
 
 # 时间格式输出
-def record_time_formate(execution_time):
+def record_time_formate(execution_time, earned):
         # 转换为分钟和秒
     minutes = int(execution_time // 60)
     seconds = execution_time % 60
-    logger.debug(f"打金耗时: {minutes} 分 {seconds:.2f} 秒")
+    rate =  earned / execution_time
+    hour_earned = rate * 60 * 60
+    logger.debug(f"打金耗时: {minutes}m {seconds:.2f}s, 1h刷金预计: {hour_earned:.2f}")
 
 
 
@@ -281,7 +283,7 @@ def farming_coin():
         cs.closeGame()
         # 结束计时
         end_time = time.time()
-        record_time_formate(end_time - start_time)
+        record_time_formate(end_time - start_time, earned)
         # 启动游戏
         wake_up_window()
 
