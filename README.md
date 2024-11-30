@@ -1,15 +1,9 @@
+
+### 启动项目的命令
 source venv/bin/activate
 python3 main.py
-
-
 deactivate
 
-
-私服: 
-kenny123
-kenny123
-
-https://temperedheroes.zhlthy.com/
-https://ss.dstormrecords.com/index/user/login.html
-
+### 配置twilio
+https://www.twilio.com/en-us
 
