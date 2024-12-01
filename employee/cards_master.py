@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import pyautogui
 from exception.game_status import GameStatusError
-from instance.guild_quest import UnionTask
+from instance.union_task import UnionTask
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger

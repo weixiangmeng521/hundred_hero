@@ -1,7 +1,7 @@
 import time
-from PIL import Image
 import pyautogui
 import Quartz
+import pytesseract
 import cv2
 import numpy as np
 from lib.challenge_select import ChallengeSelect
@@ -18,6 +18,7 @@ class InfoReader:
         self.logger = init_logger(config)
         self.cs = ChallengeSelect(config)
 
+
     # 获取窗口信息
     def get_specific_window_info(self):
         # 获取所有在屏幕上的窗口信息
@@ -31,6 +32,7 @@ class InfoReader:
                 return window  # 返回指定窗口的信息
         return None
 
+
     # 获得窗口的信息
     def get_win_info(self):
         window = self.get_specific_window_info()
@@ -41,17 +43,19 @@ class InfoReader:
         return winX, winY, winWidth, winHeight
 
 
+    # 打印字代颜色
     def print_color(self, text, r, g, b):
         print(f"\033[48;2;{r};{g};{b}m{text}\033[0m")
 
 
+    # 输出图片每个色块
     def print_img(self, mat_image):
         for row in range(mat_image.shape[0]):  # 遍历行
             for col in range(mat_image.shape[1]):  # 遍历列
                 b, g, r = mat_image[row, col]  # 获取像素的 BGR 值
                 self.print_color(f"{r},{g},{b}", r, g, b)
 
-
+    # 通过rgb的方式输出图片的色块
     def print_img_by_rgb(self, mat_image):
         for row in range(mat_image.shape[0]):  # 遍历行
             for col in range(mat_image.shape[1]):  # 遍历列
@@ -59,6 +63,7 @@ class InfoReader:
                 self.print_color(f"{r},{g},{b}", r, g, b)
 
 
+    # 查看木头和蓝矿是否满了
     def is_full_from_img(self, meatPosList):
         # 读取指定位置
         screenshot = pyautogui.screenshot(region=(meatPosList))
@@ -98,15 +103,18 @@ class InfoReader:
 
 
     # 判断工会任务是否完成, false的情况下是完成了，true的情况下是没完成
-    def is_task_complete(self):
+    def is_task_complete(self, screenshot_handler):
         self.cs.openTaskList()
-        time.sleep(1)
+        time.sleep(.6)
 
         btnPos = (320, 365, 90, 37)
         # 读取指定位置
         screenshot = pyautogui.screenshot(region=(btnPos))
         mat_image = np.array(screenshot)
         mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+        
+        self.read_task_list()
+        screenshot_handler()
 
         # 定义目标颜色并转换为 BGR 格式
         target_rgb = (225, 204, 77)   # RGB 格式
@@ -121,6 +129,106 @@ class InfoReader:
 
         # 检查掩码中是否包含目标颜色
         return cv2.countNonZero(mask) == 0
+
+
+
+    # 读取屏幕中的任务列表
+    def read_task_list(self):
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        # 读取指定位置
+        screenshot = pyautogui.screenshot(region=(
+            int(winX + 50), 
+            int(winY + 325), 
+            int(winWidth - 100), 
+            int(winHeight - 650)
+        ))
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+        task_img_heigt = int((winHeight - 650 - 15) / 3)
+        task_img_width = int(winWidth - 100 - 100)
+        gutter = 30
+        # start_y:end_y, start_x:end_x
+        task_1_img = mat_image[0:task_img_heigt - 5 - gutter - 3, 130:task_img_width]
+        task_2_img = mat_image[task_img_heigt + 5 + 3:task_img_heigt * 2 - gutter, 130:task_img_width]
+        task_3_img = mat_image[task_img_heigt * 2 + 18:task_img_heigt * 3 + 3 - gutter, 130:task_img_width]
+
+        task_list = (
+            self.recognize_chinese_text(task_1_img), 
+            self.recognize_chinese_text(task_2_img), 
+            self.recognize_chinese_text(task_3_img),
+        )
+
+        
+        print(task_list)
+
+
+        # complete_color = (218,224,230)
+        # rate = self.get_color_ratio(mat_image, complete_color)
+
+        # for task_img in img_list:
+        #     uuid1 = uuid.uuid1()
+        #     self.save_task_sample_img(task_img, uuid1)
+
+
+        # self.print_img(task_1_img)
+
+
+
+    # 读取中文
+    def recognize_chinese_text(self, bgr_image):
+        pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
+        # 读取图片
+        image = self.preprocess_img(bgr_image)
+        # 转换为灰度图像
+        gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        # 进行二值化，提升OCR识别效果
+        binary_image = cv2.adaptiveThreshold(
+            gray_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 5, 2
+        )
+        blended_image = cv2.addWeighted(gray_image, 0.7, binary_image, 0.3, 0)
+
+        # 识别中文文字，使用简体中文语言包 'chi_sim'
+        text = pytesseract.image_to_string(blended_image, lang='chi_sim',  config='--psm 6')  # 使用简体中文语言包
+        return text
+    
+
+    # 提高图像
+    def preprocess_img(self, bgr_image):
+        # Laplacian 算子
+        laplacian = cv2.Laplacian(bgr_image, cv2.CV_64F)
+        # 将拉普拉斯算子的结果转换为 uint8
+        laplacian = cv2.convertScaleAbs(laplacian)
+        # 应用加权合成     
+        sharp = cv2.addWeighted(bgr_image, 1.7, laplacian, -0.3, 0)
+        return sharp
+
+
+    # 保存task的图片
+    def save_task_sample_img(self, bgr_img, name):
+        path = f"static/task_img_sample/{name}.png"
+        cv2.imwrite(path, bgr_img)                
+
+
+    # 获取颜色占比
+    def get_color_ratio(self, bgr_img, target_rgb_color):
+        tolerance = 10
+        target_bgr_color = target_rgb_color[::-1]        
+        # 目标颜色上下限
+        lower_bound = np.array([max(0, c - tolerance) for c in target_bgr_color], dtype=np.uint8)
+        upper_bound = np.array([min(255, c + tolerance) for c in target_bgr_color], dtype=np.uint8)
+        # 创建颜色掩膜
+        mask = cv2.inRange(bgr_img, lower_bound, upper_bound)
+        # 计算目标颜色的像素数
+        target_pixels = cv2.countNonZero(mask)
+        # 检查图像是否为二维
+        if len(bgr_img.shape) != 3:
+            raise ValueError("输入图像必须为三通道 BGR 格式。")        
+        # 计算图像总像素数
+        total_pixels = bgr_img.shape[0] * bgr_img.shape[1]
+        # 计算占比
+        color_ratio = target_pixels / total_pixels
+        print(target_pixels, total_pixels)
+        return color_ratio
 
 
     # 关闭按钮点击
@@ -273,3 +381,23 @@ class InfoReader:
                 self.logger.debug("加载完毕！")
                 return
         
+    
+    # 纵向排列三张图片
+    def v_stack_show(self, *imgs):  
+        # 确保所有图片的宽度一致，否则调整为相同宽度
+        widths = [img.shape[1] for img in imgs]
+        max_width = max(widths)
+        
+        resized_imgs = [
+            cv2.resize(img, (max_width, int(img.shape[0] * max_width / img.shape[1])))
+            if img.shape[1] != max_width else img
+            for img in imgs
+        ]
+        
+        # 纵向堆叠图片
+        stacked_img = np.vstack(resized_imgs)
+        
+        # 显示结果
+        cv2.imshow("Vertical Stack", stacked_img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
