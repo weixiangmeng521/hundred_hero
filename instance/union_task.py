@@ -31,7 +31,7 @@ class UnionTask:
             time.sleep(10)
 
         # 刷副本
-        instance = snow_zone.SnowZone()
+        instance = snow_zone.SnowZone(self.config)
         instance.crossGuildRoom()
 
      
@@ -44,7 +44,7 @@ class UnionTask:
             time.sleep(10)
 
         # 刷副本
-        instance = snow_zone.SnowZone()
+        instance = snow_zone.SnowZone(self.config)
 
         # 走到圈内
         if(self.loop_lock == False):
@@ -63,7 +63,7 @@ class UnionTask:
             self.cs.selectPollutionOutpost()
             time.sleep(10)
 
-        instance = forest.RottenSwamp()
+        instance = forest.RottenSwamp(self.config)
 
         # 走到圈内
         if(self.loop_lock == False):
@@ -83,5 +83,5 @@ class UnionTask:
             time.sleep(10)
             
         # 刷副本
-        instance = forest.RottenSwamp()
+        instance = forest.RottenSwamp(self.config)
         instance.crossColdWindCamp()

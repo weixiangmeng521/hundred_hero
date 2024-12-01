@@ -3,9 +3,10 @@ import numpy as np
 from employee.bounty_hunter import BountyHunter
 from employee.cards_master import CardsMaster
 from employee.coach_NPC import CoachNPC
+from employee.task_excutor import TaskExcutor
 from exception.game_status import GameStatusError
 from employee.farmer import Farmer
-from instance.guild_quest import UnionTask
+from instance.union_task import UnionTask
 import time
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
@@ -31,6 +32,7 @@ cardsMaster = CardsMaster(config)
 logger = init_logger(config)
 bountyHunter = BountyHunter(config)
 farmer = Farmer(config)
+taskExcutor = TaskExcutor(config)
 trace = AppTrace(config)
 coachNPC = CoachNPC(config)
 
@@ -43,15 +45,15 @@ IS_WAKE_UP_APP = True
 # 是否有加载广告
 IS_LOADING_ADS = True
 # 刷工会副本
-FARM_UNION_TASK = False
+FARM_UNION_TASK = True
 # 无限训练营
 IS_ABILITY_AIM = False
 # 无限抽卡
 IS_AUTO_GACHA = False
 # 无限打钱
-IS_AUTO_FARM = True
+IS_AUTO_FARM = False
 # 无限刷资源
-IS_AUTO_WOOD_AND_MINE = True
+IS_AUTO_WOOD_AND_MINE = False
 
 
 
@@ -59,25 +61,6 @@ IS_AUTO_WOOD_AND_MINE = True
 def wake_up_window():
     # 把窗口拖动到桌面顶端
     cs.move2LeftTop(reader.wait_game_loaded, IS_LOADING_ADS)
-
-
-
-# # 矫正位置
-# def check_position():
-#     # 聚拢
-#     mc.move_left_down(.6)
-#     x, y, tx, ty = vt.find_position((0xc7, 0xd4, 0xb1), 5, 5)
-#     mc.move(x, y, tx, ty)
-
-
-
-# # 获取当前画面绿色冒泡的列表
-# def get_pop_list():
-#     _list = vt.get_targets_list((0x66,0xc1,0x52), 20, 20)
-#     point = vt.get_shortest_point(_list)
-#     logger.info(point)
-#     mc.pointer_move_to(point[0], point[1] + 20)
-
 
 
 
@@ -98,7 +81,7 @@ def bootstrap():
     # 唤醒
     if(IS_WAKE_UP_APP): wake_up_window()
     # 打工会
-    if(FARM_UNION_TASK): farmer.for_union_task()
+    if(FARM_UNION_TASK): taskExcutor.work()
     # 训练营
     if(IS_ABILITY_AIM): coachNPC.work()
     # 抽卡
@@ -110,7 +93,7 @@ def bootstrap():
 
 
 
-def __init__():
+def __main__():
     try:
         bootstrap()
 
@@ -128,4 +111,5 @@ def __init__():
         trace.play_sound("Ping.aiff")
 
 
-__init__()
+if __name__ == "__main__":
+    __main__()

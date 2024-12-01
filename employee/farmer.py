@@ -2,7 +2,7 @@ import time
 from exception.game_status import GameStatusError
 from instance.black_rock import CenterHall
 from instance.forest import RottenSwamp
-from instance.guild_quest import UnionTask
+from instance.union_task import UnionTask
 from instance.hell_of_fire import HellOfFire
 from instance.snow_zone import SnowZone
 from lib.challenge_select import ChallengeSelect
