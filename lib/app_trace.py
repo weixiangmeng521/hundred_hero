@@ -1,18 +1,24 @@
 import datetime
 import os
+import time
 
 import cv2
 import numpy as np
 import pyautogui
 
+from lib.challenge_select import ChallengeSelect
 from lib.logger import init_logger
+from lib.message import MessageService
 
 # 捕获error消息
 class AppTrace:
 
     def __init__(self, config):
         self.config = config
+        self.app_name = config["APP"]["Name"]
         self.logger = init_logger(config)
+        self.pusher = MessageService(config)
+        self.cs = ChallengeSelect(config)
 
 
     # 截屏，查看bug信息
@@ -51,3 +57,10 @@ class AppTrace:
         hour_earned = rate * 60 * 60
         self.logger.debug(f"打金耗时: {minutes}m {seconds:.2f}s, 1h刷金预计: {hour_earned:.2f}")
 
+    # 报告错误
+    def report_error(self, info):
+        self.play_sound("Glass.aiff")
+        self.pusher.push(f"[{self.app_name}]运行异常, 请查看错误日志. err: {info}")
+        self.screen_shot()
+        self.cs.closeGameWithoutException()
+        time.sleep(.3)        
