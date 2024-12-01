@@ -40,7 +40,9 @@ class TaskExcutor:
             if(key.find("击杀") != -1 and bool(value)):
                 fn = self.task_mapping.get(key)
                 self.target_task_fn = fn
-                self.logger.debug(f"今天需要完成的工会任务:[{ key }]")
+                self.logger.info(f"今天需要完成的工会任务:[{ key }]")
+                if(fn == None):
+                    self.logger.debug(f"[{ key }]的功能还没有完善.")
     
 
     # 刷工会副本

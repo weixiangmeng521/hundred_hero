@@ -49,9 +49,9 @@ FARM_UNION_TASK = True
 # 无限训练营
 IS_ABILITY_AIM = False
 # 无限抽卡
-IS_AUTO_GACHA = False
+IS_AUTO_GACHA = True
 # 无限打钱
-IS_AUTO_FARM = False
+IS_AUTO_FARM = True
 # 无限刷资源
 IS_AUTO_WOOD_AND_MINE = False
 
