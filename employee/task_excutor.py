@@ -22,7 +22,7 @@ class TaskExcutor:
         self.target_task_fn = None
         # 手动分类
         self.task_mapping = {
-            "击杀BOSS岩石巨像": self.unionTask.farmingRottingSwamp,
+            "击杀BOSS岩石巨像": self.unionTask.farmingStoneMenEfficiently,
 
 
         }

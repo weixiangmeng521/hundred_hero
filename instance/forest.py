@@ -357,3 +357,16 @@ class RottenSwamp:
             mc.move_down(1.2)
             mc.move_left(1.8)
         return lamda
+
+    # 打岩石巨人
+    def killStoneMen(self):
+        mc = self.mc
+
+        mc.move_left(5.8)
+
+        time.sleep(3)
+        
+        # 返回
+        def lamda():
+            mc.move_right(5.8)
+        return lamda

@@ -1,6 +1,7 @@
 
 # 刷工会副本
 import time
+from employee.bounty_hunter import BountyHunter
 from exception.game_status import GameStatusError
 from instance import forest, snow_zone
 from lib.challenge_select import ChallengeSelect
@@ -17,6 +18,7 @@ class UnionTask:
         self.cs = ChallengeSelect(config)
         self.reader = InfoReader(config)
         self.logger = init_logger(config)
+        self.bountyHunter = BountyHunter(config)
         # 是否进入了雪原循环圈
         self.loop_lock = False
 
@@ -84,12 +86,8 @@ class UnionTask:
         self.reader.wait_tranported()
         instance = forest.RottenSwamp(self.config)
 
-        try:
-            while True:
-                # instance.crossRoom1()
-                instance.crossRoom2(should_check = False)
-        except GameStatusError as e:
-            self.logger.error(e)
+        # instance.crossRoom1()
+        instance.crossRoom2(should_check = False)
 
         self.cs.back2Town()
         # 等待
@@ -107,3 +105,11 @@ class UnionTask:
         # 刷副本
         instance = forest.RottenSwamp(self.config)
         instance.crossColdWindCamp()
+
+
+    # 效率单刷岩石巨人
+    def farmingStoneMenEfficiently(self):
+        self.bountyHunter.killBossStoneMen()
+        # 去刷新
+        self.cs.selectIcecrownThrone()
+        self.reader.wait_tranported()
