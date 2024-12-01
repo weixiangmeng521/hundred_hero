@@ -5,6 +5,7 @@ import pytesseract
 import cv2
 import numpy as np
 from lib.challenge_select import ChallengeSelect
+from lib.handler import correct_text_handler
 from lib.logger import init_logger
 
 
@@ -113,8 +114,8 @@ class InfoReader:
         mat_image = np.array(screenshot)
         mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
         
-        self.read_task_list()
-        screenshot_handler()
+        result = self.read_task_list()
+        screenshot_handler(result)
 
         # 定义目标颜色并转换为 BGR 格式
         target_rgb = (225, 204, 77)   # RGB 格式
@@ -152,26 +153,18 @@ class InfoReader:
         task_2_img = mat_image[task_img_heigt + 5 + 3:task_img_heigt * 2 - gutter, 130:task_img_width]
         task_3_img = mat_image[task_img_heigt * 2 + 18:task_img_heigt * 3 + 3 - gutter, 130:task_img_width]
 
-        task_list = (
-            self.recognize_chinese_text(task_1_img), 
-            self.recognize_chinese_text(task_2_img), 
-            self.recognize_chinese_text(task_3_img),
-        )
-
-        
-        print(task_list)
+        return {
+            self.recognize_chinese_text(task_1_img): self.is_task_complete_by_color_percent(task_1_img),
+            self.recognize_chinese_text(task_2_img): self.is_task_complete_by_color_percent(task_2_img),
+            self.recognize_chinese_text(task_3_img): self.is_task_complete_by_color_percent(task_3_img),
+        }
 
 
-        # complete_color = (218,224,230)
-        # rate = self.get_color_ratio(mat_image, complete_color)
-
-        # for task_img in img_list:
-        #     uuid1 = uuid.uuid1()
-        #     self.save_task_sample_img(task_img, uuid1)
-
-
-        # self.print_img(task_1_img)
-
+    # 通过颜色占比来判断是否完成任务
+    def is_task_complete_by_color_percent(self, bgr_img):
+        complete_color = (218,224,230)
+        rate = self.get_color_ratio(bgr_img, complete_color)
+        return rate > 0.3
 
 
     # 读取中文
@@ -189,7 +182,7 @@ class InfoReader:
 
         # 识别中文文字，使用简体中文语言包 'chi_sim'
         text = pytesseract.image_to_string(blended_image, lang='chi_sim',  config='--psm 6')  # 使用简体中文语言包
-        return text
+        return correct_text_handler(text)
     
 
     # 提高图像
@@ -204,6 +197,7 @@ class InfoReader:
 
 
     # 保存task的图片
+    # ! 目前用不到
     def save_task_sample_img(self, bgr_img, name):
         path = f"static/task_img_sample/{name}.png"
         cv2.imwrite(path, bgr_img)                
@@ -227,7 +221,6 @@ class InfoReader:
         total_pixels = bgr_img.shape[0] * bgr_img.shape[1]
         # 计算占比
         color_ratio = target_pixels / total_pixels
-        print(target_pixels, total_pixels)
         return color_ratio
 
 
