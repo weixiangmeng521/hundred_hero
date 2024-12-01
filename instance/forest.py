@@ -276,7 +276,7 @@ class RottenSwamp:
     # 进入寒风营地
     def crossColdWindCamp(self):
         mc = self.mc
-        waitTime = 3
+        waitTime = 1.5
 
         mc.move_right(1.8)
         time.sleep(waitTime * 0)

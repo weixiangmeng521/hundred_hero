@@ -102,35 +102,47 @@ class InfoReader:
 
         return isMeatFull, isBlueMineFull
 
+    # ! 重构
+    # # 判断工会任务是否完成, false的情况下是完成了，true的情况下是没完成
+    # def is_task_complete(self, screenshot_handler):
+    #     self.cs.openTaskList()
+    #     time.sleep(.6)
+
+    #     btnPos = (320, 365, 90, 37)
+    #     # 读取指定位置
+    #     screenshot = pyautogui.screenshot(region=(btnPos))
+    #     mat_image = np.array(screenshot)
+    #     mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+        
+    #     result = self.read_task_list()
+    #     screenshot_handler(result)
+
+    #     # 定义目标颜色并转换为 BGR 格式
+    #     target_rgb = (225, 204, 77)   # RGB 格式
+    #     target_bgr = target_rgb[::-1]      # 转换为 BGR 格式
+
+    #     # 定义颜色的容差上下界，并转换为 uint8 类型
+    #     lower_bound = np.array(target_bgr) - 20
+    #     upper_bound = np.array(target_bgr) + 20
+
+    #     # 创建掩码，找到接近目标颜色的区域
+    #     mask = cv2.inRange(mat_image, lower_bound, upper_bound)
+
+    #     # 检查掩码中是否包含目标颜色
+    #     return cv2.countNonZero(mask) == 0
+
 
     # 判断工会任务是否完成, false的情况下是完成了，true的情况下是没完成
-    def is_task_complete(self, screenshot_handler):
-        self.cs.openTaskList()
-        time.sleep(.6)
-
-        btnPos = (320, 365, 90, 37)
-        # 读取指定位置
-        screenshot = pyautogui.screenshot(region=(btnPos))
-        mat_image = np.array(screenshot)
-        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
-        
-        result = self.read_task_list()
-        screenshot_handler(result)
-
-        # 定义目标颜色并转换为 BGR 格式
-        target_rgb = (225, 204, 77)   # RGB 格式
-        target_bgr = target_rgb[::-1]      # 转换为 BGR 格式
-
-        # 定义颜色的容差上下界，并转换为 uint8 类型
-        lower_bound = np.array(target_bgr) - 20
-        upper_bound = np.array(target_bgr) + 20
-
-        # 创建掩码，找到接近目标颜色的区域
-        mask = cv2.inRange(mat_image, lower_bound, upper_bound)
-
-        # 检查掩码中是否包含目标颜色
-        return cv2.countNonZero(mask) == 0
-
+    def is_task_complete(self, task_name):
+        if(len(task_name) == 0):
+            raise ValueError("Err: task_name cannot not be empty.")
+        # 获取task的list
+        task_list = self.read_task_list()
+        for key, value in task_list.items():
+            if(key == task_name):
+                if(not bool(value)):
+                    return True
+        return False
 
 
     # 读取屏幕中的任务列表
