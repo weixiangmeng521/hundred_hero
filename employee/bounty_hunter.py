@@ -9,6 +9,8 @@ from lib.app_trace import AppTrace
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
+from lib.move_controller import MoveControll
+from lib.visual_track import VisualTrack
 
 
 # BOSS杀手，专业打boss
@@ -20,6 +22,8 @@ class BountyHunter:
         self.reader = InfoReader(config)
         self.trace = AppTrace(config)
         self.logger = init_logger(config)
+        self.vt = VisualTrack(config)
+        self.mc = MoveControll(config)
 
 
     # 打第一个巨人boss
@@ -44,7 +48,7 @@ class BountyHunter:
         self.reader.wait_tranported()
         return 10
     
-    
+
     # 打小树精
     def killTreeSpirit(self):
         self.cs.selectPoorCamp()
@@ -111,10 +115,19 @@ class BountyHunter:
         return gold
 
 
+    # 移动到传送台
+    def move_2_port(self):
+        x, y, tx, ty = self.vt.find_position((121, 236, 239), 15, 15)
+        self.mc.move(x, y, tx, ty)
+        time.sleep(.3)
+
+
     # 循环打金
     def work(self):
-        total = 0
+        # 也许有那么一点点位置偏移，就会偏航
+        self.move_2_port()
 
+        total = 0
         while True:
             # 开始计时
             start_time = time.time()
