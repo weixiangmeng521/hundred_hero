@@ -92,7 +92,7 @@ class VisualTrack:
 
         # Calculate the center of the window
         height, width = binary_image.shape
-        window_center = np.array([width // 2, height // 2])
+        window_center = (width // 2, height // 2)
 
         # Default values for the target centroid
         target_x, target_y = window_center
@@ -107,7 +107,7 @@ class VisualTrack:
                 target_x = int(moments['m10'] / moments['m00'])
                 target_y = int(moments['m01'] / moments['m00'])
 
-        return window_center[0], window_center[1], target_x, target_y
+        return (window_center[0], window_center[1], target_x, target_y)
 
 
     # 计算两点距离
