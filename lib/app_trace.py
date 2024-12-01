@@ -8,7 +8,7 @@ import pyautogui
 
 from lib.challenge_select import ChallengeSelect
 from lib.logger import init_logger
-from lib.message import MessageService
+from lib.message_service import MessageService
 
 # 捕获error消息
 class AppTrace:

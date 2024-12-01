@@ -7,11 +7,10 @@ from employee.task_excutor import TaskExcutor
 from exception.game_status import GameStatusError
 from employee.farmer import Farmer
 from instance.union_task import UnionTask
-import time
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
-from lib.message import MessageService
+from lib.message_service import MessageService
 from lib.move_controller import MoveControll
 from lib.app_trace import AppTrace
 from lib.threads_manager import ThreadsManager
@@ -48,7 +47,7 @@ IS_WAKE_UP_APP = True
 # 是否有加载广告
 IS_LOADING_ADS = True
 # 刷工会副本
-FARM_UNION_TASK = False
+FARM_UNION_TASK = True
 # 无限训练营
 IS_ABILITY_AIM = False
 # 无限抽卡

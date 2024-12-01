@@ -100,11 +100,16 @@ class UnionTask:
         if(self.reader.is_show_back2town_btn() == False):
             # 选择并进入副本
             self.cs.selectColdWindCamp()
-            time.sleep(10)
+            self.reader.wait_tranported()
             
         # 刷副本
         instance = forest.RottenSwamp(self.config)
         instance.crossColdWindCamp()
+
+        self.cs.back2Town()
+        # 等待
+        self.reader.wait_tranported()
+
 
 
     # 效率单刷岩石巨人
