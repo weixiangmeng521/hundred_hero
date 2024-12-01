@@ -14,6 +14,7 @@ from lib.logger import init_logger
 from lib.message import MessageService
 from lib.move_controller import MoveControll
 from lib.app_trace import AppTrace
+from lib.threads_manager import ThreadsManager
 from lib.visual_track import VisualTrack
 import configparser
 
@@ -35,6 +36,8 @@ farmer = Farmer(config)
 taskExcutor = TaskExcutor(config)
 trace = AppTrace(config)
 coachNPC = CoachNPC(config)
+threadsManager = ThreadsManager(config)
+
 
 # 配置twilio
 pusher = MessageService(config)
@@ -63,7 +66,6 @@ def wake_up_window():
     cs.move2LeftTop(reader.wait_game_loaded, IS_LOADING_ADS)
 
 
-
 # 错误处理
 def error_handle():
     trace.play_sound("Glass.aiff")
@@ -72,8 +74,6 @@ def error_handle():
     cs.closeGameWithoutException()
     time.sleep(.3)
     bootstrap()
-
-
 
 
 # 初始函数
@@ -92,8 +92,8 @@ def bootstrap():
     if(IS_AUTO_WOOD_AND_MINE): farmer.work()
 
 
-
-def __main__():
+# 工作线程
+def work_thread(name):
     try:
         bootstrap()
 
@@ -102,13 +102,15 @@ def __main__():
         logger.error(f"{e}, {stack_info}")
         error_handle()
 
-    except KeyboardInterrupt:
-        print("正常结束")
-
     except Exception as e:
         stack_info = traceback.format_exc()
         logger.error(f"{e}, {stack_info}")
         trace.play_sound("Ping.aiff")
+
+
+def __main__():
+    threadsManager.add_task("WorkThread", work_thread)
+    threadsManager.run()
 
 
 if __name__ == "__main__":
