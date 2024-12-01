@@ -33,7 +33,18 @@ class BountyHunter:
         self.reader.wait_tranported()
         return 10
 
-
+    
+    # 击杀岩石巨人
+    def killBossStoneMen(self):
+        self.cs.selectWoodInstance()
+        instance = RottenSwamp(self.config)
+        self.reader.wait_tranported()
+        instance.killStoneMen()
+        self.cs.back2Town()
+        self.reader.wait_tranported()
+        return 10
+    
+    
     # 打小树精
     def killTreeSpirit(self):
         self.cs.selectPoorCamp()

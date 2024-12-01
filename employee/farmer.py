@@ -111,36 +111,36 @@ class Farmer:
         self.work()
 
 
+ 
 
-
-    # 刷工会副本
-    def for_union_task(self):
-        while True:
-            # 检测是否完成工会副本
-            if(self.reader.is_task_complete() == True):
-                self.reader.close_task_menu(True)
-                time.sleep(1.2)
-                self.cs.clearAds(1)
-                self.logger.info("工会任务已完成，无需再打")
-                if(self.reader.is_show_back2town_btn()): 
-                    self.cs.back2Town()
-                    self.unionTask.refresh()
-                    time.sleep(10)
-                return
+    # # 刷工会副本
+    # def for_union_task(self):
+    #     while True:
+    #         # 检测是否完成工会副本
+    #         if(self.reader.is_task_complete() == True):
+    #             self.reader.close_task_menu(True)
+    #             time.sleep(1.2)
+    #             self.cs.clearAds(1)
+    #             self.logger.info("工会任务已完成，无需再打")
+    #             if(self.reader.is_show_back2town_btn()): 
+    #                 self.cs.back2Town()
+    #                 self.unionTask.refresh()
+    #                 time.sleep(10)
+    #             return
             
-            self.reader.close_task_menu()
-            # 工会副本任务没有完成，准备打工会副本
-            self.logger.info(f"工会任务没有完成，打工会任务。")
+    #         self.reader.close_task_menu()
+    #         # 工会副本任务没有完成，准备打工会副本
+    #         self.logger.info(f"工会任务没有完成，打工会任务。")
             
-            # 刷副本
-            time.sleep(1.2)
+    #         # 刷副本
+    #         time.sleep(1.2)
             
-            self.unionTask.farmingMagicRing()
+    #         self.unionTask.farmingMagicRing()
 
-            # GuildTask.farmingSnowfield()
+    #         # GuildTask.farmingSnowfield()
 
-            # GuildTask.farmingPollutionOutpost()
+    #         # GuildTask.farmingPollutionOutpost()
 
-            # GuildTask.farmingColdWindCamp()
+    #         # GuildTask.farmingColdWindCamp()
 
     
