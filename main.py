@@ -48,11 +48,11 @@ IS_WAKE_UP_APP = True
 # 是否有加载广告
 IS_LOADING_ADS = True
 # 刷工会副本
-FARM_UNION_TASK = True
+FARM_UNION_TASK = False
 # 无限训练营
 IS_ABILITY_AIM = False
 # 无限抽卡
-IS_AUTO_GACHA = True
+IS_AUTO_GACHA = False
 # 无限打钱
 IS_AUTO_FARM = True
 # 无限刷资源
@@ -66,41 +66,26 @@ def wake_up_window():
     cs.move2LeftTop(reader.wait_game_loaded, IS_LOADING_ADS)
 
 
-# 错误处理
-def error_handle():
-    trace.play_sound("Glass.aiff")
-    pusher.push(f"[{app_name}]运行异常, 请查看错误日志.")
-    trace.screen_shot()
-    cs.closeGameWithoutException()
-    time.sleep(.3)
-    bootstrap()
-
-
-# 初始函数
-def bootstrap():
-    # 唤醒
-    if(IS_WAKE_UP_APP): wake_up_window()
-    # 打工会
-    if(FARM_UNION_TASK): taskExcutor.work()
-    # 训练营
-    if(IS_ABILITY_AIM): coachNPC.work()
-    # 抽卡
-    if(IS_AUTO_GACHA): cardsMaster.work()
-    # 打钱
-    if(IS_AUTO_FARM): bountyHunter.work()
-    # 刷资源
-    if(IS_AUTO_WOOD_AND_MINE): farmer.work()
-
-
 # 工作线程
 def work_thread(name):
     try:
-        bootstrap()
+        # 唤醒
+        if(IS_WAKE_UP_APP): wake_up_window()
+        # 打工会
+        if(FARM_UNION_TASK): taskExcutor.work()
+        # 训练营
+        if(IS_ABILITY_AIM): coachNPC.work()
+        # 抽卡
+        if(IS_AUTO_GACHA): cardsMaster.work()
+        # 打钱
+        if(IS_AUTO_FARM): bountyHunter.work()
+        # 刷资源
+        if(IS_AUTO_WOOD_AND_MINE): farmer.work()
 
     except (RuntimeError, GameStatusError, TimeoutError) as e:
         stack_info = traceback.format_exc()
         logger.error(f"{e}, {stack_info}")
-        error_handle()
+        trace.report_error(e)
 
     except Exception as e:
         stack_info = traceback.format_exc()
@@ -108,10 +93,11 @@ def work_thread(name):
         trace.play_sound("Ping.aiff")
 
 
-def __main__():
+# 入口函数
+def main():
     threadsManager.add_task("WorkThread", work_thread)
     threadsManager.run()
 
 
 if __name__ == "__main__":
-    __main__()
+    main()
