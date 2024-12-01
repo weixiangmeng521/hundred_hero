@@ -1,9 +1,11 @@
 
 # 刷工会副本
 import time
+from exception.game_status import GameStatusError
 from instance import forest, snow_zone
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
+from lib.logger import init_logger
 
 
 # 工会任务
@@ -14,6 +16,7 @@ class UnionTask:
         self.app_name = config["APP"]["Name"]
         self.cs = ChallengeSelect(config)
         self.reader = InfoReader(config)
+        self.logger = init_logger(config)
         # 是否进入了雪原循环圈
         self.loop_lock = False
 
@@ -72,6 +75,25 @@ class UnionTask:
         
         # 循环走圈
         instance.crossRoom3Loop()
+
+
+    # 刷腐烂沼泽
+    def farmingRottingSwamp(self):
+        self.cs.selectWoodInstance()
+        # 等待
+        self.reader.wait_tranported()
+        instance = forest.RottenSwamp(self.config)
+
+        try:
+            while True:
+                # instance.crossRoom1()
+                instance.crossRoom2(should_check = False)
+        except GameStatusError as e:
+            self.logger.error(e)
+
+        self.cs.back2Town()
+        # 等待
+        self.reader.wait_tranported()
 
     
     # 刷寒风营地

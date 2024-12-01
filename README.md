@@ -8,6 +8,8 @@ python3 -m venv venv
 source venv/bin/activate
 # 运行
 python3 main.py
+# 生成依赖
+pip freeze > requirements.txt
 # 结束
 deactivate
 ```
@@ -18,12 +20,7 @@ https://www.twilio.com/en-us
 
 ### 依赖
 ORC系:
-- pytesseract 对中文支持不好，放弃
-- CnOCR 中文支持好，轻量
-
-```bash
-pip install "cnocr[ort-cpu]"
-```
+- pytesseract 对中文支持害行
 
 
 ### python版本选择
@@ -36,7 +33,7 @@ export PATH="/usr/local/anaconda3/bin:$PATH"
 # <<< conda initialize <<<
 ```
 
-- 适配他
+- 适配
 ```bash
 # bash
 source ~/.bash_profile
