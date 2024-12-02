@@ -4,6 +4,7 @@ from employee.bounty_hunter import BountyHunter
 from employee.cards_master import CardsMaster
 from employee.coach_NPC import CoachNPC
 from employee.task_excutor import TaskExcutor
+from employee.treasure_hunt import TreasureHunt
 from exception.game_status import GameStatusError
 from employee.farmer import Farmer
 from instance.union_task import UnionTask
@@ -26,7 +27,6 @@ config.read('config.ini')
 cs = ChallengeSelect(config)
 mc = MoveControll(config)
 reader = InfoReader(config)
-vt = VisualTrack(config)
 unionTask = UnionTask(config)
 cardsMaster = CardsMaster(config)
 logger = init_logger(config)
@@ -36,7 +36,7 @@ taskExcutor = TaskExcutor(config)
 trace = AppTrace(config)
 coachNPC = CoachNPC(config)
 threadsManager = ThreadsManager(config)
-
+treasureHunter = TreasureHunt(config)
 
 # 配置twilio
 pusher = MessageService(config)
@@ -52,6 +52,8 @@ ENABLE_AUTO_UNION_TASK = config.getboolean('TASK', 'EnableAutoUnionTask')
 ENABLE_AUTO_ABILITY_IMPROVE = config.getboolean('TASK', 'EnableAutoAbilityImporve')
 # 无限抽卡
 ENABLE_AUTO_GACHA = config.getboolean('TASK', 'EnableAutoGaCha')
+# 刷每日箱子
+ENABLE_AUTO_DAILY_CASE = config.getboolean('TASK', 'EnableAutoDaliyCase')
 # 无限打钱
 ENABLE_AUTO_COIN = config.getboolean('TASK', 'EnableAutoCoin')
 # 无限刷资源
@@ -76,6 +78,8 @@ def work_thread(name):
         if(ENABLE_AUTO_ABILITY_IMPROVE): coachNPC.work()
         # 抽卡
         if(ENABLE_AUTO_GACHA): cardsMaster.work()
+        # 刷30个箱子
+        if(ENABLE_AUTO_DAILY_CASE): treasureHunter.work()
         # 打钱
         if(ENABLE_AUTO_COIN): bountyHunter.work()
         # 刷资源
@@ -93,6 +97,7 @@ def work_thread(name):
 
 
 # 入口函数
+# TODO: 为了方便测试，做单线程和守护线程运行的两种模式。
 def main():
     threadsManager.add_task("WorkThread", work_thread)
     threadsManager.run()
