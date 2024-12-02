@@ -1,6 +1,7 @@
 import time
-import numpy as np
+from defined import IS_UNION_TASK_FINISHED
 from instance.union_task import UnionTask
+from lib.cache import CacheManager
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
@@ -16,6 +17,7 @@ class TaskExcutor:
         self.unionTask = UnionTask(config)
         self.reader = InfoReader(config)
         self.logger = init_logger(config)
+        self.cache = CacheManager(config)
         # 今日目标任务
         self.target_task_fn = None
         # 今日的任务名称
@@ -59,9 +61,12 @@ class TaskExcutor:
             # 检测是否完成工会副本
             if(self.reader.is_task_complete(self.target_task_name)):
                 self.reader.close_task_menu(True)
+                # 设置缓存
+                self.cache.set(IS_UNION_TASK_FINISHED, 1)                
                 time.sleep(1.2)
                 self.cs.clearAds(1)
                 self.logger.info("工会任务已完成，无需再打")
+                # 是否显示回城按钮
                 if(self.reader.is_show_back2town_btn()): 
                     self.cs.back2Town()
                     self.unionTask.refresh()
@@ -85,4 +90,10 @@ class TaskExcutor:
 
     # 执行任务
     def work(self):
+        is_finished = self.cache.get(IS_UNION_TASK_FINISHED)
+        # 如果完成了任务就直接结束。
+        if(is_finished and int(is_finished) == 1):
+            self.logger.info("工会任务已完成，无需再打")
+            return
+
         self.for_union_task()

@@ -6,3 +6,6 @@ CORRECTION_DICT = {
     '荣': '杀',
     '茶': '杀',
 }
+
+
+IS_UNION_TASK_FINISHED = "1"

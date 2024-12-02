@@ -57,6 +57,7 @@ class AppTrace:
         hour_earned = rate * 60 * 60
         self.logger.debug(f"打金耗时: {minutes}m {seconds:.2f}s, 1h刷金预计: {hour_earned:.2f}")
 
+
     # 报告错误
     def report_error(self, info):
         self.play_sound("Glass.aiff")
