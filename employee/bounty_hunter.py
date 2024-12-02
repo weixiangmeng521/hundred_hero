@@ -65,7 +65,7 @@ class BountyHunter:
         self.cs.selectTwoPeak()
         instance = PoorZone(self.config)
         self.reader.wait_tranported()
-        move_back = instance.killBullBoos()
+        move_back = instance.killBullBossOldVersion()
         move_back()
         self.reader.wait_tranported()
         return 20

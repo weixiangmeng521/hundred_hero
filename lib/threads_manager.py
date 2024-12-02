@@ -11,6 +11,11 @@ class ThreadsManager:
         self.logger = init_logger(config)
         self.threads = {}  # 存储任务信息
         self.running = True  # 控制线程运行状态
+        # 重启时间
+        if(not config["THREADS"]["RestartWaitTime"]):
+            raise ValueError("RestartWaitTime cannot be invalid. please check config.ini.")
+
+        self.restart_wait_time = int(config["THREADS"]["RestartWaitTime"])
 
 
     # 增加线程
@@ -47,9 +52,10 @@ class ThreadsManager:
                 for name, info in list(self.threads.items()):
                     thread = info['thread']
                     if not thread.is_alive():  # 检查线程存活状态
-                        self.logger.warning(f"线程[{name}]已退出，正在重启...")
+                        self.logger.warning(f"线程[{name}]已退出,{self.restart_wait_time}s后重启...")
+                        time.sleep(self.restart_wait_time)
                         self.restart_thread(name)
-                time.sleep(5)
+                    time.sleep(1)
 
         except KeyboardInterrupt:
             self.logger.debug("主线程被手动中断，正在退出...")

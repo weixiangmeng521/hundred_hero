@@ -7,7 +7,7 @@ import numpy as np
 from lib.challenge_select import ChallengeSelect
 from lib.handler import correct_text_handler
 from lib.logger import init_logger
-
+import matplotlib.pyplot as plt
 
 # 读取屏幕信息
 class InfoReader:
@@ -42,7 +42,7 @@ class InfoReader:
         winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
         winWidth, winHeight = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
         return winX, winY, winWidth, winHeight
-
+    
 
     # 打印字代颜色
     def print_color(self, text, r, g, b):
@@ -101,35 +101,6 @@ class InfoReader:
         isBlueMineFull = self.is_full_from_img(blueMinePosList)
 
         return isMeatFull, isBlueMineFull
-
-    # ! 重构
-    # # 判断工会任务是否完成, false的情况下是完成了，true的情况下是没完成
-    # def is_task_complete(self, screenshot_handler):
-    #     self.cs.openTaskList()
-    #     time.sleep(.6)
-
-    #     btnPos = (320, 365, 90, 37)
-    #     # 读取指定位置
-    #     screenshot = pyautogui.screenshot(region=(btnPos))
-    #     mat_image = np.array(screenshot)
-    #     mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
-        
-    #     result = self.read_task_list()
-    #     screenshot_handler(result)
-
-    #     # 定义目标颜色并转换为 BGR 格式
-    #     target_rgb = (225, 204, 77)   # RGB 格式
-    #     target_bgr = target_rgb[::-1]      # 转换为 BGR 格式
-
-    #     # 定义颜色的容差上下界，并转换为 uint8 类型
-    #     lower_bound = np.array(target_bgr) - 20
-    #     upper_bound = np.array(target_bgr) + 20
-
-    #     # 创建掩码，找到接近目标颜色的区域
-    #     mask = cv2.inRange(mat_image, lower_bound, upper_bound)
-
-    #     # 检查掩码中是否包含目标颜色
-    #     return cv2.countNonZero(mask) == 0
 
 
     # 判断工会任务是否完成, false的情况下是完成了，true的情况下是没完成
@@ -305,6 +276,37 @@ class InfoReader:
         return is_contain_reborn_btn and is_contain_give_up_btn
 
 
+    # 直到出现箱子
+    def till_find_treasure(self):
+        # TODO: 计划设置10分钟系统超时
+
+        # while True:
+        window = self.get_specific_window_info()
+        if(window == None): 
+            raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+        
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        # 获取目标定位
+        flagPos = (
+            int(winX + 10), 
+            int(winY + 10), 
+            int(winWidth - winX),  # 宽度
+            int(winHeight - winY)  # 高度
+        )
+        print(flagPos)
+
+        screenshot = pyautogui.screenshot(region=flagPos)
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
+        # target_rgb = (102, 193, 82)   # RGB 格式
+
+        # cv2.imshow("asdas", mat_image)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+
+
+
+
     # 等待传送完成
     def wait_tranported(self):
         start_time = time.time()  # 记录开始时间
@@ -339,11 +341,12 @@ class InfoReader:
             # cv2.destroyAllWindows()
 
             target_bgr = target_rgb[::-1]      # 转换为 BGR 格式
-            tolerance = 5  # 容差
+            tolerance = 0  # 容差
             lower_bound = np.array([max(0, c - tolerance) for c in target_bgr])
             upper_bound = np.array([min(255, c + tolerance) for c in target_bgr])
             mask = cv2.inRange(mat_image, lower_bound, upper_bound)
             if(cv2.countNonZero(mask) > 0):
+                time.sleep(.05)
                 return
 
 

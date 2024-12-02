@@ -32,6 +32,30 @@ class PoorZone:
             mc.move_left(1.2)
         return lamda
 
+    # 老版本的刷牛
+    def killBullBossOldVersion(self):
+        mc = self.mc
+
+        mc.move_top(4)
+
+        mc.move_right(.5)
+
+        mc.move_top(3.8)
+
+        mc.move_left(1.8)
+        time.sleep(1)
+
+        mc.move_top(5.6)
+        time.sleep(1)
+
+        def lamb():
+            mc.move_top(1.4)
+            mc.move_right_top(2.1)
+            mc.move_top(.7)
+            mc.move_left(1.6)
+        return lamb
+
+
 
     # 杀牛魔王boss
     def killBullBoos(self):
