@@ -41,7 +41,8 @@ treasureHunter = TreasureHunt(config)
 # 配置twilio
 pusher = MessageService(config)
 
-
+# 是否守护线程
+ENABLE_DEAMON = config.getboolean('THREADS', 'EnableDeamon')
 # 需不需要唤醒
 IS_WAKE_UP_APP = config.getboolean('TASK', 'IsWakeUpApp')
 # 是否有加载广告
@@ -97,10 +98,13 @@ def work_thread(name):
 
 
 # 入口函数
-# TODO: 为了方便测试，做单线程和守护线程运行的两种模式。
 def main():
-    threadsManager.add_task("WorkThread", work_thread)
-    threadsManager.run()
+    if(ENABLE_DEAMON):
+        threadsManager.add_task("WorkThread", work_thread)
+        threadsManager.run()
+
+    if(not ENABLE_DEAMON):
+        work_thread("single_thread_mode")
 
 
 if __name__ == "__main__":

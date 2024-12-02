@@ -107,13 +107,78 @@ class InfoReader:
     def is_task_complete(self, task_name):
         if(len(task_name) == 0):
             raise ValueError("Err: task_name cannot not be empty.")
-        # 获取task的list
+        
+        # 获取三个位置，如果是变绿了，就点击。
+        self.click_complete_task_btn()
+        time.sleep(3)
+
+        # 获取task的list，判断是不是已经提交了
         task_list = self.read_task_list()
         for key, value in task_list.items():
             if(key == task_name):
                 if(not bool(value)):
                     return True
         return False
+    
+
+    # 获取三个任务的领取按钮的位置，如果符合要求就点击
+    def click_complete_task_btn(self):
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        # 读取指定位置
+        screenshot = pyautogui.screenshot(region=(
+            int(winX + 50), 
+            int(winY + 325), 
+            int(winWidth - 100), 
+            int(winHeight - 650)
+        ))
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+        task_img_heigt = int((winHeight - 650 - 15) / 3)
+        task_img_width = int(winWidth - 110)
+        gutter = 12
+        # start_y:end_y, start_x:end_x
+        task_1_img = mat_image[12:task_img_heigt - 8 - gutter, 275:task_img_width]
+        task_2_img = mat_image[task_img_heigt + 20:task_img_heigt * 2 - gutter, 275:task_img_width]
+        task_3_img = mat_image[task_img_heigt + 95:task_img_heigt * 3 - 5 - gutter, 275:task_img_width]
+
+        btn1 = (int((task_img_width // 2) + 185) , int((task_img_heigt - 8 - gutter) // 2 + 352))
+        btn2 = (int((task_img_width // 2) + 185) , int((task_img_heigt * 2 - gutter) // 2  + task_img_heigt + 320))
+        btn3 = (int((task_img_width // 2) + 185) , int((task_img_heigt * 3 - 5 - gutter) // 2  + task_img_heigt + 360))
+
+        # 点击完成按钮
+        green_color = (97, 198, 98)
+        if(self.is_target_area(task_1_img, green_color, 0)):
+            pyautogui.click(btn1[0], btn1[1])
+        
+        if(self.is_target_area(task_2_img, green_color, 0)):
+            pyautogui.click(btn2[0], btn2[1])
+
+        if(self.is_target_area(task_3_img, green_color, 0)):
+            pyautogui.click(btn3[0], btn3[1])
+    
+
+    # 是不是指定地方
+    def is_target_area(self, bgr_img, target_rgb, threshold = 10):
+        # 定义目标颜色并转换为 BGR 格式
+        target_bgr = target_rgb[::-1]      # 转换为 BGR 格式
+
+        # 定义颜色的容差上下界，并转换为 uint8 类型
+        lower_bound = np.array(target_bgr) - threshold
+        upper_bound = np.array(target_bgr) + threshold
+
+        # 创建掩码，找到接近目标颜色的区域
+        mask = cv2.inRange(bgr_img, lower_bound, upper_bound)
+
+        # 检查掩码中是否包含目标颜色
+        return cv2.countNonZero(mask) > 0
+
+
+    # 输出图片每个色块
+    def print_img(self, mat_image):
+        for row in range(mat_image.shape[0]):  # 遍历行
+            for col in range(mat_image.shape[1]):  # 遍历列
+                b, g, r = mat_image[row, col]  # 获取像素的 BGR 值
+                self.print_color(f"{r},{g},{b}", r, g, b)
 
 
     # 读取屏幕中的任务列表
@@ -211,7 +276,7 @@ class InfoReader:
     def close_task_menu(self, is_click_complete = False):
         if(is_click_complete): 
             self.cs.completeUnionTask()
-            self.logger.info(f"点击已完成工会副本按钮.")
+            self.logger.info(f"点击关闭窗口按钮.")
         self.cs.closeWin()
         time.sleep(.3)
 
