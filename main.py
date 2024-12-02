@@ -43,19 +43,19 @@ pusher = MessageService(config)
 
 
 # 需不需要唤醒
-IS_WAKE_UP_APP = config["TASK"]["IsWakeUpApp"]
+IS_WAKE_UP_APP = config.getboolean('TASK', 'IsWakeUpApp')
 # 是否有加载广告
-IS_LOADING_ADS = config["TASK"]["IsLoadingAds"]
+IS_LOADING_ADS = config.getboolean('TASK', 'IsLoadingAds')
 # 刷工会副本
-ENABLE_AUTO_UNION_TASK = config["TASK"]["EnableAutoUnionTask"]
+ENABLE_AUTO_UNION_TASK = config.getboolean('TASK', 'EnableAutoUnionTask')
 # 无限训练营
-ENABLE_AUTO_ABILITY_IMPROVE = config["TASK"]["EnableAutoAbilityImporve"]
+ENABLE_AUTO_ABILITY_IMPROVE = config.getboolean('TASK', 'EnableAutoAbilityImporve')
 # 无限抽卡
-ENABLE_AUTO_GACHA = config["TASK"]["EnableAutoGaCha"]
+ENABLE_AUTO_GACHA = config.getboolean('TASK', 'EnableAutoGaCha')
 # 无限打钱
-ENABLE_AUTO_COIN = config["TASK"]["EnableAutoCoin"]
+ENABLE_AUTO_COIN = config.getboolean('TASK', 'EnableAutoCoin')
 # 无限刷资源
-ENABLE_AUTO_WOOD_AND_MINE = config["TASK"]["EnableAutoWoodAndMine"]
+ENABLE_AUTO_WOOD_AND_MINE = config.getboolean('TASK', 'EnableAutoWoodAndMine')
 
 
 
