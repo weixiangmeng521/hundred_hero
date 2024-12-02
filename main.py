@@ -41,21 +41,21 @@ threadsManager = ThreadsManager(config)
 # 配置twilio
 pusher = MessageService(config)
 
-app_name = config["APP"]["Name"]
+
 # 需不需要唤醒
-IS_WAKE_UP_APP = True
+IS_WAKE_UP_APP = config["TASK"]["IsWakeUpApp"]
 # 是否有加载广告
-IS_LOADING_ADS = True
+IS_LOADING_ADS = config["TASK"]["IsLoadingAds"]
 # 刷工会副本
-FARM_UNION_TASK = True
+ENABLE_AUTO_UNION_TASK = config["TASK"]["EnableAutoUnionTask"]
 # 无限训练营
-IS_ABILITY_AIM = False
+ENABLE_AUTO_ABILITY_IMPROVE = config["TASK"]["EnableAutoAbilityImporve"]
 # 无限抽卡
-IS_AUTO_GACHA = False
+ENABLE_AUTO_GACHA = config["TASK"]["EnableAutoGaCha"]
 # 无限打钱
-IS_AUTO_FARM = True
+ENABLE_AUTO_COIN = config["TASK"]["EnableAutoCoin"]
 # 无限刷资源
-IS_AUTO_WOOD_AND_MINE = False
+ENABLE_AUTO_WOOD_AND_MINE = config["TASK"]["EnableAutoWoodAndMine"]
 
 
 
@@ -71,15 +71,15 @@ def work_thread(name):
         # 唤醒
         if(IS_WAKE_UP_APP): wake_up_window()
         # 打工会
-        if(FARM_UNION_TASK): taskExcutor.work()
+        if(ENABLE_AUTO_UNION_TASK): taskExcutor.work()
         # 训练营
-        if(IS_ABILITY_AIM): coachNPC.work()
+        if(ENABLE_AUTO_ABILITY_IMPROVE): coachNPC.work()
         # 抽卡
-        if(IS_AUTO_GACHA): cardsMaster.work()
+        if(ENABLE_AUTO_GACHA): cardsMaster.work()
         # 打钱
-        if(IS_AUTO_FARM): bountyHunter.work()
+        if(ENABLE_AUTO_COIN): bountyHunter.work()
         # 刷资源
-        if(IS_AUTO_WOOD_AND_MINE): farmer.work()
+        if(ENABLE_AUTO_WOOD_AND_MINE): farmer.work()
 
     except (RuntimeError, GameStatusError, TimeoutError) as e:
         stack_info = traceback.format_exc()

@@ -57,7 +57,6 @@ class TaskExcutor:
         while True:
             self.check_union_task_list()
             # 检测是否完成工会副本
-            print(self.reader.is_task_complete(self.target_task_name))
             if(self.reader.is_task_complete(self.target_task_name)):
                 self.reader.close_task_menu(True)
                 time.sleep(1.2)
