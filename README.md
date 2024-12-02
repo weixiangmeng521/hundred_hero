@@ -51,3 +51,10 @@ conda activate python312
 # deactivate
 conda deactivate
 ```
+
+### MEMO
+如果调试cv.imshow函数，需要把设置成单线程
+```ini
+[THREADS]
+EnableDeamon = False
+```

@@ -117,7 +117,7 @@ class BountyHunter:
 
     # 移动到传送台
     def move_2_port(self):
-        x, y, tx, ty = self.vt.find_position((121, 236, 239), 15, 15)
+        x, y, tx, ty = self.vt.find_position((121, 236, 239), 0, 0)
         self.mc.move(x, y, tx, ty)
         time.sleep(.3)
 
