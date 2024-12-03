@@ -24,6 +24,5 @@ class TwoCentipede:
         mc.move_right_down(5)
         time.sleep(.1)
 
-        mc.move_right_top(5)
-        time.sleep(10)
+        mc.move_right_top(5.6)
 
