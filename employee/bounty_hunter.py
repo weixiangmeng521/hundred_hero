@@ -125,7 +125,7 @@ class BountyHunter:
     # 循环打金
     def work(self):
         # 也许有那么一点点位置偏移，就会偏航
-        self.move_2_port()
+        # self.move_2_port()
 
         total = 0
         while True:

@@ -1,3 +1,4 @@
+import queue
 import traceback
 import numpy as np
 from employee.bounty_hunter import BountyHunter
@@ -35,11 +36,15 @@ farmer = Farmer(config)
 taskExcutor = TaskExcutor(config)
 trace = AppTrace(config)
 coachNPC = CoachNPC(config)
-threadsManager = ThreadsManager(config)
 treasureHunter = TreasureHunt(config)
 
 # 配置twilio
 pusher = MessageService(config)
+# 定义队列用于线程间通信
+event_queue = queue.Queue()
+# 初始化多线程管理器
+threadsManager = ThreadsManager(config, event_queue)
+
 
 # 是否守护线程
 ENABLE_DEAMON = config.getboolean('THREADS', 'EnableDeamon')
@@ -69,7 +74,7 @@ def wake_up_window():
 
 
 # 工作线程
-def work_thread(name):
+def work_thread(event_queue):
     try:
         # 唤醒
         if(IS_WAKE_UP_APP): wake_up_window()
@@ -101,10 +106,11 @@ def work_thread(name):
 def main():
     if(ENABLE_DEAMON):
         threadsManager.add_task("WorkThread", work_thread)
+        # threadsManager.add_task("KeyBoardMonitor", keyboradMonitor.work)
         threadsManager.run()
 
     if(not ENABLE_DEAMON):
-        work_thread("single_thread_mode")
+        work_thread(event_queue)
 
 
 if __name__ == "__main__":

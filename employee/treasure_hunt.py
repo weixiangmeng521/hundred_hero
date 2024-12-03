@@ -38,9 +38,8 @@ class TreasureHunt:
         # killboss, till find two of treasure
         self.reader.till_find_treasure()
         self.logger.info("成功击杀双蜈蚣")
-
-        treasure_list = self.reader.find_treasure_case()
-        self.click_treasure(treasure_list)
+        # 等到获得宝箱的东西
+        self.till_get_treasure()
         time.sleep(1.2)
 
         self.cs.back2Town()
@@ -48,20 +47,34 @@ class TreasureHunt:
 
     # 点击宝箱
     # 点击，因为旁边有小怪，也可能失效，点击不上
-    def click_treasure(self, treasure_list):
+    # TODO: 判断今日是否已经领取完30个奖励
+    def till_get_treasure(self):
         start_time = time.time()  # 记录开始时间
-        timeout = 60 * 120 # 超时时间，单位为秒
-
-        elapsed_time = time.time() - start_time  # 计算已过去的时间
-        if elapsed_time > timeout:
-            raise TimeoutError(f"点击宝箱时: 未在{timeout}s点击宝箱。")            
+        timeout = 60 * 4  # 超时时间，单位为秒
         
-        for btn in treasure_list:
-            pyautogui.click(btn[0], btn[1] + 20)
-            time.sleep(2.4)
-            self.reader.click_rewards()
-            time.sleep(.3)
-            self.cs.clearAds(5)
+        while True:
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError(f"点击宝箱时: 未在 {timeout}s 内点击宝箱。")
+
+            # 获取宝箱列表
+            treasure_list = self.reader.find_treasure_case()
+
+            if len(treasure_list) >= 1:
+                # 点击第一个宝箱
+                btn = treasure_list[0]
+                pyautogui.click(btn[0], btn[1] + 20)
+
+                # 判断是否点击成功并处理弹窗
+                self.reader.wait_treasure_pop_up()
+                time.sleep(0.3)
+                self.reader.click_rewards()
+                time.sleep(1)
+                # self.cs.clearAds(5)
+            
+            # 如果领取完全部奖励，结束
+            if len(treasure_list) == 0:
+                break
 
 
     
