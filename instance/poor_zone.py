@@ -56,8 +56,24 @@ class PoorZone:
         return lamb
 
 
+    # 根据某人的视频，做的优化，多人版本
+    def killBullBossQuickly(self):
+        mc = self.mc
 
-    # 杀牛魔王boss
+        mc.move_right(1.6)
+        mc.move_down(.9)
+        mc.move_left_down(2.3)
+        mc.move_down(1.4)
+        # 杀第一个boss
+        time.sleep(.4)
+
+        mc.move_down(5)
+        # 杀第二个boss
+        time.sleep(.4)
+
+
+
+    # 杀牛魔王boss，适合只带两个人
     def killBullBoos(self):
         mc = self.mc
         

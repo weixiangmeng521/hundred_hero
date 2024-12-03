@@ -69,11 +69,22 @@ class BountyHunter:
         move_back()
         self.reader.wait_tranported()
         return 20
+    
+
+    # 打牛魔王
+    def killBullBossQuickly(self):
+        self.cs.selectPollutionOutpost()
+        instance = PoorZone(self.config)
+        self.reader.wait_tranported()
+        instance.killBullBossQuickly()
+        self.cs.back2Town()
+        self.reader.wait_tranported()
+        return 20
 
 
     # 打蜘蛛boss
     def killSpiderBoss(self):
-        self.cs.selectWoodInstance()
+        self.cs.select()
         instance = RottenSwamp(self.config)
         self.reader.wait_tranported()
         instance.killSpiderBoss()
@@ -106,9 +117,9 @@ class BountyHunter:
     # 单个打金任务
     def task(self):
         gold = 0
-        gold += self.killBossGiant()
+        # gold += self.killBossGiant()
         gold += self.killTreeSpirit()
-        gold += self.killBullBoss()
+        gold += self.killBullBossQuickly()
         # gold += self.killSpiderBoss()
         gold += self.killBigTreeBoss()
         # gold += self.killSnowmanBoss()
