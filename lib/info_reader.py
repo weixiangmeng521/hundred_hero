@@ -1,9 +1,11 @@
+import math
 import time
 import pyautogui
 import Quartz
 import pytesseract
 import cv2
 import numpy as np
+from exception.game_status import GameStatusError
 from lib.challenge_select import ChallengeSelect
 from lib.handler import correct_text_handler
 from lib.logger import init_logger
@@ -18,7 +20,10 @@ class InfoReader:
         self.img_win_name = "ImageAnalysis"   
         self.logger = init_logger(config)
         self.cs = ChallengeSelect(config)
-
+        self.font = cv2.FONT_HERSHEY_SIMPLEX
+        self.font_scale = .5
+        self.color = (255, 0, 0)  # 绿色
+        self.thickness = 1
 
     # 获取窗口信息
     def get_specific_window_info(self):
@@ -110,7 +115,7 @@ class InfoReader:
         
         # 获取三个位置，如果是变绿了，就点击。
         self.click_complete_task_btn()
-        time.sleep(3)
+        time.sleep(1)
 
         # 获取task的list，判断是不是已经提交了
         task_list = self.read_task_list()
@@ -149,12 +154,18 @@ class InfoReader:
         green_color = (97, 198, 98)
         if(self.is_target_area(task_1_img, green_color, 0)):
             pyautogui.click(btn1[0], btn1[1])
+            time.sleep(3)
+            self.click_complete_task_btn()
         
         if(self.is_target_area(task_2_img, green_color, 0)):
             pyautogui.click(btn2[0], btn2[1])
+            time.sleep(3)
+            self.click_complete_task_btn()
 
         if(self.is_target_area(task_3_img, green_color, 0)):
             pyautogui.click(btn3[0], btn3[1])
+            time.sleep(3)
+            self.click_complete_task_btn()
     
 
     # 是不是指定地方
@@ -343,32 +354,91 @@ class InfoReader:
 
     # 直到出现箱子
     def till_find_treasure(self):
-        # TODO: 计划设置10分钟系统超时
+        # 计划设置10分钟系统超时
+        start_time = time.time()  # 记录开始时间
+        timeout = 60 * 3 # 超时时间，单位为秒
 
-        # while True:
+        while True:
+            window = self.get_specific_window_info()
+            if(window == None): 
+                raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError(f"找宝箱超时: 未在{timeout}s内找到宝箱。")            
+            
+            # 死亡监控
+            if(self.is_dead()):
+                raise GameStatusError("泼街了，准备复活。")
+
+
+            winX, winY, winWidth, winHeight = self.get_win_info()
+            # 获取目标定位
+            flagPos = (
+                int(winX),
+                int(winY), 
+                int(winWidth - winX),  # 宽度
+                int(winHeight - winY)  # 高度
+            )
+            screenshot = pyautogui.screenshot(region=flagPos)
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
+
+            clickable_list = self.find_treasure_case()
+            if(len(clickable_list) >= 2):
+                break
+            
+            time.sleep(3)
+            self.logger.info("等待击杀完boss,出现两个宝箱.")
+
+
+    # 找到寻宝箱
+    def find_treasure_case(self):
+        green = (0x66,0xc1,0x52)
+        clickable_list = self.get_targets_list(green, 0, 0)
+        return clickable_list
+
+
+    # 有广告和无广告的版本
+    def click_rewards(self):
+        wait_ads_time = 30
         window = self.get_specific_window_info()
         if(window == None): 
             raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
-        
+          
         winX, winY, winWidth, winHeight = self.get_win_info()
         # 获取目标定位
         flagPos = (
-            int(winX + 10), 
-            int(winY + 10), 
-            int(winWidth - winX),  # 宽度
-            int(winHeight - winY)  # 高度
+            int(winX + winWidth // 2 - 60),
+            int(winY + 560),
+            int(120),  # 宽度
+            int(45)  # 高度
         )
-        print(flagPos)
-
         screenshot = pyautogui.screenshot(region=flagPos)
         mat_image = np.array(screenshot)
         mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
-        # target_rgb = (102, 193, 82)   # RGB 格式
 
-        # cv2.imshow("asdas", mat_image)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
+        ads_btn = (221,200,75)
+        is_contain_ads = self.is_target_area(mat_image, ads_btn, 0)
+        # 点击领取按钮
+        pyautogui.click(int(winX + winWidth // 2), int(winY + 560) + 12)
 
+        # TODO: 广告无法关闭，根据金币的图片是否显示，判断是否点击成功。点击失败，就重复
+        if(is_contain_ads):
+            self.cs.clearAds(3)
+            # mute
+            time.sleep(5)
+            pyautogui.leftClick(int(winX + winWidth - 80), int(winY + 75))
+            self.logger.debug("广告静音按钮点击")
+
+            self.logger.debug(f"等待{wait_ads_time}s广告.")
+            time.sleep(wait_ads_time)
+            # 关闭
+            pyautogui.leftClick(int(winX + winWidth - 45), int(winY + 75))
+            self.logger.debug("看完广告后关闭按钮点击")
+            time.sleep(3)
+            
+        
 
 
 
@@ -474,3 +544,82 @@ class InfoReader:
         cv2.imshow("Vertical Stack", stacked_img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+
+
+  # 获得目标对象的列表
+    def get_targets_list(self, target_color, lower_bound, upper_bound):
+        DEBUG = False
+
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        # frame draw
+        screenshot = pyautogui.screenshot(region=(int(winX), int(winY), int(winWidth), int(winHeight)))
+        mat_image = np.array(screenshot)
+        # 创建新的空白图像   
+        mat_image = mat_image.copy()  
+
+        # # 转化为rgb 
+        rgb_img = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2RGB)
+
+        # 清除广告干扰
+        cv2.rectangle(mat_image, (340, 110), (460,170), (0, 0, 0), -1)
+
+        # 转变格式
+        hsv_image = cv2.cvtColor(mat_image, cv2.COLOR_BGR2HSV)
+
+        target_hsv = cv2.cvtColor(np.uint8([[target_color]]), cv2.COLOR_BGR2HSV)[0][0]
+        # Define the color range to extract the color (a tolerance can be added)
+        lower_bound = np.array([target_hsv[0], target_hsv[1], target_hsv[2] - lower_bound])  # lower bound (with some tolerance)
+        upper_bound = np.array([target_hsv[0], target_hsv[1], target_hsv[2] + upper_bound])  # upper bound
+
+        # 取色
+        mask = cv2.inRange(hsv_image, lower_bound, upper_bound)
+        result = cv2.bitwise_and(mat_image, mat_image, mask=mask)
+
+        # 膨胀
+        _, binary_image = cv2.threshold(result, 127, 255, cv2.THRESH_BINARY)
+        kernel = np.ones((5, 5), np.uint8)
+        dilated_result = cv2.dilate(binary_image, kernel, iterations=1)
+
+        gray_img = cv2.cvtColor(dilated_result, cv2.COLOR_RGB2GRAY)
+        _, binary_image = cv2.threshold(gray_img, 127, 255, cv2.THRESH_BINARY)
+
+        # 检测图像中的轮廓
+        contours, _ = cv2.findContours(binary_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        res_list = list({})
+        center = self.get_center_point()
+        for cnt in contours:
+            M = cv2.moments(cnt)
+            # 计算质心（中心点）的坐标
+            if M['m00'] != 0:  # 确保区域面积非零，防止除零错误
+                cX = int(M['m10'] / M['m00'])
+                cY = int(M['m01'] / M['m00'])
+            else:
+                # 如果区域面积为零，则默认中心为 (0, 0)
+                cX, cY = 0, 0
+            res_list.append(np.array([cX, cY]))
+            if(DEBUG): 
+                cv2.circle(rgb_img, (cX, cY), 5, (255, 0, 0), -1)
+                cv2.line(rgb_img, (cX, cY), center, (255, 0, 0), 5)
+                distance = self.get_point_distance(center[0], center[1], cX, cY)
+                cv2.putText(rgb_img, f"(D:{int(distance)})", (cX + 20, cY), self.font, self.font_scale, self.color, self.thickness, cv2.LINE_AA)
+
+        if(DEBUG): 
+            cv2.circle(rgb_img, center, 5, (255, 0, 0), -1)
+            bgr_image = cv2.cvtColor(rgb_img, cv2.COLOR_RGBA2BGR)
+            cv2.imshow("test", bgr_image)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+
+        return res_list
+
+
+    # 获取游戏的中心点
+    def get_center_point(self):
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        return (int(winX + winWidth // 2), int(winY + winHeight // 2))
+
+
+    # 获得两点之间的距离
+    def get_point_distance(self, x1, y1, x2, y2):
+        return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
