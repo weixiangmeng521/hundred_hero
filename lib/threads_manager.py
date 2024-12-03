@@ -6,11 +6,12 @@ from lib.logger import init_logger
 
 # 多线程管理器
 class ThreadsManager:
-    def __init__(self, config):
+    def __init__(self, config, event_queue):
         self.config = config
         self.logger = init_logger(config)
         self.threads = {}  # 存储任务信息
         self.running = True  # 控制线程运行状态
+        self.event_queue = event_queue
         # 重启时间
         if(not config["THREADS"]["RestartWaitTime"]):
             raise ValueError("RestartWaitTime cannot be invalid. please check config.ini.")
@@ -26,7 +27,7 @@ class ThreadsManager:
     # 启动线程
     def start_thread(self, name):
         thread_task = self.threads[name]['task']
-        thread = threading.Thread(target=thread_task, args=(name,))
+        thread = threading.Thread(target=thread_task, args=(self.event_queue,))
         thread.daemon = True  # 守护线程
         thread.start()
         self.threads[name]['thread'] = thread

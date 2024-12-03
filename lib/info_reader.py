@@ -438,8 +438,39 @@ class InfoReader:
             self.logger.debug("看完广告后关闭按钮点击")
             time.sleep(3)
             
+    
+    # 是否显示了宝箱内容
+    def is_treasure_pop_up(self):
+        window = self.get_specific_window_info()
+        if(window == None): 
+            raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+          
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        # 获取目标定位
+        flagPos = (
+            int(winX + 110),
+            int(winY + 290),
+            int(250),  # 宽度
+            int(30)  # 高度
+        )
+        screenshot = pyautogui.screenshot(region=flagPos)
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
+        target_color = (54,122,107)
+        return self.is_target_area(mat_image, target_color, 0)
         
 
+    # 等待出现pop up
+    def wait_treasure_pop_up(self):
+        start_time = time.time()  # 记录开始时间
+        timeout = 30  # 超时时间，单位为秒
+        
+        # 等待出现弹窗
+        while self.is_treasure_pop_up():
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError(f"等待超时: {timeout}s内寻找的宝箱弹窗。")
+            time.sleep(1)
 
 
     # 等待传送完成
