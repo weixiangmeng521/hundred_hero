@@ -346,16 +346,14 @@ class RottenSwamp:
         mc = self.mc
 
         mc.move_right(1.8)
-
         mc.move_up(1.2)
-
         mc.move_right(.3)
-        time.sleep(1.6)
+        time.sleep(.6)
 
         def lamda():
             mc.move_left(.3)
             mc.move_down(1.2)
-            mc.move_left(1.8)
+            mc.move_left(2)
         return lamda
 
     # 打岩石巨人
