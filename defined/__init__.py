@@ -5,7 +5,14 @@ CORRECTION_DICT = {
     '马': '弓',
     '荣': '杀',
     '茶': '杀',
+    '箱': '霜',
+    '便': '傀',
+    '蝎': '儡',
+    '货': '傀',
+    '晶': '儡',
+    '伪': '儡',
 }
 
 
 IS_UNION_TASK_FINISHED = "1"
+IS_DALIY_CASE_FINISHED = "2"

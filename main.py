@@ -1,11 +1,12 @@
 import queue
 import traceback
 import numpy as np
+import pyautogui
 from employee.bounty_hunter import BountyHunter
 from employee.cards_master import CardsMaster
 from employee.coach_NPC import CoachNPC
 from employee.task_excutor import TaskExcutor
-from employee.treasure_hunt import TreasureHunt
+from employee.treasure_hunter import TreasureHunt
 from exception.game_status import GameStatusError
 from employee.farmer import Farmer
 from instance.union_task import UnionTask
@@ -115,3 +116,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+    # print(pyautogui.position())

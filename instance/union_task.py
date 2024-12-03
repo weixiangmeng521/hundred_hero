@@ -46,7 +46,7 @@ class UnionTask:
         if(self.reader.is_show_back2town_btn() == False):
             # 选择并进入副本
             self.cs.selectDiamondInstance()
-            time.sleep(10)
+            self.reader.wait_tranported()
 
         # 刷副本
         instance = snow_zone.SnowZone(self.config)
@@ -57,7 +57,7 @@ class UnionTask:
             self.loop_lock = True
         
         # 循环走圈
-        instance.room1TaskLoop()
+        instance.room1TaskLoop(False)
 
 
     # 刷污染前哨

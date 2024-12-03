@@ -5,7 +5,9 @@ import Quartz
 import pytesseract
 import cv2
 import numpy as np
+from defined import IS_UNION_TASK_FINISHED
 from exception.game_status import GameStatusError
+from lib.cache import CacheManager
 from lib.challenge_select import ChallengeSelect
 from lib.handler import correct_text_handler
 from lib.logger import init_logger
@@ -20,6 +22,7 @@ class InfoReader:
         self.img_win_name = "ImageAnalysis"   
         self.logger = init_logger(config)
         self.cs = ChallengeSelect(config)
+        self.cache = CacheManager(config)
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.font_scale = .5
         self.color = (255, 0, 0)  # 绿色
@@ -154,19 +157,36 @@ class InfoReader:
         green_color = (97, 198, 98)
         if(self.is_target_area(task_1_img, green_color, 0)):
             pyautogui.click(btn1[0], btn1[1])
-            time.sleep(3)
+            time.sleep(1.2)
+            self.clearRewards()
+            time.sleep(.3)
             self.click_complete_task_btn()
         
         if(self.is_target_area(task_2_img, green_color, 0)):
             pyautogui.click(btn2[0], btn2[1])
-            time.sleep(3)
+            time.sleep(1.2)
+            self.clearRewards()
+            time.sleep(.3)
             self.click_complete_task_btn()
 
         if(self.is_target_area(task_3_img, green_color, 0)):
             pyautogui.click(btn3[0], btn3[1])
-            time.sleep(3)
+            time.sleep(1.2)
+            self.clearRewards()
+            time.sleep(.3)
             self.click_complete_task_btn()
     
+
+    # 关闭奖励弹窗
+    def clearRewards(self, times = 1):
+        self.logger.info("关闭奖励显示。")
+        window = self.get_specific_window_info()
+        if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        for _ in range(int(times)):
+            pyautogui.click(winX + winWidth - 10, winY + winHeight - 10)
+            time.sleep(.3)
+
 
     # 是不是指定地方
     def is_target_area(self, bgr_img, target_rgb, threshold = 10):
@@ -353,10 +373,12 @@ class InfoReader:
 
 
     # 直到出现箱子
-    def till_find_treasure(self):
+    def till_find_treasure(self, treasure_num = 1):
         # 计划设置10分钟系统超时
         start_time = time.time()  # 记录开始时间
         timeout = 60 * 3 # 超时时间，单位为秒
+        # 如果有爆宝箱，却达不到treasure_num的标准，就降低标准
+        tolerate_timeout = 40
 
         while True:
             window = self.get_specific_window_info()
@@ -365,8 +387,9 @@ class InfoReader:
 
             elapsed_time = time.time() - start_time  # 计算已过去的时间
             if elapsed_time > timeout:
-                raise TimeoutError(f"找宝箱超时: 未在{timeout}s内找到宝箱。")            
-            
+                self.cache.set(IS_UNION_TASK_FINISHED, 1)      
+                raise TimeoutError(f"找宝箱超时: 未在{timeout}s内找到宝箱。")                
+
             # 死亡监控
             if(self.is_dead()):
                 raise GameStatusError("泼街了，准备复活。")
@@ -385,11 +408,18 @@ class InfoReader:
             mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
 
             clickable_list = self.find_treasure_case()
-            if(len(clickable_list) >= 2):
+            # print(clickable_list)
+            if(len(clickable_list) >= treasure_num):
                 break
             
+            # 降低标准
+            if(elapsed_time > tolerate_timeout and len(clickable_list) == 1):
+                self.logger.debug("降级击杀BOSS多宝箱的标准。")
+                break
+
+
             time.sleep(3)
-            self.logger.info("等待击杀完boss,出现两个宝箱.")
+            self.logger.info("等待击杀完boss,出现宝箱.")
 
 
     # 找到寻宝箱
@@ -401,7 +431,6 @@ class InfoReader:
 
     # 有广告和无广告的版本
     def click_rewards(self):
-        wait_ads_time = 30
         window = self.get_specific_window_info()
         if(window == None): 
             raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
@@ -418,26 +447,82 @@ class InfoReader:
         mat_image = np.array(screenshot)
         mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
 
+        # 黄色广告的btn
         ads_btn = (221,200,75)
-        is_contain_ads = self.is_target_area(mat_image, ads_btn, 0)
-        # 点击领取按钮
-        pyautogui.click(int(winX + winWidth // 2), int(winY + 560) + 12)
 
-        # TODO: 广告无法关闭，根据金币的图片是否显示，判断是否点击成功。点击失败，就重复
-        if(is_contain_ads):
-            self.cs.clearAds(3)
-            # mute
-            time.sleep(5)
-            pyautogui.leftClick(int(winX + winWidth - 80), int(winY + 75))
-            self.logger.debug("广告静音按钮点击")
-
-            self.logger.debug(f"等待{wait_ads_time}s广告.")
-            time.sleep(wait_ads_time)
-            # 关闭
-            pyautogui.leftClick(int(winX + winWidth - 45), int(winY + 75))
-            self.logger.debug("看完广告后关闭按钮点击")
-            time.sleep(3)
+        start_time = time.time()  # 记录开始时间
+        timeout = 30 # 超时时间，单位为秒
+        while True:
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError(f"点击领取按钮失败: 未在{timeout}s内点击领取宝箱成功。")
+            # print(winX, winY)
+            # 如果有广告就不看广告
+            is_contain_ads = self.is_target_area(mat_image, ads_btn, 0)
+            if(self.is_treasure_pop_up()):
+                self.logger.debug(f"宝箱按钮为: [{'广告' if is_contain_ads else '普通' }]按钮")
+            if(is_contain_ads and self.is_treasure_pop_up()):
+                # Point(x=244, y=674)
+                pyautogui.click(int(winX + winWidth // 2), int(winY + 560) + 90)
+                self.logger.debug("点击跳过广告。")
+            if(not is_contain_ads and self.is_treasure_pop_up()):
+                pyautogui.click(int(winX + winWidth // 2), int(winY + 560) + 12)
+                self.logger.debug("领取奖励。")
             
+            time.sleep(.3)
+            self.clearRewards()
+            time.sleep(.3)
+            # 如果消失了，就算成功
+            if(not self.is_treasure_pop_up()):
+                break
+            
+            time.sleep(1)
+
+
+
+
+        # # TODO: 广告无法关闭，根据金币的图片是否显示，判断是否点击成功。点击失败，就重复
+        # if(is_contain_ads):
+        #     self.logger.debug("包含广告，进入广告")
+        #     # 进入广告
+        #     self.logger.debug("等待广告加载...")
+        #     self.wait_ads_loaded()
+        #     self.logger.debug("已经加载广告完成")
+        #     time.sleep(.3)
+
+        #     # 静音
+        #     self.mute_30s_ads()
+        #     # 关闭
+        #     self.close_30s_ads()
+        #     self.logger.debug("等待广告结束")
+        #     self.wait_ads_closed()
+        #     self.logger.debug("广告已经结束")
+        #     time.sleep(.3)
+            
+    
+    # 关闭30s的广告
+    def close_30s_ads(self):
+        window = self.get_specific_window_info()
+        if(window == None): 
+            raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+          
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        pyautogui.moveTo(int(winX + winWidth - 45), int(winY + 75),duration=.5)
+        pyautogui.click(clicks=3)
+        self.logger.debug("点击关闭按钮点击")
+        
+
+    # 静音广告
+    def mute_30s_ads(self):
+        window = self.get_specific_window_info()
+        if(window == None): 
+            raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+          
+        winX, winY, winWidth, winHeight = self.get_win_info()   
+        pyautogui.moveTo(int(winX + winWidth - 80), int(winY + 75), duration=.5)
+        pyautogui.click(clicks=3)
+        self.logger.debug("点击广告静音按钮")
+
     
     # 是否显示了宝箱内容
     def is_treasure_pop_up(self):
@@ -555,7 +640,48 @@ class InfoReader:
                 self.logger.debug("加载完毕！")
                 return
         
-    
+
+    # 等待广告
+    def __wait_ads_do(self, loaded_or_closed):
+        self.logger.debug("等待广告加载...")
+        start_time = time.time()  # 记录开始时间
+        timeout = 60 * 2  # 超时时间，单位为秒\
+
+        while True:
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError("加载超时: 广告加载超时。")
+            
+            window = self.get_specific_window_info()
+            if(window == None): 
+                raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+            
+            winX, winY, winWidth, winHeight = self.get_win_info()
+            # 获取目标定位
+            flagPos = (int(287 + winX), int(53 + winY), 20, 20)
+            screenshot = pyautogui.screenshot(region=(flagPos))
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+            # 金币的颜色
+            target_rgb = (246,199,77)   # RGB 格式
+            if(self.is_target_area(mat_image, target_rgb, 0) == loaded_or_closed):
+                if(loaded_or_closed):  
+                    self.logger.debug("广告已经关闭！") 
+                if(not loaded_or_closed): 
+                    self.logger.debug("广告加载完毕！")
+                break
+
+
+    # 等待广告加载完成
+    def wait_ads_loaded(self):
+        self.__wait_ads_do(False)
+
+
+    # 等待广告看完
+    def wait_ads_closed(self):
+        self.__wait_ads_do(True)
+
+
     # 纵向排列三张图片
     def v_stack_show(self, *imgs):  
         # 确保所有图片的宽度一致，否则调整为相同宽度
@@ -608,7 +734,7 @@ class InfoReader:
 
         # 膨胀
         _, binary_image = cv2.threshold(result, 127, 255, cv2.THRESH_BINARY)
-        kernel = np.ones((5, 5), np.uint8)
+        kernel = np.ones((10, 10), np.uint8)
         dilated_result = cv2.dilate(binary_image, kernel, iterations=1)
 
         gray_img = cv2.cvtColor(dilated_result, cv2.COLOR_RGB2GRAY)
