@@ -26,6 +26,7 @@ class TaskExcutor:
         self.task_mapping = {
             "击杀BOSS岩石巨像": self.unionTask.farmingStoneMenEfficiently,
             "击杀100名兽人弓手": self.unionTask.farmingColdWindCamp,
+            "击杀100只冰霜傀儡": self.unionTask.farmingSnowfield,
         }
 
         # self.unionTask.farmingMagicRing()

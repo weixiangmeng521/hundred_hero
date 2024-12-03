@@ -12,80 +12,82 @@ class SnowZone:
         self.reader = InfoReader(config)
 
 
-    def check_handle(self):
+    def check_handle(self, is_check = True):
+        if(not is_check):
+            return
         _, isMineFull = self.reader.read_screen()
         if(isMineFull): raise GameStatusError("蓝矿满了")
 
 
-    def recur(self):
+    def recur(self, is_check = True):
         mc = self.mc
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_up(1.6)
         time.sleep(3)
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_up(1.6)
         time.sleep(3)        
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_left(1.8)
         time.sleep(3)                
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_up(1.8)
         time.sleep(3)        
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_left(3.2)
         time.sleep(3)     
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_left(2)
         time.sleep(5)     
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_down(1.6)
         time.sleep(5)     
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_left(2.4)
         time.sleep(5)     
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_down(2.3)
         time.sleep(5)     
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_right(1.7)
         time.sleep(5)
 
         # 打boss
-        self.check_handle()        
+        self.check_handle(is_check)        
         mc.move_down(2.3)
         time.sleep(6)     
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_up(2.3)
         time.sleep(.1) 
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_right(2)
         time.sleep(3)    
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_right(1.8)
         time.sleep(3)    
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_down(4)
         time.sleep(3) # 6      
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_right(3.4)
         time.sleep(3) # 6    
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_up(2.7)
         time.sleep(6) # 6   
 
@@ -115,8 +117,8 @@ class SnowZone:
         time.sleep(3) # 6
 
 
-    def room1TaskLoop(self):
-        self.recur()
+    def room1TaskLoop(self, is_check = True):
+        self.recur(is_check)
 
 
     def crossRoom1Loop(self):
