@@ -53,8 +53,12 @@ IconcrownThroneBtnPos = [302, 285]
 
 # 地狱火副本
 hellInstanceTabPos = [337, 750]
+# 炎狱之层
 fireOfHellLayerTabPos = [121, 330]
 fireOfHellInstancePos = [300, 530]
+# 炽晶之地
+fireMineLandTabPos = [121, 260]
+twoCentipedePos = [302, 360]
 
 # 任务列表
 taskListBtnPos = [445, 385]
@@ -269,6 +273,19 @@ class ChallengeSelect:
         time.sleep(self.waitTime)
         pyautogui.click(IconcrownThroneBtnPos[0], IconcrownThroneBtnPos[1])
         self.logger.info("进入[王座大厅]")
+
+
+    # 选择双虫
+    def selectTwoCentipede(self):
+        self.check_window_handler()
+        self.clickGreenPop()
+        time.sleep(self.waitTime)
+        pyautogui.click(hellInstanceTabPos[0], hellInstanceTabPos[1])        
+        time.sleep(self.waitTime)
+        pyautogui.click(fireMineLandTabPos[0], fireMineLandTabPos[1])
+        time.sleep(self.waitTime)
+        pyautogui.click(twoCentipedePos[0], twoCentipedePos[1])
+        self.logger.info("进入[蜈蚣岗]")
 
     
     # 查看任务栏的任务

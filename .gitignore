@@ -9,3 +9,5 @@ venv
 screenshot
 logs
 config.ini
+.DS_Store
+.cache

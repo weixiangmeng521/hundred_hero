@@ -9,6 +9,8 @@ from lib.app_trace import AppTrace
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
+from lib.move_controller import MoveControll
+from lib.visual_track import VisualTrack
 
 
 # BOSS杀手，专业打boss
@@ -20,6 +22,8 @@ class BountyHunter:
         self.reader = InfoReader(config)
         self.trace = AppTrace(config)
         self.logger = init_logger(config)
+        self.vt = VisualTrack(config)
+        self.mc = MoveControll(config)
 
 
     # 打第一个巨人boss
@@ -33,6 +37,17 @@ class BountyHunter:
         self.reader.wait_tranported()
         return 10
 
+    
+    # 击杀岩石巨人
+    def killBossStoneMen(self):
+        self.cs.selectWoodInstance()
+        instance = RottenSwamp(self.config)
+        self.reader.wait_tranported()
+        instance.killStoneMen()
+        self.cs.back2Town()
+        self.reader.wait_tranported()
+        return 10
+    
 
     # 打小树精
     def killTreeSpirit(self):
@@ -50,15 +65,26 @@ class BountyHunter:
         self.cs.selectTwoPeak()
         instance = PoorZone(self.config)
         self.reader.wait_tranported()
-        move_back = instance.killBullBoos()
+        move_back = instance.killBullBossOldVersion()
         move_back()
+        self.reader.wait_tranported()
+        return 20
+    
+
+    # 打牛魔王
+    def killBullBossQuickly(self):
+        self.cs.selectPollutionOutpost()
+        instance = PoorZone(self.config)
+        self.reader.wait_tranported()
+        instance.killBullBossQuickly()
+        self.cs.back2Town()
         self.reader.wait_tranported()
         return 20
 
 
     # 打蜘蛛boss
     def killSpiderBoss(self):
-        self.cs.selectWoodInstance()
+        self.cs.select()
         instance = RottenSwamp(self.config)
         self.reader.wait_tranported()
         instance.killSpiderBoss()
@@ -91,19 +117,28 @@ class BountyHunter:
     # 单个打金任务
     def task(self):
         gold = 0
-        gold += self.killBossGiant()
+        # gold += self.killBossGiant()
         gold += self.killTreeSpirit()
-        gold += self.killBullBoss()
+        gold += self.killBullBossQuickly()
         # gold += self.killSpiderBoss()
         gold += self.killBigTreeBoss()
         # gold += self.killSnowmanBoss()
         return gold
 
 
+    # 移动到传送台
+    def move_2_port(self):
+        x, y, tx, ty = self.vt.find_position((121, 236, 239), 0, 0)
+        self.mc.move(x, y, tx, ty)
+        time.sleep(.3)
+
+
     # 循环打金
     def work(self):
-        total = 0
+        # 也许有那么一点点位置偏移，就会偏航
+        # self.move_2_port()
 
+        total = 0
         while True:
             # 开始计时
             start_time = time.time()

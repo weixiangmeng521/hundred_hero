@@ -12,82 +12,111 @@ class SnowZone:
         self.reader = InfoReader(config)
 
 
-    def check_handle(self):
+    def check_handle(self, is_check = True):
+        if(not is_check):
+            return
         _, isMineFull = self.reader.read_screen()
         if(isMineFull): raise GameStatusError("蓝矿满了")
 
 
-    def recur(self):
+    def recur(self, is_check = True, wait_time = 3):
         mc = self.mc
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_up(1.6)
-        time.sleep(3)
+        time.sleep(wait_time)
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_up(1.6)
-        time.sleep(3)        
+        time.sleep(wait_time)        
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_left(1.8)
-        time.sleep(3)                
+        time.sleep(wait_time)                
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_up(1.8)
-        time.sleep(3)        
+        time.sleep(wait_time)        
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_left(3.2)
-        time.sleep(3)     
+        time.sleep(wait_time)     
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_left(2)
-        time.sleep(5)     
+        time.sleep(wait_time * 1.5)     
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_down(1.6)
-        time.sleep(5)     
+        time.sleep(wait_time * 1.5)     
 
-        self.check_handle()
-        mc.move_left(2.4)
-        time.sleep(5)     
+        self.check_handle(is_check)
+        mc.move_left(2.3)
+        time.sleep(wait_time * 1.5)     
 
-        self.check_handle()
-        mc.move_down(2.3)
-        time.sleep(5)     
+        self.check_handle(is_check)
+        mc.move_down(.6)
+        time.sleep(wait_time * 1.5) 
 
-        self.check_handle()
-        mc.move_right(1.7)
-        time.sleep(5)
+        self.check_handle(is_check)
+        mc.move_down(1.7)
+        time.sleep(wait_time * 1.5)            
+
+        self.check_handle(is_check)
+        mc.move_right(1.9)
+        time.sleep(wait_time * 1.5)
 
         # 打boss
-        self.check_handle()        
-        mc.move_down(2.3)
-        time.sleep(6)     
+        self.check_handle(is_check)        
+        mc.move_down(2)
+        time.sleep(wait_time * 2)     
 
-        self.check_handle()
-        mc.move_up(2.3)
+        self.check_handle(is_check)
+        mc.move_up(2)
         time.sleep(.1) 
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_right(2)
-        time.sleep(3)    
+        time.sleep(wait_time)    
 
-        self.check_handle()
+        # 走弯路 begin
+        self.check_handle(is_check)        
+        mc.move_up(1.2)
+        time.sleep(wait_time * 2)     
+
+        self.check_handle(is_check)
+        mc.move_down(1.2)
+        time.sleep(.1) 
+        # 走弯路 end
+
+        self.check_handle(is_check)
         mc.move_right(1.8)
-        time.sleep(3)    
+        time.sleep(wait_time)    
 
-        self.check_handle()
-        mc.move_down(4)
-        time.sleep(3) # 6      
+        self.check_handle(is_check)
+        mc.move_down(1)
+        time.sleep(wait_time) # 6      
 
-        self.check_handle()
+        self.check_handle(is_check)
+        mc.move_down(3)
+        time.sleep(wait_time) # 6    
+
+        self.check_handle(is_check)
         mc.move_right(3.4)
-        time.sleep(3) # 6    
+        time.sleep(wait_time) # 6    
 
-        self.check_handle()
+        self.check_handle(is_check)
         mc.move_up(2.7)
-        time.sleep(6) # 6   
+        time.sleep(wait_time) # 6   
+
+        self.check_handle(is_check)
+        mc.move_right(1.2)
+        time.sleep(wait_time) # 6   
+
+        self.check_handle(is_check)
+        mc.move_left(1.2)
+        time.sleep(wait_time) # 6   
+
 
 
     def room1Task(self):
@@ -104,19 +133,20 @@ class SnowZone:
         self.recur()
 
 
-
+    # 北风营地
     def room1TaskBegin(self):
         mc = self.mc
 
         mc.move_left_down(3)
-        time.sleep(3)
+        # time.sleep(3)
 
         mc.move_left(1.6)
-        time.sleep(3) # 6
+        time.sleep(1) # 6
 
 
-    def room1TaskLoop(self):
-        self.recur()
+    # 北风营地循环圈
+    def room1TaskLoop(self, is_check = True, wait_time = 3):
+        self.recur(is_check, wait_time)
 
 
     def crossRoom1Loop(self):

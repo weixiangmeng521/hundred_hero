@@ -1,8 +1,22 @@
 [APP]
 Name = 百炼英雄
+WechatName = 微信
+EnableScreenShot = True
+EnableSound = False
 
 [TWILIO]
-AccountSid = 
-AuthToken = 
-PhoneNumber = 
-ToNumber = 
+Enable = True
+AccountSid = xxx
+AuthToken = xxx
+PhoneNumber = xxx
+ToNumber = xxx
+
+
+[TASK]
+IsWakeUpApp = True
+IsLoadingAds = True
+EnableAutoUnionTask = True
+EnableAutoAbilityImporve = False
+EnableAutoGaCha = True
+EnableAutoCoin = True
+EnableAutoWoodAndMine = False
