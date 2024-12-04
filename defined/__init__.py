@@ -11,8 +11,9 @@ CORRECTION_DICT = {
     '货': '傀',
     '晶': '儡',
     '伪': '儡',
+    '旭': '娜',
+    '边': '迦',
 }
-
 
 IS_UNION_TASK_FINISHED = "1"
 IS_DALIY_CASE_FINISHED = "2"

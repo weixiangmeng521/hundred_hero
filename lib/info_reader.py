@@ -378,7 +378,7 @@ class InfoReader:
         start_time = time.time()  # 记录开始时间
         timeout = 60 * 3 # 超时时间，单位为秒
         # 如果有爆宝箱，却达不到treasure_num的标准，就降低标准
-        tolerate_timeout = 40
+        tolerate_timeout = 30
 
         while True:
             window = self.get_specific_window_info()
@@ -418,7 +418,7 @@ class InfoReader:
                 break
 
 
-            time.sleep(3)
+            time.sleep(1)
             self.logger.info("等待击杀完boss,出现宝箱.")
 
 
@@ -476,7 +476,7 @@ class InfoReader:
             if(not self.is_treasure_pop_up()):
                 break
             
-            time.sleep(1)
+            time.sleep(.3)
 
 
 
@@ -525,7 +525,7 @@ class InfoReader:
 
     
     # 是否显示了宝箱内容
-    def is_treasure_pop_up(self):
+    def is_treasure_pop_up(self, threshold = 0):
         window = self.get_specific_window_info()
         if(window == None): 
             raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
@@ -541,17 +541,24 @@ class InfoReader:
         screenshot = pyautogui.screenshot(region=flagPos)
         mat_image = np.array(screenshot)
         mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
+
         target_color = (54,122,107)
-        return self.is_target_area(mat_image, target_color, 0)
+        target_color2 = (60,134,117)
+        target_color3 = (59,132,116)
+
+        result1 = self.get_color_ratio(mat_image, target_color)
+        result2 = self.get_color_ratio(mat_image, target_color2)
+        result3 = self.get_color_ratio(mat_image, target_color3)
+        return result1 >= 0.7 or result2 >= 0.7 or result3 >= 0.7
         
 
     # 等待出现pop up
-    def wait_treasure_pop_up(self):
+    def wait_treasure_pop_up(self, threshold = 0):
         start_time = time.time()  # 记录开始时间
         timeout = 30  # 超时时间，单位为秒
         
         # 等待出现弹窗
-        while self.is_treasure_pop_up():
+        while self.is_treasure_pop_up(threshold):
             elapsed_time = time.time() - start_time  # 计算已过去的时间
             if elapsed_time > timeout:
                 raise TimeoutError(f"等待超时: {timeout}s内寻找的宝箱弹窗。")

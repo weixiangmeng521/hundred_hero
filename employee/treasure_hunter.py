@@ -53,7 +53,7 @@ class TreasureHunt:
     # TODO: 判断今日是否已经领取完30个奖励
     def till_get_treasure(self):
         start_time = time.time()  # 记录开始时间
-        timeout = 60 * 4  # 超时时间，单位为秒
+        timeout = 60 * 2  # 超时时间，单位为秒
         
         # 如果出现五次，点击，宝箱没有消失，就说明，30次到期了
         over_time = 0
@@ -71,15 +71,16 @@ class TreasureHunt:
 
             # 获取宝箱列表
             treasure_list = self.reader.find_treasure_case()
-            print(treasure_list)
+            # print(treasure_list)
             if len(treasure_list) >= 1:
                 # 点击第一个宝箱
                 btn = treasure_list[0]
                 pyautogui.click(btn[0], btn[1] + 20)
                 
                 # 判断是否点击成功并处理弹窗
-                self.reader.wait_treasure_pop_up()
-                self.logger.debug("弹出宝箱内容。")
+                self.logger.debug("等待弹出宝箱内容...")
+                self.reader.wait_treasure_pop_up(10)
+                self.logger.debug("宝箱内容已弹出。")
                 time.sleep(.5)
                 self.reader.click_rewards()
                 # self.cs.clearAds(3)
@@ -91,7 +92,7 @@ class TreasureHunt:
             if len(treasure_list) == 0:
                 break
             
-            time.sleep(1)
+            time.sleep(.3)
 
     
     # 工作
