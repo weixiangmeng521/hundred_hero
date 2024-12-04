@@ -1,5 +1,7 @@
+import hashlib
 import math
 import time
+import uuid
 import pyautogui
 import Quartz
 import pytesseract
@@ -118,9 +120,6 @@ class InfoReader:
         
         # 获取三个位置，如果是变绿了，就点击。
         self.click_complete_task_btn()
-        time.sleep(.3)
-        self.clearRewards()
-        time.sleep(.3)
 
         # 获取task的list，判断是不是已经提交了
         task_list = self.read_task_list()
@@ -158,21 +157,21 @@ class InfoReader:
         green_color = (97, 198, 98)
         if(self.is_target_area(task_1_img, green_color, 0)):
             pyautogui.click(btn1[0], btn1[1])
-            time.sleep(1.2)
+            time.sleep(.3)
             self.clearRewards()
             time.sleep(.3)
             self.click_complete_task_btn()
         
         if(self.is_target_area(task_2_img, green_color, 0)):
             pyautogui.click(btn2[0], btn2[1])
-            time.sleep(1.2)
+            time.sleep(.3)
             self.clearRewards()
             time.sleep(.3)
             self.click_complete_task_btn()
 
         if(self.is_target_area(task_3_img, green_color, 0)):
             pyautogui.click(btn3[0], btn3[1])
-            time.sleep(1.2)
+            time.sleep(.3)
             self.clearRewards()
             time.sleep(.3)
             self.click_complete_task_btn()
@@ -233,6 +232,9 @@ class InfoReader:
         task_2_img = mat_image[task_img_heigt + 5 + 3:task_img_heigt * 2 - gutter, 130:task_img_width]
         task_3_img = mat_image[task_img_heigt * 2 + 18:task_img_heigt * 3 + 3 - gutter, 130:task_img_width]
 
+        # 保存
+        self.save_task_sample_img(task_1_img, task_2_img, task_3_img)
+
         return {
             self.recognize_chinese_text(task_1_img): self.is_task_complete_by_color_percent(task_1_img),
             self.recognize_chinese_text(task_2_img): self.is_task_complete_by_color_percent(task_2_img),
@@ -248,6 +250,7 @@ class InfoReader:
 
 
     # 读取中文
+    # TODO: 优化
     def recognize_chinese_text(self, bgr_image):
         pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
         # 读取图片
@@ -276,11 +279,28 @@ class InfoReader:
         return sharp
 
 
-    # 保存task的图片
-    # ! 目前用不到
-    def save_task_sample_img(self, bgr_img, name):
-        path = f"static/task_img_sample/{name}.png"
-        cv2.imwrite(path, bgr_img)                
+    # 保存到sample的图片
+    def save_task_sample_img(self, *imgs):
+        for img in imgs:
+            name = self.calculate_md5_from_image(img)
+            path = f"static/sample/{name}.png"            
+            cv2.imwrite(path, img)
+
+
+
+    # 根据 OpenCV 的图像 NumPy 数组生成 MD5。
+    # :param image_array: NumPy 数组，表示图像数据
+    # :return: 图像数据的 MD5 字符串
+    def calculate_md5_from_image(self, image_array):
+        if not isinstance(image_array, np.ndarray):
+            raise ValueError("输入数据不是有效的 NumPy 数组")
+
+        # 将图像数据转换为字节流
+        image_bytes = image_array.tobytes()
+
+        # 计算 MD5 值
+        md5_hash = hashlib.md5(image_bytes).hexdigest()
+        return md5_hash
 
 
     # 获取颜色占比
@@ -308,7 +328,6 @@ class InfoReader:
     def close_task_menu(self, is_click_complete = False):
         if(is_click_complete): 
             self.cs.completeUnionTask()
-            self.logger.info(f"点击关闭窗口按钮.")
         self.cs.closeWin()
         time.sleep(.3)
 
