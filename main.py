@@ -1,5 +1,6 @@
 import queue
 import traceback
+import cv2
 import numpy as np
 import pyautogui
 from employee.bounty_hunter import BountyHunter
@@ -27,6 +28,7 @@ config.read('config.ini')
 
 # 选择关卡
 cs = ChallengeSelect(config)
+vc = VisualTrack(config)
 mc = MoveControll(config)
 reader = InfoReader(config)
 unionTask = UnionTask(config)
@@ -116,5 +118,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+    # vc.test_for_find_object_in_image()
 
     # print(pyautogui.position())
