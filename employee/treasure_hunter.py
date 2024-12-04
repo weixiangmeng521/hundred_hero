@@ -7,7 +7,7 @@ import pyautogui
 from defined import IS_DALIY_CASE_FINISHED
 from exception.game_status import GameStatusError
 from instance.two_centipede import TwoCentipede
-from lib.cache import CacheManager
+from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
@@ -20,7 +20,7 @@ class TreasureHunt:
         self.logger = init_logger(config)
         self.cs = ChallengeSelect(config)
         self.reader = InfoReader(config)
-        self.cache = CacheManager(config)
+        self.cache = get_cache_manager_instance(config)
 
     
     # 死亡处理
@@ -101,9 +101,9 @@ class TreasureHunt:
         while True:
             try:
                 is_finished = self.cache.get(IS_DALIY_CASE_FINISHED)
-                if(is_finished is not None and int(is_finished) != 1):
-                    self.logger.debug("完成每日30个箱子")
-                    return
+                if(is_finished and int(is_finished) == 1):
+                    self.logger.debug("已完成每日30个箱子,无需再打")
+                    break
 
                 self.move_2_two_centipede()
                 self.reader.wait_tranported()

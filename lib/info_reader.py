@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 from defined import IS_UNION_TASK_FINISHED
 from exception.game_status import GameStatusError
-from lib.cache import CacheManager
+from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
 from lib.handler import correct_text_handler
 from lib.logger import init_logger
@@ -22,7 +22,7 @@ class InfoReader:
         self.img_win_name = "ImageAnalysis"   
         self.logger = init_logger(config)
         self.cs = ChallengeSelect(config)
-        self.cache = CacheManager(config)
+        self.cache = get_cache_manager_instance(config)
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.font_scale = .5
         self.color = (255, 0, 0)  # 绿色
