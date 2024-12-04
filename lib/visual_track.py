@@ -92,7 +92,7 @@ class VisualTrack:
 
         # Calculate the center of the window
         height, width = binary_image.shape
-        window_center = np.array([width // 2, height // 2])
+        window_center = (width // 2, height // 2)
 
         # Default values for the target centroid
         target_x, target_y = window_center
@@ -107,7 +107,7 @@ class VisualTrack:
                 target_x = int(moments['m10'] / moments['m00'])
                 target_y = int(moments['m01'] / moments['m00'])
 
-        return window_center[0], window_center[1], target_x, target_y
+        return (window_center[0], window_center[1], target_x, target_y)
 
 
     # 计算两点距离
@@ -244,9 +244,7 @@ class VisualTrack:
 
         window = self.get_specific_window_info()
         if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
-        window_bounds = window.get('kCGWindowBounds', {})
-        winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
-        winWidth, _ = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
+        winX, winY, winWidth, winHeight = self.get_win_info()
 
         while True:
             frame = self.mark_in_frame(target_color, lower_bound, upper_bound)
@@ -260,3 +258,58 @@ class VisualTrack:
             if key == ord('q') or key == 27:  # 27 是 ESC 的 ASCII 值
                 cv2.destroyAllWindows()
                 break
+
+
+    # 找对象
+    def find_object_in_image(self, bgr_template, bgr_image):
+        # 加载图像和模板
+        template = cv2.cvtColor(bgr_template, cv2.COLOR_BGR2GRAY)
+        image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2GRAY)
+        
+        # 获取模板尺寸
+        h, w = template.shape
+
+        # 匹配模板
+        result = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+
+        # 如果匹配程度较高，绘制矩形
+        threshold = 0.3  # 阈值，越高越严格
+        if max_val >= threshold:
+            top_left = max_loc
+            bottom_right = (top_left[0] + w, top_left[1] + h)
+            image_with_rectangle = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+            cv2.rectangle(image_with_rectangle, top_left, bottom_right, (0, 255, 0), 2)
+            # print(f"匹配成功！匹配度：{max_val}")
+            return image_with_rectangle
+        else:
+            print("未找到匹配对象。")
+            return image
+
+        # # 显示结果
+        # cv2.imshow("Detected Object", image_with_rectangle)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+
+
+    # 测试find_object_in_image
+    def test_for_find_object_in_image(self):
+        template = cv2.imread("./static/npc/RecruitmentHall.jpg")
+        rgb_template = cv2.cvtColor(template, cv2.COLOR_RGBA2BGR)
+        img_win_name = "test"
+
+        while True:
+            winX, winY, winWidth, winHeight = self.get_win_info()
+            screenshot = pyautogui.screenshot(region=(int(winX), int(winY), int(winWidth), int(winHeight)))
+            mat_image = np.array(screenshot)
+            rgb_img = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
+            frame = self.find_object_in_image(rgb_template, rgb_img)
+
+            cv2.imshow(img_win_name, frame)
+            cv2.moveWindow(img_win_name, int(winX + winWidth), - 100)   
+
+            # 设置刷新间隔，并检测按键退出
+            key = cv2.waitKey(30)
+            if key == ord('q') or key == 27:  # 27 是 ESC 的 ASCII 值
+                cv2.destroyAllWindows()
+                break        

@@ -12,117 +12,119 @@ class RottenSwamp:
         self.reader = InfoReader(config)
         
 
-    def check_handle(self):
+    def check_handle(self, should_check = True):
+        if(not should_check):
+            return
         isWoodFull, _ = self.reader.read_screen()
         if(isWoodFull): raise GameStatusError("木头满了")
 
 
     # 腐烂沼泽上圈
-    def crossRoom1(self):
+    def crossRoom1(self, should_check = True):
         mc = self.mc
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_left_top(.6)
         time.sleep(3)
 
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_right_top(1)
         time.sleep(3)
 
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_left_top(.5)
         time.sleep(.1)
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_right_top(.6)
         time.sleep(3)      
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_left_top(1)
         time.sleep(5)        
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_right_top(.8)
         time.sleep(5)      
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_left_top(.8)
         time.sleep(3)              
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_right_top(1.6)
         time.sleep(3)              
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_left_top(.3)
         time.sleep(1.)          
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_right_top(1.2)
         time.sleep(3)              
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_left_top(.3)
         time.sleep(.1)          
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_right_top(.5)
         time.sleep(3)     
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_left_top(.6)
         time.sleep(3)    
                 
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_right_top(1)
         time.sleep(3)            
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_up(1)
         time.sleep(3) 
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_up(.7)
         time.sleep(3)       
                 
-        self.check_handle()# 走弯路begin
+        self.check_handle(should_check)# 走弯路begin
         mc.move_right_top(2.6)
         time.sleep(3)            
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_left_down(2.6)
         time.sleep(.1)            
         # 走弯路end
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_up(1.5)
         time.sleep(3)       
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_left(2.3)
         time.sleep(6)      
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_left_down(1)
         time.sleep(3)     
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_left_down(1.6)
         time.sleep(3)      
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_down(1.6)
         time.sleep(3)      
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_down(1.6)
         time.sleep(3)      
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_right_down(2.6)
         time.sleep(3)    
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_down(3.1)
         time.sleep(3)    
 
@@ -130,52 +132,52 @@ class RottenSwamp:
         # circle end
     
     # 腐烂沼泽下圈
-    def crossRoom2(self):
+    def crossRoom2(self, should_check = True):
         mc = self.mc
         
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_left(2.6)
         time.sleep(3)
 
         # 走弯路 begin
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_down(1)
         time.sleep(5)
 
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_up(1)
         time.sleep(.1)
         # 走弯路 end
 
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_left(2.6)
         time.sleep(3)
 
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_left(1.7)
         time.sleep(3)
 
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_left(1.7)
         time.sleep(8)
 
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_right(4.6)
         time.sleep(5)
 
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_up(2.4)
         time.sleep(5)
 
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_right(2.5)
         time.sleep(5)
 
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_right(1.5)
         time.sleep(5)
 
-        self.check_handle()
+        self.check_handle(should_check)
         mc.move_down(2.3)
         time.sleep(3)
     
@@ -274,7 +276,7 @@ class RottenSwamp:
     # 进入寒风营地
     def crossColdWindCamp(self):
         mc = self.mc
-        waitTime = 3
+        waitTime = 1.5
 
         mc.move_right(1.8)
         time.sleep(waitTime * 0)
@@ -344,14 +346,25 @@ class RottenSwamp:
         mc = self.mc
 
         mc.move_right(1.8)
-
         mc.move_up(1.2)
-
         mc.move_right(.3)
-        time.sleep(1.6)
+        time.sleep(.6)
 
         def lamda():
             mc.move_left(.3)
             mc.move_down(1.2)
-            mc.move_left(1.8)
+            mc.move_left(2)
+        return lamda
+
+    # 打岩石巨人
+    def killStoneMen(self):
+        mc = self.mc
+
+        mc.move_left(5.8)
+
+        time.sleep(3)
+        
+        # 返回
+        def lamda():
+            mc.move_right(5.8)
         return lamda

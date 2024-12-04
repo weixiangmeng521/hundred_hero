@@ -1,19 +1,23 @@
+import queue
 import traceback
+import cv2
 import numpy as np
+import pyautogui
 from employee.bounty_hunter import BountyHunter
 from employee.cards_master import CardsMaster
 from employee.coach_NPC import CoachNPC
 from employee.task_excutor import TaskExcutor
+from employee.treasure_hunter import TreasureHunt
 from exception.game_status import GameStatusError
 from employee.farmer import Farmer
 from instance.union_task import UnionTask
-import time
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
-from lib.message import MessageService
+from lib.message_service import MessageService
 from lib.move_controller import MoveControll
 from lib.app_trace import AppTrace
+from lib.threads_manager import ThreadsManager
 from lib.visual_track import VisualTrack
 import configparser
 
@@ -24,9 +28,9 @@ config.read('config.ini')
 
 # 选择关卡
 cs = ChallengeSelect(config)
+vc = VisualTrack(config)
 mc = MoveControll(config)
 reader = InfoReader(config)
-vt = VisualTrack(config)
 unionTask = UnionTask(config)
 cardsMaster = CardsMaster(config)
 logger = init_logger(config)
@@ -35,25 +39,34 @@ farmer = Farmer(config)
 taskExcutor = TaskExcutor(config)
 trace = AppTrace(config)
 coachNPC = CoachNPC(config)
+treasureHunter = TreasureHunt(config)
 
 # 配置twilio
 pusher = MessageService(config)
+# 定义队列用于线程间通信
+event_queue = queue.Queue()
+# 初始化多线程管理器
+threadsManager = ThreadsManager(config, event_queue)
 
-app_name = config["APP"]["Name"]
+
+# 是否守护线程
+ENABLE_DEAMON = config.getboolean('THREADS', 'EnableDeamon')
 # 需不需要唤醒
-IS_WAKE_UP_APP = True
+IS_WAKE_UP_APP = config.getboolean('TASK', 'IsWakeUpApp')
 # 是否有加载广告
-IS_LOADING_ADS = True
+IS_LOADING_ADS = config.getboolean('TASK', 'IsLoadingAds')
 # 刷工会副本
-FARM_UNION_TASK = True
+ENABLE_AUTO_UNION_TASK = config.getboolean('TASK', 'EnableAutoUnionTask')
 # 无限训练营
-IS_ABILITY_AIM = False
+ENABLE_AUTO_ABILITY_IMPROVE = config.getboolean('TASK', 'EnableAutoAbilityImporve')
 # 无限抽卡
-IS_AUTO_GACHA = False
+ENABLE_AUTO_GACHA = config.getboolean('TASK', 'EnableAutoGaCha')
+# 刷每日箱子
+ENABLE_AUTO_DAILY_CASE = config.getboolean('TASK', 'EnableAutoDaliyCase')
 # 无限打钱
-IS_AUTO_FARM = False
+ENABLE_AUTO_COIN = config.getboolean('TASK', 'EnableAutoCoin')
 # 无限刷资源
-IS_AUTO_WOOD_AND_MINE = False
+ENABLE_AUTO_WOOD_AND_MINE = config.getboolean('TASK', 'EnableAutoWoodAndMine')
 
 
 
@@ -63,47 +76,28 @@ def wake_up_window():
     cs.move2LeftTop(reader.wait_game_loaded, IS_LOADING_ADS)
 
 
-
-# 错误处理
-def error_handle():
-    trace.play_sound("Glass.aiff")
-    pusher.push(f"[{app_name}]运行异常, 请查看错误日志.")
-    trace.screen_shot()
-    cs.closeGameWithoutException()
-    time.sleep(.3)
-    bootstrap()
-
-
-
-
-# 初始函数
-def bootstrap():
-    # 唤醒
-    if(IS_WAKE_UP_APP): wake_up_window()
-    # 打工会
-    if(FARM_UNION_TASK): taskExcutor.work()
-    # 训练营
-    if(IS_ABILITY_AIM): coachNPC.work()
-    # 抽卡
-    if(IS_AUTO_GACHA): cardsMaster.work()
-    # 打钱
-    if(IS_AUTO_FARM): bountyHunter.work()
-    # 刷资源
-    if(IS_AUTO_WOOD_AND_MINE): farmer.work()
-
-
-
-def __main__():
+# 工作线程
+def work_thread(event_queue):
     try:
-        bootstrap()
+        # 唤醒
+        if(IS_WAKE_UP_APP): wake_up_window()
+        # 打工会
+        if(ENABLE_AUTO_UNION_TASK): taskExcutor.work()
+        # 训练营
+        if(ENABLE_AUTO_ABILITY_IMPROVE): coachNPC.work()
+        # 抽卡
+        if(ENABLE_AUTO_GACHA): cardsMaster.work()
+        # 刷30个箱子
+        if(ENABLE_AUTO_DAILY_CASE): treasureHunter.work()
+        # 打钱
+        if(ENABLE_AUTO_COIN): bountyHunter.work()
+        # 刷资源
+        if(ENABLE_AUTO_WOOD_AND_MINE): farmer.work()
 
     except (RuntimeError, GameStatusError, TimeoutError) as e:
         stack_info = traceback.format_exc()
         logger.error(f"{e}, {stack_info}")
-        error_handle()
-
-    except KeyboardInterrupt:
-        print("正常结束")
+        trace.report_error(e)
 
     except Exception as e:
         stack_info = traceback.format_exc()
@@ -111,5 +105,21 @@ def __main__():
         trace.play_sound("Ping.aiff")
 
 
+# 入口函数
+def main():
+    if(ENABLE_DEAMON):
+        threadsManager.add_task("WorkThread", work_thread)
+        # threadsManager.add_task("KeyBoardMonitor", keyboradMonitor.work)
+        threadsManager.run()
+
+    if(not ENABLE_DEAMON):
+        work_thread(event_queue)
+
+
 if __name__ == "__main__":
-    __main__()
+    main()
+
+
+    # vc.test_for_find_object_in_image()
+
+    # print(pyautogui.position())
