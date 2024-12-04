@@ -118,14 +118,15 @@ class InfoReader:
         
         # 获取三个位置，如果是变绿了，就点击。
         self.click_complete_task_btn()
-        time.sleep(1)
+        time.sleep(.3)
+        self.clearRewards()
+        time.sleep(.3)
 
         # 获取task的list，判断是不是已经提交了
         task_list = self.read_task_list()
         for key, value in task_list.items():
-            if(key == task_name):
-                if(not bool(value)):
-                    return True
+            if(key == task_name and not bool(value)):
+                return True
         return False
     
 
