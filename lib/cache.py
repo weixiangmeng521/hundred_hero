@@ -6,6 +6,15 @@ import time
 
 from lib.logger import init_logger
 
+# 单例模式
+cache_manager_instance = None
+def get_cache_manager_instance(config):
+    global cache_manager_instance
+    if(cache_manager_instance):
+        return cache_manager_instance
+    cache_manager_instance = CacheManager(config)
+    
+
 # 缓存管理
 class CacheManager:
     def __init__(self, config):

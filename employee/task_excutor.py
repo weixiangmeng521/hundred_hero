@@ -1,7 +1,7 @@
 import time
 from defined import IS_UNION_TASK_FINISHED
 from instance.union_task import UnionTask
-from lib.cache import CacheManager
+from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
@@ -17,7 +17,7 @@ class TaskExcutor:
         self.unionTask = UnionTask(config)
         self.reader = InfoReader(config)
         self.logger = init_logger(config)
-        self.cache = CacheManager(config)
+        self.cache = get_cache_manager_instance(config)
         # 今日目标任务
         self.target_task_fn = None
         # 今日的任务名称
