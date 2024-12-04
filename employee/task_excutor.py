@@ -64,16 +64,14 @@ class TaskExcutor:
             if(self.reader.is_task_complete(self.target_task_name)):
                 self.reader.close_task_menu(True)
                 # 设置缓存
-                self.cache.set(IS_UNION_TASK_FINISHED, 1)                
-                time.sleep(1.2)
-                self.cs.clearAds(1)
+                self.cache.set(IS_UNION_TASK_FINISHED, 1)
                 self.logger.info("工会任务已完成，无需再打")
                 # 是否显示回城按钮
                 if(self.reader.is_show_back2town_btn()): 
                     self.cs.back2Town()
                     self.unionTask.refresh()
                     self.target_task_fn = None
-                    time.sleep(10)
+                    self.reader.wait_tranported()
                 return
             
             self.reader.close_task_menu()

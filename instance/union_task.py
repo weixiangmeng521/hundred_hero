@@ -57,7 +57,7 @@ class UnionTask:
             self.loop_lock = True
         
         # 循环走圈
-        instance.room1TaskLoop(False)
+        instance.room1TaskLoop(False, .5)
 
 
     # 刷污染前哨
