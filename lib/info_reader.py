@@ -120,12 +120,15 @@ class InfoReader:
             raise ValueError("Err: task_name cannot not be empty.")
         
         # 获取三个位置，如果是变绿了，就点击。
-        self.click_complete_task_btn()
+        while(self.click_complete_task_btn()):
+            time.sleep(.3)
+            self.clearRewards()
+            time.sleep(1)
 
         # 获取task的list，判断是不是已经提交了
         task_list = self.read_task_list()
         for key, value in task_list.items():
-            if(key == task_name and not bool(value)):
+            if(key == task_name and bool(value)):
                 return True
         return False
     
@@ -156,27 +159,19 @@ class InfoReader:
 
         # 点击完成按钮
         green_color = (97, 198, 98)
+        # 只点击第一个
         if(self.is_target_area(task_1_img, green_color, 0)):
             pyautogui.click(btn1[0], btn1[1])
-            time.sleep(.3)
-            self.clearRewards()
-            time.sleep(.3)
-            self.click_complete_task_btn()
-        
-        if(self.is_target_area(task_2_img, green_color, 0)):
-            pyautogui.click(btn2[0], btn2[1])
-            time.sleep(.3)
-            self.clearRewards()
-            time.sleep(.3)
-            self.click_complete_task_btn()
+            return True        
+        # if(self.is_target_area(task_2_img, green_color, 0)):
+        #     pyautogui.click(btn2[0], btn2[1])
+        #     return True
 
-        if(self.is_target_area(task_3_img, green_color, 0)):
-            pyautogui.click(btn3[0], btn3[1])
-            time.sleep(.3)
-            self.clearRewards()
-            time.sleep(.3)
-            self.click_complete_task_btn()
-    
+        # if(self.is_target_area(task_3_img, green_color, 0)):
+        #     pyautogui.click(btn3[0], btn3[1])
+        #     return True
+        return False
+
 
     # 关闭奖励弹窗
     def clearRewards(self, times = 1):
@@ -224,7 +219,6 @@ class InfoReader:
         #     int(winHeight - 650)
         # ))
         
-        
         # 创建 mss 实例
         with mss.mss() as sct:
             region = {
@@ -261,9 +255,10 @@ class InfoReader:
 
     # 通过颜色占比来判断是否完成任务
     def is_task_complete_by_color_percent(self, bgr_img):
-        complete_color = (218,224,230)
+        complete_color = (229,223,217)
         rate = self.get_color_ratio(bgr_img, complete_color)
-        return rate > 0.3
+        # self.print_img(bgr_img)
+        return rate <= 0.5
 
 
     # 读取中文
@@ -520,7 +515,8 @@ class InfoReader:
             if(not self.is_treasure_pop_up()):
                 break
             
-            time.sleep(.3)
+            # 这个延迟很有必要
+            time.sleep(1.2)
 
 
 

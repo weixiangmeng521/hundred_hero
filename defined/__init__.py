@@ -18,6 +18,8 @@ CORRECTION_DICT = {
     # '加': '迦',
     # '是': '师',
     # '共': '杀',
+    "(": "",
+    "粳": "精",
 }
 
 IS_UNION_TASK_FINISHED = "1"
