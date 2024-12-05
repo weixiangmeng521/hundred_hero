@@ -8,7 +8,7 @@ import Quartz
 import pytesseract
 import cv2
 import numpy as np
-from defined import IS_UNION_TASK_FINISHED
+from defined import IS_DALIY_CASE_FINISHED
 from exception.game_status import GameStatusError
 from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
@@ -417,10 +417,10 @@ class InfoReader:
 
 
     # 直到出现箱子
-    def till_find_treasure(self, treasure_num = 1):
+    def till_find_treasure(self, treasure_num = 1, wait_max_time = 60 * 3):
         # 计划设置10分钟系统超时
         start_time = time.time()  # 记录开始时间
-        timeout = 60 * 3 # 超时时间，单位为秒
+        timeout = wait_max_time # 超时时间，单位为秒
         # 如果有爆宝箱，却达不到treasure_num的标准，就降低标准
         tolerate_timeout = 30
 
@@ -431,7 +431,7 @@ class InfoReader:
 
             elapsed_time = time.time() - start_time  # 计算已过去的时间
             if elapsed_time > timeout:
-                self.cache.set(IS_UNION_TASK_FINISHED, 1)      
+                self.cache.set(IS_DALIY_CASE_FINISHED, 1)
                 raise TimeoutError(f"找宝箱超时: 未在{timeout}s内找到宝箱。")                
 
             # 死亡监控

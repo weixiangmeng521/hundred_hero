@@ -13,6 +13,7 @@ def get_cache_manager_instance(config):
     if(cache_manager_instance):
         return cache_manager_instance
     cache_manager_instance = CacheManager(config)
+    return cache_manager_instance
     
 
 # 缓存管理
