@@ -81,8 +81,8 @@ class TreasureHunt:
                 # 判断是否点击成功并处理弹窗
                 self.logger.debug("等待弹出宝箱内容...")
                 self.reader.wait_treasure_pop_up(10)
-                self.logger.debug("宝箱内容已弹出。")
-                time.sleep(.5)
+                self.logger.debug("宝箱内容已弹出。等待2s")
+                time.sleep(2) # 因为有缓动动画，所以等2s
                 self.reader.click_rewards()
                 # self.cs.clearAds(3)
 

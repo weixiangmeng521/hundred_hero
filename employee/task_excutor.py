@@ -28,6 +28,7 @@ class TaskExcutor:
             "击杀100名兽人弓手": self.unionTask.farmingColdWindCamp,
             "击杀100只冰霜傀儡": self.unionTask.farmingSnowfield,
             "击杀100名娜迦法师": self.unionTask.farmingSnowfield,
+            "击杀100名树精斥候": self.unionTask.farmingColdWindCamp,
         }
 
         # self.unionTask.farmingMagicRing()
