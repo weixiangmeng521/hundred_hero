@@ -12,7 +12,7 @@ import math
 from lib.controll_wechat import ControllWechat
 from lib.logger import init_logger
 from lib.visual_track import VisualTrack
-
+from AppKit import NSWorkspace
 
 
 cPos = [222 , 696]
