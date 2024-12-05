@@ -21,7 +21,8 @@ class TreasureHunt:
         self.cs = ChallengeSelect(config)
         self.reader = InfoReader(config)
         self.cache = get_cache_manager_instance(config)
-
+        # 最大等待击杀怪物时间
+        self.wait_max_time = 60 * 2
     
     # 死亡处理
     def dead_hander(self):
@@ -39,7 +40,7 @@ class TreasureHunt:
         self.logger.info("已经移动到BOSS面前")
 
         # killboss, till find two of treasure
-        self.reader.till_find_treasure(2)
+        self.reader.till_find_treasure(treasure_num = 2, wait_max_time = self.wait_max_time)
         self.logger.info("成功击杀双蜈蚣")
         # 等到获得宝箱的东西
         self.till_get_treasure()
