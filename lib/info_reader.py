@@ -2,6 +2,7 @@ import hashlib
 import math
 import time
 import uuid
+import mss
 import pyautogui
 import Quartz
 import pytesseract
@@ -215,31 +216,47 @@ class InfoReader:
     # 读取屏幕中的任务列表
     def read_task_list(self):
         winX, winY, winWidth, winHeight = self.get_win_info()
-        # 读取指定位置
-        screenshot = pyautogui.screenshot(region=(
-            int(winX + 50), 
-            int(winY + 325), 
-            int(winWidth - 100), 
-            int(winHeight - 650)
-        ))
-        mat_image = np.array(screenshot)
-        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
-        task_img_heigt = int((winHeight - 650 - 15) / 3)
-        task_img_width = int(winWidth - 100 - 100)
-        gutter = 30
-        # start_y:end_y, start_x:end_x
-        task_1_img = mat_image[0:task_img_heigt - 5 - gutter - 3, 130:task_img_width]
-        task_2_img = mat_image[task_img_heigt + 5 + 3:task_img_heigt * 2 - gutter, 130:task_img_width]
-        task_3_img = mat_image[task_img_heigt * 2 + 18:task_img_heigt * 3 + 3 - gutter, 130:task_img_width]
+        # # 读取指定位置
+        # screenshot = pyautogui.screenshot(region=(
+        #     int(winX + 50), 
+        #     int(winY + 325), 
+        #     int(winWidth - 100), 
+        #     int(winHeight - 650)
+        # ))
+        
+        
+        # 创建 mss 实例
+        with mss.mss() as sct:
+            region = {
+                "top": int(winY + 325), 
+                "left": int(winX + 50),
+                "width": int(winWidth - 100), 
+                "height": int(winHeight - 650)
+            }
+            # 截取屏幕
+            screenshot = sct.grab(region)
+            
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+            task_img_heigt = int((winHeight - 650 - 15) / 3)
+            task_img_width = int(winWidth + 80)
+            gutter = 30
+            # start_y:end_y, start_x:end_x
+            task_1_img = mat_image[20:task_img_heigt - 5 - gutter - 3 + 23, 255:task_img_width]
+            task_2_img = mat_image[task_img_heigt * 2 + 38:task_img_heigt * 3 + 26 - gutter, 255:task_img_width]
+            task_3_img = mat_image[task_img_heigt * 3 + 122:task_img_heigt * 3 + 179 - gutter, 255:task_img_width]
 
-        # 保存
-        self.save_task_sample_img(task_1_img, task_2_img, task_3_img)
+            # self.v_stack_show(
+            #     self.preprocess_img(task_1_img),
+            #     self.preprocess_img(task_2_img),
+            #     self.preprocess_img(task_3_img),
+            # )
 
-        return {
-            self.recognize_chinese_text(task_1_img): self.is_task_complete_by_color_percent(task_1_img),
-            self.recognize_chinese_text(task_2_img): self.is_task_complete_by_color_percent(task_2_img),
-            self.recognize_chinese_text(task_3_img): self.is_task_complete_by_color_percent(task_3_img),
-        }
+            return {
+                self.recognize_chinese_text(task_1_img): self.is_task_complete_by_color_percent(task_1_img),
+                self.recognize_chinese_text(task_2_img): self.is_task_complete_by_color_percent(task_2_img),
+                self.recognize_chinese_text(task_3_img): self.is_task_complete_by_color_percent(task_3_img),
+            }
 
 
     # 通过颜色占比来判断是否完成任务
@@ -255,28 +272,35 @@ class InfoReader:
         pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
         # 读取图片
         image = self.preprocess_img(bgr_image)
-        # 转换为灰度图像
-        gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        # 进行二值化，提升OCR识别效果
-        binary_image = cv2.adaptiveThreshold(
-            gray_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 5, 2
-        )
-        blended_image = cv2.addWeighted(gray_image, 0.7, binary_image, 0.3, 0)
 
         # 识别中文文字，使用简体中文语言包 'chi_sim'
-        text = pytesseract.image_to_string(blended_image, lang='chi_sim',  config='--psm 6')  # 使用简体中文语言包
+        text = pytesseract.image_to_string(image, lang='chi_sim',  config='--psm 6')  # 使用简体中文语言包
         return correct_text_handler(text)
     
 
     # 提高图像
     def preprocess_img(self, bgr_image):
+        scale_factor = 2.0  # 宽和高均放大两倍
         # Laplacian 算子
         laplacian = cv2.Laplacian(bgr_image, cv2.CV_64F)
         # 将拉普拉斯算子的结果转换为 uint8
         laplacian = cv2.convertScaleAbs(laplacian)
         # 应用加权合成     
         sharp = cv2.addWeighted(bgr_image, 1.7, laplacian, -0.3, 0)
-        return sharp
+        # 扩大一倍
+        # resized_img = cv2.resize(sharp, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_CUBIC)
+        # 转换为灰度图像
+        gray_image = cv2.cvtColor(sharp, cv2.COLOR_BGR2GRAY)
+        # 进行二值化，提升OCR识别效果
+        binary_image = cv2.adaptiveThreshold(
+            gray_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 7, 3
+        )
+        # # 轻微膨胀一次
+        # kernel = np.ones((2, 2), np.uint8)  # 高度为1，宽度为15的矩阵
+        # dilated = cv2.dilate(binary_image, kernel, iterations=1)
+
+        blended_image = cv2.addWeighted(gray_image, 0.6, binary_image, 0.4, 0)
+        return blended_image
 
 
     # 保存到sample的图片
@@ -710,7 +734,7 @@ class InfoReader:
 
 
     # 纵向排列三张图片
-    def v_stack_show(self, *imgs):  
+    def v_stack_show(self, *imgs):
         # 确保所有图片的宽度一致，否则调整为相同宽度
         widths = [img.shape[1] for img in imgs]
         max_width = max(widths)
@@ -724,8 +748,12 @@ class InfoReader:
         # 纵向堆叠图片
         stacked_img = np.vstack(resized_imgs)
         
+        # 获取窗口参数
+        winX, winY, winWidth, winHeight = self.get_win_info()
+
         # 显示结果
-        cv2.imshow("Vertical Stack", stacked_img)
+        cv2.imshow("VerticalStack", stacked_img)
+        cv2.moveWindow("VerticalStack", int(winX + winWidth), - 100)  
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
