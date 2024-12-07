@@ -111,6 +111,13 @@ class UnionTask:
         self.reader.wait_tranported()
 
 
+    # 刷冰雪巨人
+    def farmingIceGiant(self):
+        self.bountyHunter.killSnowmanBoss()
+        # 去刷新
+        self.cs.selectIcecrownThrone()
+        self.reader.wait_tranported()
+
 
     # 效率单刷岩石巨人
     def farmingStoneMenEfficiently(self):

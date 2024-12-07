@@ -498,23 +498,22 @@ class InfoReader:
             # print(winX, winY)
             # 如果有广告就不看广告
             is_contain_ads = self.is_target_area(mat_image, ads_btn, 0)
-            if(self.is_treasure_pop_up()):
-                self.logger.debug(f"宝箱按钮为: [{'广告' if is_contain_ads else '普通' }]按钮")
-            if(is_contain_ads and self.is_treasure_pop_up()):
+            self.logger.debug(f"宝箱按钮为: [{'广告' if is_contain_ads else '普通' }]按钮")
+            if(is_contain_ads):
                 # Point(x=244, y=674)
                 pyautogui.click(int(winX + winWidth // 2), int(winY + 560) + 90)
                 self.logger.debug("点击跳过广告。")
-            if(not is_contain_ads and self.is_treasure_pop_up()):
+                time.sleep(.3)
+                self.clearRewards()
+                break
+
+            if(not is_contain_ads):
                 pyautogui.click(int(winX + winWidth // 2), int(winY + 560) + 12)
                 self.logger.debug("领取奖励。")
-            
-            time.sleep(.3)
-            self.clearRewards()
-            time.sleep(.3)
-            # 如果消失了，就算成功
-            if(not self.is_treasure_pop_up()):
+                time.sleep(.3)
+                self.clearRewards()
                 break
-            
+
             # 这个延迟很有必要
             time.sleep(1.2)
 
@@ -563,9 +562,20 @@ class InfoReader:
         pyautogui.click(clicks=3)
         self.logger.debug("点击广告静音按钮")
 
+
+    # 遍历目标颜色，检查比例是否超过阈值
+    def is_target_color_present(self, mat_image, target_colors, threshold=0.7):
+        for color in target_colors:
+            result = self.get_color_ratio(mat_image, color)
+            # print(f"Color {color}: {result}")
+            # if result > threshold:
+            if math.isclose(result, threshold, rel_tol=1e-9):
+                return True
+        return False
+
     
     # 是否显示了宝箱内容
-    def is_treasure_pop_up(self, threshold = 0):
+    def is_treasure_pop_up(self):
         window = self.get_specific_window_info()
         if(window == None): 
             raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
@@ -586,23 +596,20 @@ class InfoReader:
         target_color2 = (60,134,117)
         target_color3 = (59,132,116)
 
-        result1 = self.get_color_ratio(mat_image, target_color)
-        result2 = self.get_color_ratio(mat_image, target_color2)
-        result3 = self.get_color_ratio(mat_image, target_color3)
-        return result1 >= 0.7 or result2 >= 0.7 or result3 >= 0.7
+        target_colors = [target_color, target_color2, target_color3]
+        return self.is_target_color_present(mat_image, target_colors)
         
 
     # 等待出现pop up
-    def wait_treasure_pop_up(self, threshold = 0):
+    def wait_treasure_pop_up(self, timeout = 30):
         start_time = time.time()  # 记录开始时间
-        timeout = 30  # 超时时间，单位为秒
         
         # 等待出现弹窗
-        while self.is_treasure_pop_up(threshold):
+        while self.is_treasure_pop_up():
             elapsed_time = time.time() - start_time  # 计算已过去的时间
             if elapsed_time > timeout:
                 raise TimeoutError(f"等待超时: {timeout}s内寻找的宝箱弹窗。")
-            time.sleep(1)
+            time.sleep(.5)
 
 
     # 等待传送完成
