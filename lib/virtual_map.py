@@ -9,6 +9,17 @@ from defined import DOWN_MOVE_CMD, FIND_PORTAL, FIND_RECRUIT_NPC, FIND_TRAINING_
 from lib.logger import init_logger
 from lib.move_controller import MoveControll
 
+
+virtualMapInstance = None
+# 单例模式
+def init_virtual_map(config):
+    global virtualMapInstance 
+    if(virtualMapInstance):
+        return virtualMapInstance
+    virtualMapInstance = VirtualMap(config)
+    return virtualMapInstance
+
+
 # 虚拟map
 class VirtualMap:
     
@@ -58,6 +69,14 @@ class VirtualMap:
         ]
         # 人物移动matrix
         self.map_matrix = np.full_like(self.npc_map_matrix, 1)
+
+
+    # 重新设置出生地定位，在发生传送事件后，就会出现这种事情，出生地会变成传送口
+    def reposition(self):
+        pos = self.find_NPC_target(4)
+        self.map_matrix = np.full_like(self.npc_map_matrix, 1)
+        self.map_matrix[pos[1]][pos[0]] = 9
+        self.cur_position = pos
 
 
     # 找到初始位置
@@ -289,7 +308,6 @@ class VirtualMap:
 
     # 启动
     def work(self, event_queue:queue.Queue):
-        # 找到定位
         self.find_initial_position()
 
         while True:
