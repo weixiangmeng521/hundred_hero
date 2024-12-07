@@ -18,7 +18,7 @@ from lib.message_service import MessageService
 from lib.move_controller import MoveControll
 from lib.app_trace import AppTrace
 from lib.threads_manager import ThreadsManager
-from lib.virtual_map import VirtualMap
+from lib.virtual_map import VirtualMap, init_virtual_map
 from lib.visual_track import VisualTrack
 import configparser
 
@@ -46,7 +46,7 @@ treasureHunter = TreasureHunt(config)
 # web服务
 webServer = WebServer(config)
 # 虚拟map
-virtualMap = VirtualMap(config)
+virtualMap = init_virtual_map(config)
 # 配置twilio
 pusher = MessageService(config)
 # 定义队列用于线程间通信

@@ -11,8 +11,8 @@ import numpy as np
 import math
 from lib.controll_wechat import ControllWechat
 from lib.logger import init_logger
+from lib.virtual_map import init_virtual_map
 from lib.visual_track import VisualTrack
-from AppKit import NSWorkspace
 
 
 cPos = [222 , 696]
@@ -82,6 +82,7 @@ class ChallengeSelect:
         self.app_name = config["APP"]["Name"]
         self.logger = init_logger(config)
         self.wechat = ControllWechat(self.config)
+        self.virtual_map = init_virtual_map(config)
 
 
     # 获取窗口信息
@@ -165,7 +166,7 @@ class ChallengeSelect:
         # self.logger.info(f"黑石堡垒被点击")
         time.sleep(self.waitTime)
         pyautogui.click(centerHallBtnPos[0], centerHallBtnPos[1])
-        # self.logger.info(f"中央走廊被点击")
+        self.logger.info(f"进入[中央走廊]")
 
 
     # 刷木头
@@ -190,7 +191,7 @@ class ChallengeSelect:
         pyautogui.click(forestMapBtnPos[0], forestMapBtnPos[1])        
         time.sleep(self.waitTime)
         pyautogui.click(pollutionOutpostBtnPos[0], pollutionOutpostBtnPos[1])
-        
+        self.logger.info("进入[污染前哨]")
     
     # [打金]刷前哨平原的副本
     def selectFrontFlatland(self):
@@ -336,6 +337,7 @@ class ChallengeSelect:
         time.sleep(self.waitTime)
         pyautogui.click(yesBtnPos[0], yesBtnPos[1])
         self.logger.info(f"打道回府！")
+        self.virtual_map.reposition()
 
 
     # 把窗口移动到（0，0）
