@@ -11,6 +11,7 @@ from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
+from lib.virtual_map import init_virtual_map
 
 # 每日30个箱子
 class TreasureHunt:
@@ -21,8 +22,10 @@ class TreasureHunt:
         self.cs = ChallengeSelect(config)
         self.reader = InfoReader(config)
         self.cache = get_cache_manager_instance(config)
+        self.virtual_map = init_virtual_map(config)
         # 最大等待击杀怪物时间
         self.wait_max_time = 60 * 2
+        
     
     # 死亡处理
     def dead_hander(self):
@@ -98,6 +101,10 @@ class TreasureHunt:
     
     # 工作
     def work(self):
+        # 找到位置
+        if(not self.reader.is_show_back2town_btn()):
+            self.virtual_map.move2protal()
+        
         # self.reader.close_30s_ads()
         # time.sleep(20)
         while True:

@@ -5,6 +5,7 @@ from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
+from lib.virtual_map import init_virtual_map
 
 
 # 执行者，任务达人
@@ -18,6 +19,7 @@ class TaskExcutor:
         self.reader = InfoReader(config)
         self.logger = init_logger(config)
         self.cache = get_cache_manager_instance(config)
+        self.virtual_map = init_virtual_map(config)        
         # 今日目标任务
         self.target_task_fn = None
         # 今日的任务名称
@@ -91,6 +93,10 @@ class TaskExcutor:
 
     # 执行任务
     def work(self):
+        # 找到位置
+        if(not self.reader.is_show_back2town_btn()):
+            self.virtual_map.move2protal()
+
         is_finished = self.cache.get(IS_UNION_TASK_FINISHED)
         # 如果完成了任务就直接结束。
         if(is_finished and int(is_finished) == 1):

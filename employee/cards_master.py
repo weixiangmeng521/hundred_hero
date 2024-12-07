@@ -8,6 +8,7 @@ from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
 from lib.move_controller import MoveControll
+from lib.virtual_map import init_virtual_map
 from lib.visual_track import VisualTrack
 
 # 卡牌大师
@@ -36,7 +37,7 @@ class CardsMaster:
         self.mc = MoveControll(config)
         self.vt = VisualTrack(config)
         self.unionTask = UnionTask(config)
-
+        self.virtual_map = init_virtual_map(config)
 
 
     # 显示三张图片
@@ -281,20 +282,9 @@ class CardsMaster:
     def work(self):
         is_entered_interface = self.is_entered()
 
-        # 判断是否已经进入抽卡界面
-        if(not is_entered_interface):
-            x, y, tx, ty = self.vt.find_position((210, 174, 109), 0, 0)
-            # 如果没有找到目标就重新定位。
-            if((x == tx and y == ty)):
-                time.sleep(1)
-                self.logger.debug("没有找到抽卡中心，重新定位...")
-                self.work()
-
-            if(not (x == tx and y == ty)):
-                tolerate_distance = self.vt.get_point_distance(x, y, tx, ty)
-                # 如果小于10像素，就算是移动到指定目的地了
-                if(tolerate_distance >= 10):
-                    self.mc.move(x, y, tx, ty)
+        # 找到位置
+        if(not is_entered_interface and not self.reader.is_show_back2town_btn()):
+            self.virtual_map.move2recruit()
             # 定位到，点击绿色泡泡
             self.cs.clickGreenPop()
             time.sleep(.3)
@@ -310,14 +300,4 @@ class CardsMaster:
         # 关闭抽卡，返回
         self.reader.close_task_menu()
         time.sleep(.1)
-        
-        # 判断是否已经进入抽卡界面
-        if(not is_entered_interface):
-            self.mc.move(tx, ty, x, y)
-
-        # 寻找蓝色传送台
-        if(is_entered_interface):
-            x, y, tx, ty = self.vt.find_position((0xc7, 0xd4, 0xb1), 5, 5)
-            self.mc.move(x, y, tx, ty)
-
 
