@@ -21,6 +21,8 @@ from lib.threads_manager import ThreadsManager
 from lib.visual_track import VisualTrack
 import configparser
 
+from server.web_server import WebServer
+
 
 # 读取配置文件
 config = configparser.ConfigParser()
@@ -40,6 +42,8 @@ taskExcutor = TaskExcutor(config)
 trace = AppTrace(config)
 coachNPC = CoachNPC(config)
 treasureHunter = TreasureHunt(config)
+# web服务
+webServer = WebServer(config)
 
 # 配置twilio
 pusher = MessageService(config)
@@ -109,7 +113,10 @@ def work_thread(event_queue):
 def main():
     if(ENABLE_DEAMON):
         threadsManager.add_task("WorkThread", work_thread)
-        # threadsManager.add_task("KeyBoardMonitor", keyboradMonitor.work)
+        # 是否需要添加web server
+        if config.getboolean('WEB_SERVER', 'Enable'):
+            threadsManager.add_task("WebServer", webServer.run)
+
         threadsManager.run()
 
     if(not ENABLE_DEAMON):
@@ -117,7 +124,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+
+    webServer.run(event_queue)
 
 
     # vc.test_for_find_object_in_image()

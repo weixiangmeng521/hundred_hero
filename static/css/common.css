@@ -1,0 +1,44 @@
+/* *{border: 1px solid #ccc;} */
+
+.aws-bar-container{
+    height: 100vh;
+}
+.aws-controll-bar{
+    width: 130px;
+    height: 130px;
+    position: relative;
+    /* margin: 250px 15px 0px; */
+    box-shadow: 7px 7px 14px #ccc, -7px -7px 14px #fff;
+    border-radius: 15px;
+}
+.aws-controll-bar .uarr{
+    position: absolute;
+    right: 0px;
+    left: 50%;
+    transform: translate(-50%, 0px);  /* 水平和垂直居中 */
+    width: 42px;
+}
+
+.aws-controll-bar .darr{
+    position: absolute;
+    bottom: 0px;
+    left: 50%;
+    transform: translate(-50%, 0px);  /* 水平和垂直居中 */    
+    width: 42px;
+}
+
+.aws-controll-bar .larr{
+    position: absolute;
+    left: 0px;
+    top: 50%;
+    transform: translate(0%, -50%);  /* 水平和垂直居中 */
+    width: 42px;    
+}
+
+.aws-controll-bar .rarr{
+    position: absolute;
+    right: 0px;
+    top: 50%;
+    transform: translate(0%, -50%);  /* 水平和垂直居中 */
+    width: 42px;    
+}
