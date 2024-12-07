@@ -2,16 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>WebServer</title>
     <link rel="stylesheet" href="./css/common.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
     <div class="container">
-        <div class="row">
+        <div class="row pt-5">
+            <div class="col-12 d-flex justify-content-center align-items-center">
+                <button type="button" id="find_training_npc" class="btn btn-primary mb-1">找到训练营NPC</button>
+            </div>
+            <div class="col-12 d-flex justify-content-center align-items-center">
+                <button type="button" id="find_recruit_npc" class="btn btn-primary mb-1">找到招募大厅NPC</button>
+            </div>
+            <div class="col-12 d-flex justify-content-center align-items-center">
+                <button type="button" id="find_portal" class="btn btn-primary mb-1">找到传送口</button>
+            </div>
 
-            <div class="col-12 d-flex justify-content-center align-items-center aws-bar-container">
+            <div class="col-12 d-flex justify-content-center align-items-center aws-bar-container mt-5">
                 <div class="aws-controll-bar">
                     <button type="button" id="up_btn" class="btn btn-primary uarr">&uarr;</button>
                     <button type="button" id="down_btn" class="btn btn-primary darr">&darr;</button>
@@ -26,49 +35,57 @@
 <script src="./js/common.js"></script>
 <script>
 (function(){
-
+    document.addEventListener('dblclick', function(event) {
+        event.preventDefault();  // 阻止双击缩放
+    });
     
     const upBtn = document.getElementById("up_btn");
     const downBtn = document.getElementById("down_btn");
     const leftBtn = document.getElementById("left_btn");
     const rightBtn = document.getElementById("right_btn");
 
+    const findTrainingNPCBtn = document.getElementById("find_training_npc");
+    const findRecruitNPCBtn = document.getElementById("find_recruit_npc");
+    const findPortalBtn = document.getElementById("find_portal");
+
+    // 处理reponse
+    const handle_response = (res) => {
+        if(Number(res.code) === -1){
+            alert(res.message)
+        }
+        console.log(res)
+    }
+
     upBtn.addEventListener('click', async () => {
-        try {
-            const res = await request("/operate/up");
-            console.log(res);
-        } catch (error) {
-            console.error('Error:', error);
-        }
+        const res = await request("/operate/up");
+        handle_response(res)
     });
-
     downBtn.addEventListener('click', async () => {
-        try {
-            const res = await request("/operate/down");
-            console.log(res);
-        } catch (error) {
-            console.error('Error:', error);
-        }
+        const res = await request("/operate/down");
+        handle_response(res)
     });
-
     leftBtn.addEventListener('click', async () => {
-        try {
-            const res = await request("/operate/left");
-            console.log(res);
-        } catch (error) {
-            console.error('Error:', error);
-        }
+        const res = await request("/operate/left");
+        handle_response(res)
     });
-
     rightBtn.addEventListener('click', async () => {
-        try {
-            const res = await request("/operate/right");
-            console.log(res);
-        } catch (error) {
-            console.error('Error:', error);
-        }
+        const res = await request("/operate/right");
+        handle_response(res)
     });
 
+    // 找人
+    findTrainingNPCBtn.addEventListener('click', async () => {
+        const res = await request("/find/training_npc");
+        handle_response(res)
+    });
+    findRecruitNPCBtn.addEventListener('click', async () => {
+        const res = await request("/find/recruit_npc");
+        handle_response(res)
+    });
+    findPortalBtn.addEventListener('click', async () => {
+        const res = await request("/find/protal");
+        handle_response(res)
+    });
 
 
 })();

@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from defined import DOWN_MOVE_CMD, FIND_PORTAL, FIND_RECRUIT_NPC, FIND_TRAINING_NPC, LEFT_MOVE_CMD, RIGHT_MOVE_CMD, UP_MOVE_CMD
 from lib.logger import init_logger
 from pathlib import Path
 
@@ -26,35 +27,79 @@ class WebServer:
         self.app.get("/")(self.index)
         
         self.app.get("/operate/up")(self.operate_up) 
-        self.app.get("/operate/down")(self.operate_left) 
-        self.app.get("/operate/left")(self.operate_right) 
-        self.app.get("/operate/right")(self.operate_down) 
+        self.app.get("/operate/down")(self.operate_down) 
+        self.app.get("/operate/left")(self.operate_left) 
+        self.app.get("/operate/right")(self.operate_right) 
 
+        self.app.get("/find/training_npc")(self.find_training_npc) 
+        self.app.get("/find/recruit_npc")(self.find_recruit_npc) 
+        self.app.get("/find/protal")(self.find_portal) 
 
     # index
     async def index(self):
         return FileResponse(self.html_path / "index.html", media_type='text/html')
 
+
     # 向上走
     async def operate_up(self):
-        print(1)
+        if(not self.event_queue):
+            return {"code": -1, "message": "event_queue cannot be null pointer"}
+        
+        self.event_queue.put(UP_MOVE_CMD)
         return {"code": 1, "message": "success"}
 
 
     # 向左走
     async def operate_left(self):
-        print(1)
+        if(not self.event_queue):
+            return {"code": -1, "message": "event_queue cannot be null pointer"}
+        
+        self.event_queue.put(LEFT_MOVE_CMD)
         return {"code": 1, "message": "success"}
 
 
     # 向右走
     async def operate_right(self):
-        print(1)
+        if(not self.event_queue):
+            return {"code": -1, "message": "event_queue cannot be null pointer"}
+        
+        self.event_queue.put(RIGHT_MOVE_CMD)
         return {"code": 1, "message": "success"}
     
+
     # 向下走
     async def operate_down(self):
-        print(1)
+        if(not self.event_queue):
+            return {"code": -1, "message": "event_queue cannot be null pointer"}
+        
+        self.event_queue.put(DOWN_MOVE_CMD)
+        return {"code": 1, "message": "success"}
+
+
+    # 找到训练营NPC
+    async def find_training_npc(self):
+        if(not self.event_queue):
+            return {"code": -1, "message": "event_queue cannot be null pointer"}
+        
+        self.event_queue.put(FIND_TRAINING_NPC)
+        return {"code": 1, "message": "success"}
+
+
+    # 找到招募大厅NPC
+    async def find_recruit_npc(self):
+        if(not self.event_queue):
+            return {"code": -1, "message": "event_queue cannot be null pointer"}
+        
+        self.event_queue.put(FIND_RECRUIT_NPC)
+        return {"code": 1, "message": "success"}
+    
+
+    # 找到传送阵
+    async def find_portal(self):
+        if(not self.event_queue):
+            return {"code": -1, "message": "event_queue cannot be null pointer"}
+        
+        self.event_queue.put(FIND_PORTAL)
         return {"code": 1, "message": "success"}
 
 

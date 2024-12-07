@@ -18,6 +18,7 @@ from lib.message_service import MessageService
 from lib.move_controller import MoveControll
 from lib.app_trace import AppTrace
 from lib.threads_manager import ThreadsManager
+from lib.virtual_map import VirtualMap
 from lib.visual_track import VisualTrack
 import configparser
 
@@ -44,7 +45,8 @@ coachNPC = CoachNPC(config)
 treasureHunter = TreasureHunt(config)
 # web服务
 webServer = WebServer(config)
-
+# 虚拟map
+virtualMap = VirtualMap(config)
 # 配置twilio
 pusher = MessageService(config)
 # 定义队列用于线程间通信
@@ -71,7 +73,8 @@ ENABLE_AUTO_DAILY_CASE = config.getboolean('TASK', 'EnableAutoDaliyCase')
 ENABLE_AUTO_COIN = config.getboolean('TASK', 'EnableAutoCoin')
 # 无限刷资源
 ENABLE_AUTO_WOOD_AND_MINE = config.getboolean('TASK', 'EnableAutoWoodAndMine')
-
+# 无限刷资源
+ENABLE_VIRTUAL_MAP = config.getboolean('TASK', 'EnableVirtualMap')
 
 
 # wake up
@@ -97,6 +100,8 @@ def work_thread(event_queue):
         if(ENABLE_AUTO_COIN): bountyHunter.work()
         # 刷资源
         if(ENABLE_AUTO_WOOD_AND_MINE): farmer.work()
+        # 虚拟map
+        if(ENABLE_VIRTUAL_MAP): virtualMap.work(event_queue)
 
     except (RuntimeError, GameStatusError, TimeoutError) as e:
         stack_info = traceback.format_exc()
@@ -124,9 +129,7 @@ def main():
 
 
 if __name__ == "__main__":
-    # main()
-
-    webServer.run(event_queue)
+    main()
 
 
     # vc.test_for_find_object_in_image()
