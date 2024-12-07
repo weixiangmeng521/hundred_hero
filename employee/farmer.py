@@ -8,6 +8,7 @@ from instance.snow_zone import SnowZone
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
+from lib.virtual_map import init_virtual_map
 
 
 
@@ -20,6 +21,7 @@ class Farmer:
         self.logger = init_logger(config)
         self.reader = InfoReader(config)
         self.unionTask = UnionTask(config)
+        self.virtual_map = init_virtual_map(config)
 
 
     # 刷经验
@@ -88,6 +90,10 @@ class Farmer:
 
     # 自动打工，根据资源需求来打工
     def work(self):
+        # 找到位置
+        if(not self.reader.is_show_back2town_btn()):
+            self.virtual_map.move2protal()
+
         # 流水线速度
         waitSec = 3.3
 
