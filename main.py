@@ -18,7 +18,7 @@ from lib.message_service import MessageService
 from lib.move_controller import MoveControll
 from lib.app_trace import AppTrace
 from lib.threads_manager import ThreadsManager
-from lib.virtual_map import VirtualMap, init_virtual_map
+from lib.virtual_map import init_virtual_map
 from lib.visual_track import VisualTrack
 import configparser
 
