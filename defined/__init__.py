@@ -20,6 +20,7 @@ CORRECTION_DICT = {
     # '共': '杀',
     "(": "",
     "粳": "精",
+    "电": "蛇",
 }
 # 结果类
 IS_UNION_TASK_FINISHED = "1"
