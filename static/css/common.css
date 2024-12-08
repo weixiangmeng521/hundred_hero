@@ -166,3 +166,41 @@ button[type="button"].btn-primary:focus{
 .aws-table-container tbody tr:active {
     background-color: #ddd;
 }
+
+
+/* 透明背景 + 模糊效果 */
+.aws-card {
+    background: rgba(255, 255, 255, 0.1); /* 半透明背景 */
+    backdrop-filter: blur(10px);           /* 背景模糊 */
+    border: none;                          /* 去掉默认边框 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* 柔和阴影 */
+    box-shadow: 5px 5px 15px #bebebe, -5px -5px 15px #ffffff;
+}
+
+/* 透明的卡片标题 */
+.aws-card-header {
+    background: rgba(0, 0, 0, 0.5);  /* 背景透明 */
+    backdrop-filter: blur(5px);       /* 背景模糊 */
+    font-size: 1.2rem;                /* 字体大小 */
+    padding: 15px;
+}
+
+/* 日志面板 */
+.aws-log-pane {
+    height: 400px;
+    overflow-y: auto;                /* 垂直滚动条 */
+    font-family: 'Courier New', monospace;
+    background: rgba(255, 255, 255, 0.05); /* 半透明背景 */
+    color: #dcdcdc;                   /* 字体颜色 */
+    border-radius: 10px;              /* 边角圆滑 */
+}
+
+/* .aws-card-body{
+}
+
+.aws-log-content{
+} */
+
+.aws-card-footer{
+    padding: 15px;
+}
