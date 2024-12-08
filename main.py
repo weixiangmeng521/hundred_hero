@@ -14,6 +14,7 @@ from instance.union_task import UnionTask
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
+from lib.logger_analysis import get_logger_analysis_instance
 from lib.message_service import MessageService
 from lib.move_controller import MoveControll
 from lib.app_trace import AppTrace
@@ -138,10 +139,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
 
-    # webServer.run(queue)
+    webServer.run(queue)
 
     # vc.test_for_find_object_in_image()
-
     # print(pyautogui.position())
+
+    # log_analysis = get_logger_analysis_instance(config)
+    # log_analysis.test()
