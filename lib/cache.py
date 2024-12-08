@@ -90,6 +90,11 @@ class CacheManager:
                     del self.cache[key]  # 删除已过期的键
                     self._save_cache()  # 保存更新后的缓存
             return None
+        
+    
+    # 读取全部缓存
+    def all(self):
+        return self.cache
 
 
     # 清理所有过期的键。
