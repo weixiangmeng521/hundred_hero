@@ -21,9 +21,10 @@ CORRECTION_DICT = {
     "(": "",
     "粳": "精",
 }
-
+# 结果类
 IS_UNION_TASK_FINISHED = "1"
 IS_DALIY_CASE_FINISHED = "2"
+IS_DALIY_ARENA_FINISHED = "3"
 
 # 动作类
 UP_MOVE_CMD = 0x0001
