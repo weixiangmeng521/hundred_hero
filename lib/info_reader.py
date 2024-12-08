@@ -1,3 +1,4 @@
+from collections import defaultdict
 import hashlib
 import math
 import time
@@ -122,7 +123,7 @@ class InfoReader:
         # 获取三个位置，如果是变绿了，就点击。
         while(self.click_complete_task_btn()):
             time.sleep(.3)
-            self.clearRewards()
+            self.clear_rewards()
             time.sleep(1)
 
         # 获取task的list，判断是不是已经提交了
@@ -174,7 +175,7 @@ class InfoReader:
 
 
     # 关闭奖励弹窗
-    def clearRewards(self, times = 1):
+    def clear_rewards(self, times = 1):
         self.logger.info("关闭奖励显示。")
         window = self.get_specific_window_info()
         if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
@@ -198,6 +199,34 @@ class InfoReader:
 
         # 检查掩码中是否包含目标颜色
         return cv2.countNonZero(mask) > 0
+
+
+    # 统计颜色出现的次数
+    def count_colors(self, bgr_image):
+        if bgr_image is None:
+            print("图片加载失败！请检查路径。")
+            return None
+
+        # 将图片转换为 RGB 模式
+        image_rgb = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
+
+        # 统计颜色出现的次数
+        color_counts = defaultdict(int)
+
+        # 遍历每个像素点
+        for row in image_rgb:
+            for pixel in row:
+                color_tuple = tuple(map(int, pixel))  # 转换为整数元组 (R, G, B)
+                color_counts[color_tuple] += 1
+
+        # 打印结果（示例前 10 种颜色）
+        sorted_colors = sorted(color_counts.items(), key=lambda x: x[1], reverse=True)
+        print("前 10 种最常见的颜色:")
+        for color, count in sorted_colors[:10]:
+            print(f"颜色 {color}: 出现 {count} 次")
+
+        return color_counts
+
 
 
     # 输出图片每个色块
@@ -262,7 +291,6 @@ class InfoReader:
 
 
     # 读取中文
-    # TODO: 优化
     def recognize_chinese_text(self, bgr_image):
         pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
         # 读取图片
@@ -373,6 +401,22 @@ class InfoReader:
         # 检查掩码中是否包含目标颜色
         return cv2.countNonZero(mask) > 0
 
+
+    # 读取竞技场第一个按钮
+    def read_arena_first_btn(self):
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        btnPos = (int(winX + 316), int(winY + 498), 85, 38)
+        # 读取指定位置
+        screenshot = pyautogui.screenshot(region=(btnPos))
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+        return mat_image
+
+
+    # 读取安第一个竞技场按钮的坐标
+    def get_arena_first_btn_pos(self):
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        return (int(winX + 316 + 85 // 2),  int(winY + 498 + 38 // 2))
 
 
     # 判读是不是死了
@@ -504,14 +548,14 @@ class InfoReader:
                 pyautogui.click(int(winX + winWidth // 2), int(winY + 560) + 90)
                 self.logger.debug("点击跳过广告。")
                 time.sleep(.3)
-                self.clearRewards()
+                self.clear_rewards()
                 break
 
             if(not is_contain_ads):
                 pyautogui.click(int(winX + winWidth // 2), int(winY + 560) + 12)
                 self.logger.debug("领取奖励。")
                 time.sleep(.3)
-                self.clearRewards()
+                self.clear_rewards()
                 break
 
             # 这个延迟很有必要
@@ -734,6 +778,68 @@ class InfoReader:
     # 等待广告看完
     def wait_ads_closed(self):
         self.__wait_ads_do(True)
+
+
+    # 等待离开斗兽场
+    def wait_arena_leaved(self):
+        self.logger.debug("等待离开斗兽场...")
+        start_time = time.time()  # 记录开始时间
+        timeout = 60 * 2  # 超时时间，单位为秒\
+
+        while True:
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError("等待超时: 等待离开斗兽场超时。")
+            
+            window = self.get_specific_window_info()
+            if(window == None): 
+                raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+            
+            winX, winY, winWidth, winHeight = self.get_win_info()
+            # 获取目标定位
+            flagPos = (int(287 + winX), int(53 + winY), 20, 20)
+            screenshot = pyautogui.screenshot(region=(flagPos))
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+            # 金币的颜色
+            target_rgb = (246,199,77)   # RGB 格式
+            if(self.is_target_area(mat_image, target_rgb, 0)):
+                break
+            self.logger.debug("离开斗兽场: 等待中...")
+            time.sleep(.6)
+
+
+    # 等待进入斗兽场
+    # TODO: 完善中
+    def wait_arena_entered(self):
+        self.logger.debug("等待进入[斗兽场]...")
+        start_time = time.time()  # 记录开始时间
+        timeout = 60  # 超时时间，单位为秒\
+
+        while True:
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError(f"等待超时: {timeout}s等待进入斗兽场超时。")
+            
+            window = self.get_specific_window_info()
+            if(window == None): 
+                raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+            
+            winX, winY, winWidth, winHeight = self.get_win_info()
+            # 获取目标定位
+            flagPos = (int((winWidth // 2) - 30 + winX), int(100 + winY), 45, 50)
+            screenshot = pyautogui.screenshot(region=(flagPos))
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+            # VS标志的颜色
+            target_rgb1 = (215, 140, 80)   # RGB 格式
+            target_rgb2 = (233, 137, 72)   # RGB 格式
+            if(self.is_target_area(mat_image, target_rgb1, 0) and self.is_target_area(mat_image, target_rgb2, 0)):
+                return
+            
+            self.logger.debug("进入[斗兽场]: 等待中...")
+            time.sleep(.6)
+
 
 
     # 纵向排列三张图片

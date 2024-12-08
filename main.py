@@ -1,11 +1,11 @@
 import queue
 import traceback
-import cv2
-import numpy as np
+
 import pyautogui
 from employee.bounty_hunter import BountyHunter
 from employee.cards_master import CardsMaster
 from employee.coach_NPC import CoachNPC
+from employee.fighter import Fighter
 from employee.task_excutor import TaskExcutor
 from employee.treasure_hunter import TreasureHunt
 from exception.game_status import GameStatusError
@@ -43,6 +43,7 @@ taskExcutor = TaskExcutor(config)
 trace = AppTrace(config)
 coachNPC = CoachNPC(config)
 treasureHunter = TreasureHunt(config)
+fighter = Fighter(config)
 # web服务
 webServer = WebServer(config)
 # 虚拟map
@@ -69,13 +70,14 @@ ENABLE_AUTO_ABILITY_IMPROVE = config.getboolean('TASK', 'EnableAutoAbilityImporv
 ENABLE_AUTO_GACHA = config.getboolean('TASK', 'EnableAutoGaCha')
 # 刷每日箱子
 ENABLE_AUTO_DAILY_CASE = config.getboolean('TASK', 'EnableAutoDaliyCase')
+# 无限格斗
+ENABLE_AUTO_FRIGHT = config.getboolean("TASK", "EnableAutoFight")
 # 无限打钱
 ENABLE_AUTO_COIN = config.getboolean('TASK', 'EnableAutoCoin')
 # 无限刷资源
 ENABLE_AUTO_WOOD_AND_MINE = config.getboolean('TASK', 'EnableAutoWoodAndMine')
 # 无限刷资源
 ENABLE_VIRTUAL_MAP = config.getboolean('TASK', 'EnableVirtualMap')
-
 
 # wake up
 def wake_up_window():
@@ -90,18 +92,21 @@ def work_thread(event_queue):
         if(IS_WAKE_UP_APP): wake_up_window()
         # 打工会
         if(ENABLE_AUTO_UNION_TASK): taskExcutor.work()
-        # 训练营
-        if(ENABLE_AUTO_ABILITY_IMPROVE): coachNPC.work()
+        # 打架
+        if(ENABLE_AUTO_FRIGHT): fighter.work()        
         # 抽卡
         if(ENABLE_AUTO_GACHA): cardsMaster.work()
         # 刷30个箱子
         if(ENABLE_AUTO_DAILY_CASE): treasureHunter.work()
+        # 训练营
+        if(ENABLE_AUTO_ABILITY_IMPROVE): coachNPC.work()        
         # 打钱
         if(ENABLE_AUTO_COIN): bountyHunter.work()
         # 刷资源
         if(ENABLE_AUTO_WOOD_AND_MINE): farmer.work()
-        # 虚拟map
+        # 虚拟map, 测试用
         if(ENABLE_VIRTUAL_MAP): virtualMap.work(event_queue)
+
 
     except (RuntimeError, GameStatusError, TimeoutError) as e:
         stack_info = traceback.format_exc()
