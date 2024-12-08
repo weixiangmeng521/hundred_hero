@@ -10,6 +10,8 @@ from lib.cache import get_cache_manager_instance
 from lib.logger import init_logger
 from pathlib import Path
 
+from lib.logger_analysis import get_logger_analysis_instance
+
 # Web服务
 class WebServer:
     
@@ -23,6 +25,7 @@ class WebServer:
         self.cache = get_cache_manager_instance(config)
         self.html_path = Path(__file__).resolve().parent / "../static/"
         self.logs_path = Path(__file__).resolve().parent / "../logs/"
+        self.logger_analysis = get_logger_analysis_instance(config)
         self.setup_routes()
 
 
@@ -49,6 +52,8 @@ class WebServer:
         self.app.get("/system/config")(self.get_config)
         self.app.get("/system/logs")(self.get_logs)
 
+        self.app.get("/graph/last7days_cards_map")(self.get_recent7days_cards_data)
+
     # index
     async def index(self):
         return FileResponse(self.html_path / "index.html", media_type='text/html')
@@ -66,9 +71,13 @@ class WebServer:
     # 获取控制服务状态
     async def get_operate_status(self):
         status = self.config.getboolean('TASK', 'EnableVirtualMap')
-        return {
-            "code": "1" if status == True else "-1"
-        }
+        return {"code": 1 if status == True else "-1"}
+
+
+    # 获得最近7日的抽卡数据
+    async def get_recent7days_cards_data(self):
+        data = self.logger_analysis.get_last7days_cards_count_map()
+        return {"code": 1, "message": "success", "data": data}
 
 
     # 获取日志
@@ -179,6 +188,8 @@ class WebServer:
                 line_count = data.count(b'\n')
 
             return data.decode('utf-8', errors='ignore').splitlines()[-lines:]
+
+
 
 
     # 启动
