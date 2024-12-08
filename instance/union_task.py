@@ -125,3 +125,12 @@ class UnionTask:
         # 去刷新
         self.cs.selectIcecrownThrone()
         self.reader.wait_tranported()
+
+
+    # 刷双头蛇怪
+    def farmingTwoHeadSnake(self):
+        self.bountyHunter.killTwoHeadSnake()
+        # 去刷新
+        self.cs.selectIcecrownThrone()
+        self.reader.wait_tranported()
+        

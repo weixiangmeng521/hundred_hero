@@ -116,6 +116,17 @@ class BountyHunter:
         return 10
 
 
+    # 打双头蛇怪
+    def killTwoHeadSnake(self):
+        self.cs.selectDiamondInstance()
+        instance = SnowZone(self.config)
+        self.reader.wait_tranported()
+        instance.killTwoHeadSnakeBoss()
+        self.cs.back2Town()
+        self.reader.wait_tranported()
+        return 10
+
+
     # 单个打金任务
     def task(self):
         gold = 0

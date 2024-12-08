@@ -195,12 +195,34 @@ button[type="button"].btn-primary:focus{
     border-radius: 10px;              /* 边角圆滑 */
 }
 
+.aws-card-footer{
+    padding: 15px;
+}
+
 /* .aws-card-body{
 }
 
 .aws-log-content{
 } */
 
-.aws-card-footer{
-    padding: 15px;
+
+
+.aws-scroll-down {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background-color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 5px 5px 15px #bebebe, -5px -5px 15px #ffffff;
+    cursor: pointer;
+}
+.aws-scroll-down img {
+    width: 15px;
+    height: 15px;
+    position: absolute;
 }
