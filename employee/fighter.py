@@ -81,7 +81,7 @@ class Fighter:
         # 找到位置
         if(not self.reader.is_show_back2town_btn()):
             self.logger.info("准备移动到[竞技场]...")
-            self.virtual_map.move2Arena()
+            self.virtual_map.move2arena()
         
         # 自动战斗
         self.auto_fight()

@@ -1,8 +1,57 @@
 /* *{border: 1px solid #ccc;} */
+:root{
+    --var-font-color: #fff;
+    --var-second-font-color: #eadede;
+    --var-quote-font-color: #847f7f;
+    --var-primary-background: rgba(28, 28, 28, .98);
+    --var-dark-icon-color: #6d6d6d;
+    --var-line-color: #212121;
+    --var-divide-color: #565a58;
+    --var-shadow: 0px 0px 10px 0px #242424;
+    --var-primary-color: #61cb9d;
+    --var-primary-deep-color: #43b382;
+}
 
-/* .aws-bar-container{
+button[type="button"].btn-primary {
+    background-color: var(--var-primary-color);
+    border: var(--var-primary-color);
+}
+button[type="button"].btn-primary:focus{
+    background-color: var(--var-primary-deep-color);
+    border: var(--var-primary-deep-color);
+}
 
-} */
+.aws-navigation{
+    box-shadow: 7px 7px 14px #ccc, -7px -7px 14px #fff;
+}
+
+.btn-neumorphism {
+    background: #e0e0e0; /* 按钮背景 */
+    color: #333;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 5px 5px 15px #bebebe, -5px -5px 15px #ffffff;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-neumorphism:active, .btn-neumorphism:hover {
+    box-shadow: inset 5px 5px 15px #bebebe, inset -5px -5px 15px #ffffff;
+    transition: .3s;
+}
+
+.btn-neumorphism:hover {
+    background: #f0f0f0;
+}
+
+.aws-container{
+    max-width: 600px!important;
+    min-height: 100vh;
+}
+
 .aws-controll-bar{
     width: 130px;
     height: 130px;
@@ -41,4 +90,79 @@
     top: 50%;
     transform: translate(0%, -50%);  /* 水平和垂直居中 */
     width: 42px;    
+}
+
+.aws-circle-success, .aws-circle-warning{
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    vertical-align: middle;
+    border-radius: 100%;
+    margin-right: 5px;
+}
+.aws-circle-success{
+    background-color: #35d48f;
+}
+.aws-circle-warning{
+    background-color: rgb(230, 0, 81);
+}
+
+
+.aws-footer {
+    background: #e0e0e0; /* 背景色 */
+    color: #333;
+    padding: 15px 0;
+    box-shadow: 8px 8px 20px #bebebe, -8px -8px 20px #ffffff; /* 拟态风格阴影 */
+    border-radius: 15px;
+    text-align: center;
+}
+
+.aws-footer p {
+    margin-top: 15px;
+}
+
+.aws-table-header{
+    background-color: #e0e0e0;
+}
+
+/* 表格容器 */
+.aws-table-container {
+    padding: 20px;
+    background: #e0e0e0;
+    box-shadow: 8px 8px 20px #bebebe, -8px -8px 20px #ffffff; /* 拟态风格阴影 */
+    border-radius: 15px;
+    margin-top: 50px;
+}
+
+/* 表头样式 */
+.aws-table-container th {
+    background-color: #f2f2f2;
+    color: #333;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: inset 2px 2px 5px #bebebe, inset -2px -2px 5px #ffffff;
+}
+
+/* 表格样式 */
+.aws-table-container td, .aws-table-container th {
+    padding: 15px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* 行鼠标悬停效果 */
+.aws-table-container tbody tr:hover {
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+/* 每行的阴影效果 */
+.aws-table-container tbody tr {
+    box-shadow: inset 2px 2px 5px #bebebe, inset -2px -2px 5px #ffffff;
+    border-radius: 8px;
+}
+
+/* 备用行点击效果 */
+.aws-table-container tbody tr:active {
+    background-color: #ddd;
 }

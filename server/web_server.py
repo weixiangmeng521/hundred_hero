@@ -4,7 +4,8 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from defined import DOWN_MOVE_CMD, FIND_PORTAL, FIND_RECRUIT_NPC, FIND_TRAINING_NPC, LEFT_MOVE_CMD, RIGHT_MOVE_CMD, UP_MOVE_CMD
+from defined import DOWN_MOVE_CMD, FIND_ARENA, FIND_PORTAL, FIND_RECRUIT_NPC, FIND_TRAINING_NPC, LEFT_MOVE_CMD, RIGHT_MOVE_CMD, UP_MOVE_CMD
+from lib.cache import get_cache_manager_instance
 from lib.logger import init_logger
 from pathlib import Path
 
@@ -18,26 +19,58 @@ class WebServer:
         self.host = config["WEB_SERVER"]["Host"]
         self.port = config["WEB_SERVER"]["Port"]
         self.app = FastAPI()
+        self.cache = get_cache_manager_instance(config)
         self.html_path = Path(__file__).resolve().parent / "../static/"
         self.setup_routes()
 
 
     # 设置路由
     def setup_routes(self):
+        # 页面
         self.app.get("/")(self.index)
+        self.app.get("/controll")(self.controll)
         
         self.app.get("/operate/up")(self.operate_up) 
         self.app.get("/operate/down")(self.operate_down) 
         self.app.get("/operate/left")(self.operate_left) 
         self.app.get("/operate/right")(self.operate_right) 
+        self.app.get("/operate/status")(self.get_operate_status) 
 
         self.app.get("/find/training_npc")(self.find_training_npc) 
         self.app.get("/find/recruit_npc")(self.find_recruit_npc) 
         self.app.get("/find/protal")(self.find_portal) 
+        self.app.get("/find/arena")(self.find_arena) 
+
+        self.app.get("/task/list")(self.get_task_list)
+
+        self.app.get("/system/config")(self.get_config)
 
     # index
     async def index(self):
         return FileResponse(self.html_path / "index.html", media_type='text/html')
+
+    # controll
+    async def controll(self):
+        return FileResponse(self.html_path / "controll.html", media_type='text/html')
+
+
+    # 获取控制服务状态
+    async def get_operate_status(self):
+        status = self.config.getboolean('TASK', 'EnableVirtualMap')
+        return {
+            "code": "1" if status == True else "-1"
+        }
+
+
+    # 获取task的进展情况
+    async def get_task_list(self):
+        task_list = self.cache.all()
+        return {"code": 1, "message": "success", "data": task_list}
+
+
+    # 获取系统配置
+    async def get_config(self):
+        return {"code": 1, "message": "success","data": self.config}
 
 
     # 向上走
@@ -100,6 +133,15 @@ class WebServer:
             return {"code": -1, "message": "event_queue cannot be null pointer"}
         
         self.event_queue.put(FIND_PORTAL)
+        return {"code": 1, "message": "success"}
+
+
+    # 找到决斗场
+    async def find_arena(self):
+        if(not self.event_queue):
+            return {"code": -1, "message": "event_queue cannot be null pointer"}
+        
+        self.event_queue.put(FIND_ARENA)
         return {"code": 1, "message": "success"}
 
 

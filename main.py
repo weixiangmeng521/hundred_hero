@@ -53,7 +53,7 @@ pusher = MessageService(config)
 # 定义队列用于线程间通信
 event_queue = queue.Queue()
 # 初始化多线程管理器
-threadsManager = ThreadsManager(config, event_queue)
+threads_manager = ThreadsManager(config, event_queue)
 
 
 # 是否守护线程
@@ -76,7 +76,7 @@ ENABLE_AUTO_FRIGHT = config.getboolean("TASK", "EnableAutoFight")
 ENABLE_AUTO_COIN = config.getboolean('TASK', 'EnableAutoCoin')
 # 无限刷资源
 ENABLE_AUTO_WOOD_AND_MINE = config.getboolean('TASK', 'EnableAutoWoodAndMine')
-# 无限刷资源
+# 虚拟地图
 ENABLE_VIRTUAL_MAP = config.getboolean('TASK', 'EnableVirtualMap')
 
 # wake up
@@ -86,10 +86,16 @@ def wake_up_window():
 
 
 # 工作线程
+# TODO: 加入1h检测机制
 def work_thread(event_queue):
     try:
         # 唤醒
         if(IS_WAKE_UP_APP): wake_up_window()
+        # 虚拟map, 测试用
+        if(ENABLE_VIRTUAL_MAP): 
+            virtualMap.work(event_queue)
+            return
+
         # 打工会
         if(ENABLE_AUTO_UNION_TASK): taskExcutor.work()
         # 打架
@@ -104,8 +110,6 @@ def work_thread(event_queue):
         if(ENABLE_AUTO_COIN): bountyHunter.work()
         # 刷资源
         if(ENABLE_AUTO_WOOD_AND_MINE): farmer.work()
-        # 虚拟map, 测试用
-        if(ENABLE_VIRTUAL_MAP): virtualMap.work(event_queue)
 
 
     except (RuntimeError, GameStatusError, TimeoutError) as e:
@@ -122,20 +126,21 @@ def work_thread(event_queue):
 # 入口函数
 def main():
     if(ENABLE_DEAMON):
-        threadsManager.add_task("WorkThread", work_thread)
+        threads_manager.add_task("WorkThread", work_thread)
         # 是否需要添加web server
         if config.getboolean('WEB_SERVER', 'Enable'):
-            threadsManager.add_task("WebServer", webServer.run)
+            threads_manager.add_task("WebServer", webServer.run)
 
-        threadsManager.run()
+        threads_manager.run()
 
     if(not ENABLE_DEAMON):
         work_thread(event_queue)
 
 
 if __name__ == "__main__":
-    main()
+    # main()
 
+    webServer.run(queue)
 
     # vc.test_for_find_object_in_image()
 

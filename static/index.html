@@ -8,36 +8,126 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
-    <div class="container">
+    <!-- navigation begin -->
+    <nav class="aws-navigation navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">百炼英雄挂机系统</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="切换导航">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/controll">控制</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">统计</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- navigation end -->
+    <!-- controll page begin -->
+    <div class="container aws-container">
         <div class="row pt-5">
-            <div class="col-12 d-flex justify-content-center align-items-center">
-                <button type="button" id="find_training_npc" class="btn btn-primary mb-1">找到训练营NPC</button>
-            </div>
-            <div class="col-12 d-flex justify-content-center align-items-center">
-                <button type="button" id="find_recruit_npc" class="btn btn-primary mb-1">找到招募大厅NPC</button>
-            </div>
-            <div class="col-12 d-flex justify-content-center align-items-center">
-                <button type="button" id="find_portal" class="btn btn-primary mb-1">找到传送口</button>
-            </div>
-
-            <div class="col-12 d-flex justify-content-center align-items-center aws-bar-container mt-5">
-                <div class="aws-controll-bar">
-                    <button type="button" id="up_btn" class="btn btn-primary uarr">&uarr;</button>
-                    <button type="button" id="down_btn" class="btn btn-primary darr">&darr;</button>
-                    <button type="button" id="left_btn" class="btn btn-primary larr">&larr;</button>
-                    <button type="button" id="right_btn" class="btn btn-primary rarr">&rarr;</button>
+            <!-- task list begin -->
+            <div class="col-12 mt-5">
+                <div class="table-container">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th colspan="3" class="text-center aws-table-header fw-bold">每日任务</th>
+                            </tr>                            
+                            <tr>
+                                <th>项目名</th>
+                                <th>下次检查时间</th>
+                                <th>当前状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="task_table"></tbody>
+                    </table>
                 </div>
             </div>
+            <!-- task list end -->
 
+            <!-- config list begin -->
+            <div class="col-12 mt-5">
+                <div class="table-container">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th colspan="2" class="text-center aws-table-header fw-bold">用户设置</th>
+                            </tr>                               
+                            <tr>
+                                <th>项目</th>
+                                <th>当前状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="config_table"></tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- config list end -->            
+
+
+            <!-- system list begin -->
+            <div class="col-12 mt-5">
+                <div class="table-container">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th colspan="2" class="text-center aws-table-header fw-bold">系统设置</th>
+                            </tr>                              
+                            <tr>
+                                <th>项目</th>
+                                <th>当前状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="system_table"></tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- system list end -->               
         </div>
     </div>
+    <!-- controll page end -->
 
+    <!-- footer begin -->
+    <div class="aws-footer mt-5">
+        <p>&copy; 2024冷锋.保留所有权利。</p>
+    </div>
+    <!-- footer end -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>    
 <script src="./js/common.js"></script>
 <script>
 (function(){
     document.addEventListener('dblclick', function(event) {
         event.preventDefault();  // 阻止双击缩放
     });
+
+    const translationMap = new Map();
+    translationMap.set("1", "工会任务")
+    translationMap.set("2", "每日30个宝箱")
+    translationMap.set("3", "每日决斗场")
+
+    translationMap.set("enableautoabilityimporve", "无限训练营")
+    translationMap.set("enableautocoin", "无限打钱")
+    translationMap.set("enableautodaliycase", "刷每日箱子")
+    translationMap.set("enableautofight", "每日格斗")
+    translationMap.set("enableautogacha", "无限抽卡")
+    translationMap.set("enableautouniontask", "刷工会副本")
+    translationMap.set("enableautowoodandmine", "无限刷资源")
+    translationMap.set("enablevirtualmap", "虚拟地图")
+    translationMap.set("isloadingads", "是否有加载广告")
+    translationMap.set("iswakeupapp", "是否唤醒")
+    translationMap.set("enabledeamon", "是否守护线程")
+    translationMap.set("restartwaittime", "系统重启时间")
+    
     
     const upBtn = document.getElementById("up_btn");
     const downBtn = document.getElementById("down_btn");
@@ -47,6 +137,28 @@
     const findTrainingNPCBtn = document.getElementById("find_training_npc");
     const findRecruitNPCBtn = document.getElementById("find_recruit_npc");
     const findPortalBtn = document.getElementById("find_portal");
+    const findArena = document.getElementById("find_arena");
+    const taskTable = document.getElementById("task_table");
+    const configTable = document.getElementById("config_table");
+    const systemTable = document.getElementById("system_table");
+    
+    // 是不是数字
+    const isNumeric = (status) => {
+        return /^[+-]?\d+(\.\d+)?$/.test(status);
+    }
+    
+    // 时间转化
+    const formate_time = (timestamp) => {
+        // 转换为毫秒并创建 Date 对象
+        let date = new Date(timestamp * 1000);
+        // 提取各个部分
+        let year = date.getFullYear();
+        let month = String(date.getMonth() + 1).padStart(2, '0');  // 月份从0开始，所以加1，并补充前导零
+        let day = String(date.getDate()).padStart(2, '0');
+        let hours = String(date.getHours()).padStart(2, '0');
+        // 拼接成目标格式
+        return `${year}-${month}-${day} ${hours}h`
+    }
 
     // 处理reponse
     const handle_response = (res) => {
@@ -56,36 +168,79 @@
         console.log(res)
     }
 
-    upBtn.addEventListener('click', async () => {
-        const res = await request("/operate/up");
-        handle_response(res)
-    });
-    downBtn.addEventListener('click', async () => {
-        const res = await request("/operate/down");
-        handle_response(res)
-    });
-    leftBtn.addEventListener('click', async () => {
-        const res = await request("/operate/left");
-        handle_response(res)
-    });
-    rightBtn.addEventListener('click', async () => {
-        const res = await request("/operate/right");
-        handle_response(res)
-    });
 
-    // 找人
-    findTrainingNPCBtn.addEventListener('click', async () => {
-        const res = await request("/find/training_npc");
-        handle_response(res)
-    });
-    findRecruitNPCBtn.addEventListener('click', async () => {
-        const res = await request("/find/recruit_npc");
-        handle_response(res)
-    });
-    findPortalBtn.addEventListener('click', async () => {
-        const res = await request("/find/protal");
-        handle_response(res)
-    });
+    // 读取task
+    request("task/list").then((res) => {
+        let htmlString = "";
+        for(const key in res.data){
+            htmlString += `
+                <tr>
+                    <td>${translationMap.get(key)}</td>
+                    <td>${formate_time(res.data[key]["expiry"])}</td>
+                    <td>
+                        ${Number(res.data[key]["value"]) === 1 ? 
+                            "<span class='aws-circle-success'></span>已完成" : 
+                            "<span class='aws-circle-warning'></span>未完成"
+                        }
+                    </td>
+                </tr>
+            `
+        }
+        taskTable.innerHTML = htmlString
+    })
+
+
+    // 读取配置
+    request("system/config").then((res) => {
+        console.log(res)
+
+        let htmlString = "";
+        // 用户配置
+        for(const key in res.data["TASK"]){    
+            htmlString += `
+                <tr>
+                    <td>${translationMap.get(key)}</td>
+                    <td>
+                        ${res.data["TASK"][key] === 'True' ? 
+                            "<span class='aws-circle-success'></span>已启用" : 
+                            "<span class='aws-circle-warning'></span>未启用"
+                        }
+                    </td>
+                </tr>
+            `
+        }
+        configTable.innerHTML = htmlString
+
+
+        // 系统配置
+        htmlString = "";
+        // 系统配置
+        for(const key in res.data["THREADS"]){
+            let status = res.data["THREADS"][key];
+            let cell;
+
+            // 根据不同的状态设置内容
+            switch (status) {
+                case 'True':
+                    cell = "<span class='aws-circle-success'></span>已启用";
+                    break;
+                case 'False':
+                    cell = "<span class='aws-circle-warning'></span>未启用";
+                    break;
+                default:
+                    cell = `${status}`;
+            }
+
+            htmlString += `
+                <tr>
+                    <td>${translationMap.get(key)}</td>
+                    <td>${cell}</td>
+                </tr>
+            `
+        }
+        systemTable.innerHTML = htmlString
+    })
+
 
 
 })();
