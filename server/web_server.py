@@ -1,3 +1,4 @@
+import datetime
 import os
 import queue
 from fastapi import FastAPI
@@ -21,6 +22,7 @@ class WebServer:
         self.app = FastAPI()
         self.cache = get_cache_manager_instance(config)
         self.html_path = Path(__file__).resolve().parent / "../static/"
+        self.logs_path = Path(__file__).resolve().parent / "../logs/"
         self.setup_routes()
 
 
@@ -28,7 +30,8 @@ class WebServer:
     def setup_routes(self):
         # 页面
         self.app.get("/")(self.index)
-        self.app.get("/controll")(self.controll)
+        self.app.get("/controll")(self.controll_page)
+        self.app.get("/logger")(self.logger_page)
         
         self.app.get("/operate/up")(self.operate_up) 
         self.app.get("/operate/down")(self.operate_down) 
@@ -44,14 +47,20 @@ class WebServer:
         self.app.get("/task/list")(self.get_task_list)
 
         self.app.get("/system/config")(self.get_config)
+        self.app.get("/system/logs")(self.get_logs)
 
     # index
     async def index(self):
         return FileResponse(self.html_path / "index.html", media_type='text/html')
 
     # controll
-    async def controll(self):
+    async def controll_page(self):
         return FileResponse(self.html_path / "controll.html", media_type='text/html')
+
+    # controll
+    async def logger_page(self):
+        return FileResponse(self.html_path / "logger.html", media_type='text/html')
+
 
 
     # 获取控制服务状态
@@ -60,6 +69,13 @@ class WebServer:
         return {
             "code": "1" if status == True else "-1"
         }
+
+
+    # 获取日志
+    async def get_logs(self):
+        filename = datetime.datetime.now().strftime("app_%Y-%m-%d.log")
+        res = self.tail_log(self.logs_path / filename)
+        return {"code": 1, "message": "success", "data": res}
 
 
     # 获取task的进展情况
@@ -143,6 +159,26 @@ class WebServer:
         
         self.event_queue.put(FIND_ARENA)
         return {"code": 1, "message": "success"}
+
+
+    # 输出最后300行
+    def tail_log(self, file_path, lines=300, buffer_size=8192):
+        with open(file_path, 'rb') as f:
+            f.seek(0, 2)  # 文件指针移动到末尾
+            file_size = f.tell()
+            block_size = buffer_size
+            data = b''
+            line_count = 0
+            
+            while file_size > 0 and line_count <= lines:
+                if file_size - block_size < 0:
+                    block_size = file_size
+                f.seek(file_size - block_size, 0)
+                data = f.read(block_size) + data
+                file_size -= block_size
+                line_count = data.count(b'\n')
+
+            return data.decode('utf-8', errors='ignore').splitlines()[-lines:]
 
 
     # 启动
