@@ -113,6 +113,9 @@ class TreasureHunt:
                 if(is_finished and int(is_finished) == 1):
                     self.logger.debug("已完成每日30个箱子,无需再打")
                     break
+                # 设置默认值
+                if(not is_finished):
+                    self.cache.set(IS_DALIY_CASE_FINISHED, 0)
 
                 self.move_2_two_centipede()
                 self.reader.wait_tranported()

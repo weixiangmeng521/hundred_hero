@@ -48,6 +48,9 @@
                     <button type="button" id="find_arena" class="btn btn-neumorphism mb-2">找到决斗场</button>
                 </div>            
                 <div class="col-12 d-flex justify-content-center align-items-center">
+                    <button type="button" id="find_tower" class="btn btn-neumorphism mb-2">找到塔</button>
+                </div>                
+                <div class="col-12 d-flex justify-content-center align-items-center">
                     <button type="button" id="find_portal" class="btn btn-neumorphism mb-2">找到传送口</button>
                 </div>
             </div>
@@ -88,6 +91,7 @@
     const findRecruitNPCBtn = document.getElementById("find_recruit_npc");
     const findPortalBtn = document.getElementById("find_portal");
     const findArena = document.getElementById("find_arena");
+    const findTower = document.getElementById("find_tower");
     const taskTable = document.getElementById("task_table");
     const serviceStatus = document.getElementById("service_status");
     const plane = document.getElementById("plane");
@@ -150,7 +154,10 @@
         const res = await request("/find/arena");
         handle_response(res)
     });
-
+    findTower.addEventListener('click', async () => {
+        const res = await request("/find/tower");
+        handle_response(res)
+    });
 
 })();
 </script>

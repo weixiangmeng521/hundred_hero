@@ -72,6 +72,10 @@ closeBtnPos = [85, 840]
 giveUpRebornBtn = [315, 740]
 
 
+# 元素塔的pos
+elementTowerTabPos = [399, 847]
+
+
 
 # 选择关卡
 class ChallengeSelect:
@@ -309,6 +313,12 @@ class ChallengeSelect:
         time.sleep(self.waitTime)
         pyautogui.click(fireOfHellInstancePos[0], fireOfHellInstancePos[1])
         self.logger.info("进入[炎火之狱]")
+
+
+    # 选择元素塔
+    def selectElementTower(self):
+        pyautogui.click(elementTowerTabPos[0], elementTowerTabPos[1])
+        self.logger.info("选择[元素塔的TAB]")
 
 
     # 放弃

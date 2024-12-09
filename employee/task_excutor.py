@@ -104,5 +104,8 @@ class TaskExcutor:
         if(is_finished and int(is_finished) == 1):
             self.logger.info("工会任务已完成，无需再打")
             return
+        # 设置默认值
+        if(not is_finished):
+            self.cache.set(IS_UNION_TASK_FINISHED, 0)
 
         self.for_union_task()
