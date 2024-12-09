@@ -47,6 +47,12 @@
             </div>
             <!-- graph last 7 days coin end -->
 
+            <!-- graph today error message begin -->
+            <div class="col-12 col-md-6 mt-5">
+                <canvas id="today_error_message" width="100%" height="400px"></canvas>
+            </div>
+            <!-- graph today error message end -->
+
             <!-- task list begin -->
             <div class="col-12 col-md-6 mt-5">
                 <div class="table-container">
@@ -115,139 +121,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="./js/common.js"></script>
 <script>
-// 初始化chart
-const init_last7days_cards_chart = (data) => {
-    // 提取日期和卡片类型
-    const labels = Object.keys(data);  // 日期
-    const cardTypes = ['蓝卡', '紫卡', '橙卡', '垃圾', '红卡'];  // 可能的卡片类型
-    // 定义卡片类型与颜色的映射
-    const cardTypeColors = {
-        '蓝卡': 'rgb(105, 187, 255)',  // 蓝色
-        '紫卡': 'rgb(209, 6, 131)',  // 紫色
-        '橙卡': '#FFA500',  // 橙色
-        '垃圾': 'rgb(204, 204, 204)',  // 灰色
-        '红卡': '#FF0000'   // 红色
-    };
-
-    // 数据准备：每个卡片类型的数量
-    const datasets = cardTypes.map(cardType => ({
-        label: cardType,
-        data: labels.map(date => data[date][cardType] || 0),  // 获取每个日期对应卡片类型的数量，若没有则为0
-        borderColor: getColor(cardType),
-        backgroundColor: getColor(cardType),
-        fill: false
-    }));
-
-    // 随机颜色生成函数
-    function getColor(cardType) {
-        return cardTypeColors[cardType];
-    }
-
-    // 创建图表
-    const ctx = document.getElementById('last7days_cards_chart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',  // 折线图
-        data: {
-            labels: labels,  // X 轴为日期
-            datasets: datasets  // Y 轴为不同的卡片类型
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,  // 取消保持比例
-            plugins: {
-                title: {
-                    display: true,  // 显示标题
-                    text: '近7日的抽卡情况',  // 标题内容
-                    font: {
-                        size: 18,  // 标题字体大小
-                        weight: 'bold',  // 标题字体加粗
-                    },
-                    color: '#333',  // 标题颜色
-                    padding: {
-                        top: 20,  // 上边距
-                        bottom: 20  // 下边距
-                    }
-                }
-            },            
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: '日期'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: '数量'
-                    },
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-}
-
-
-
-// 初始化chart
-const init_last7days_coins_chart = (data) => {
-    // 提取日期和金币数量
-    const labels = Object.keys(data);  // 日期
-    // 数据准备：每个日期的金币数量
-    const datasets = [{
-        label: "金币",
-        data: labels.map(date => data[date] || 0),  // 获取每个日期对应金币数量，若没有则为0
-        borderColor: '#FFA500',
-        backgroundColor: '#FFA500',
-        fill: false
-    }];
-
-    // 创建图表
-    const ctx = document.getElementById('last7days_coin_chart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',  // 折线图
-        data: {
-            labels: labels,  // X 轴为日期
-            datasets: datasets  // Y 轴为不同的卡片类型
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,  // 取消保持比例
-            plugins: {
-                title: {
-                    display: true,  // 显示标题
-                    text: '近7日的打金情况',  // 标题内容
-                    font: {
-                        size: 18,  // 标题字体大小
-                        weight: 'bold',  // 标题字体加粗
-                    },
-                    color: '#333',  // 标题颜色
-                    padding: {
-                        top: 20,  // 上边距
-                        bottom: 20  // 下边距
-                    }
-                }
-            },            
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: '日期'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: '金币'
-                    },
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-}
-
 (function(){
     document.addEventListener('dblclick', function(event) {
         event.preventDefault();  // 阻止双击缩放
@@ -272,6 +145,8 @@ const init_last7days_coins_chart = (data) => {
     translationMap.set("enabledeamon", "是否守护线程")
     translationMap.set("restartwaittime", "系统重启时间")
     translationMap.set("enableautodaliyelementtower", "每日元素塔")
+    translationMap.set("enablescreenshot", "是否运行截图")
+    translationMap.set("enablesound", "是否允许播放声音")
     
     
     const upBtn = document.getElementById("up_btn");
@@ -315,6 +190,32 @@ const init_last7days_coins_chart = (data) => {
         console.log(res)
     }
 
+    // 生成table的html
+    const generateTableHTML = (dataMap) => {
+        htmlString = "";
+        for(const key in dataMap){
+            let status = dataMap[key];
+            let cell;
+            // 根据不同的状态设置内容
+            switch (status) {
+                case 'True':
+                    cell = "<span class='aws-circle-success'></span>已启用";
+                    break;
+                case 'False':
+                    cell = "<span class='aws-circle-warning'></span>未启用";
+                    break;
+                default:
+                    cell = `${status}`;
+            }
+            htmlString += `
+                <tr>
+                    <td>${translationMap.get(key)}</td>
+                    <td>${cell}</td>
+                </tr>
+            `
+        }
+        return htmlString;
+    }
 
     // 读取task
     request("task/list").then((res) => {
@@ -341,51 +242,13 @@ const init_last7days_coins_chart = (data) => {
     request("system/config").then((res) => {
         console.log(res)
 
-        let htmlString = "";
         // 用户配置
-        for(const key in res.data["TASK"]){    
-            htmlString += `
-                <tr>
-                    <td>${translationMap.get(key)}</td>
-                    <td>
-                        ${res.data["TASK"][key] === 'True' ? 
-                            "<span class='aws-circle-success'></span>已启用" : 
-                            "<span class='aws-circle-warning'></span>未启用"
-                        }
-                    </td>
-                </tr>
-            `
-        }
-        configTable.innerHTML = htmlString
-
-
+        configTable.innerHTML = generateTableHTML(res.data["TASK"])
+        
         // 系统配置
-        htmlString = "";
-        // 系统配置
-        for(const key in res.data["THREADS"]){
-            let status = res.data["THREADS"][key];
-            let cell;
-
-            // 根据不同的状态设置内容
-            switch (status) {
-                case 'True':
-                    cell = "<span class='aws-circle-success'></span>已启用";
-                    break;
-                case 'False':
-                    cell = "<span class='aws-circle-warning'></span>未启用";
-                    break;
-                default:
-                    cell = `${status}`;
-            }
-
-            htmlString += `
-                <tr>
-                    <td>${translationMap.get(key)}</td>
-                    <td>${cell}</td>
-                </tr>
-            `
-        }
-        systemTable.innerHTML = htmlString
+        delete res.data["APP"]["name"]
+        delete res.data["APP"]["wechatname"]
+        systemTable.innerHTML = generateTableHTML(res.data["THREADS"]) + generateTableHTML(res.data["APP"])
     })
 
     request("graph/last7days_coins_data").then((res) => {
@@ -395,6 +258,10 @@ const init_last7days_coins_chart = (data) => {
     request("graph/last7days_cards_map").then((res) => {
         init_last7days_cards_chart(res.data)
     })
+
+    request("graph/today_error_data").then((res) => {
+        init_today_error_data(res.data)
+    })    
 })();
 </script>
 </body>
