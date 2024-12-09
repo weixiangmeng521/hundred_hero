@@ -810,7 +810,6 @@ class InfoReader:
 
 
     # 等待进入斗兽场
-    # TODO: 完善中
     def wait_arena_entered(self):
         self.logger.debug("等待进入[斗兽场]...")
         start_time = time.time()  # 记录开始时间
@@ -832,12 +831,51 @@ class InfoReader:
             mat_image = np.array(screenshot)
             mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
             # VS标志的颜色
-            target_rgb1 = (215, 140, 80)   # RGB 格式
-            target_rgb2 = (233, 137, 72)   # RGB 格式
-            if(self.is_target_area(mat_image, target_rgb1, 0) and self.is_target_area(mat_image, target_rgb2, 0)):
+            target_rgb1 = (80, 140, 215)   # 正常模式
+            target_rgb2 = (72, 137, 233)   # 正常模式
+            target_rgb3 = (24, 48, 82)     # 出现pk结果时，会变暗
+            target_rgb4 = (30, 54, 83)     # 出现pk结果时，会变暗
+            if(self.is_target_area(mat_image, target_rgb1, 0) or self.is_target_area(mat_image, target_rgb2, 0)):
                 return
             
+            if(self.is_target_area(mat_image, target_rgb3, 0) or self.is_target_area(mat_image, target_rgb4, 0)):
+                return
+
             self.logger.debug("进入[斗兽场]: 等待中...")
+            time.sleep(.6)
+
+
+
+    # 等待战斗结束
+    def wait_fight_over(self):
+        self.logger.debug("等待[斗兽场]战斗结束...")
+        start_time = time.time()  # 记录开始时间
+        timeout = 60  # 超时时间，单位为秒\
+
+        while True:
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError(f"等待超时: {timeout}s等待战斗结束超时。")
+            
+            window = self.get_specific_window_info()
+            if(window == None): 
+                raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+            
+            winX, winY, winWidth, winHeight = self.get_win_info()
+            # 获取目标定位
+            flagPos = (int((winWidth // 2) - 30 + winX), int(100 + winY), 45, 50)
+            screenshot = pyautogui.screenshot(region=(flagPos))
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+            # VS标志的颜色
+            target_rgb3 = (24, 48, 82)     # 出现pk结果时，会变暗
+            target_rgb4 = (30, 54, 83)     # 出现pk结果时，会变暗
+            if(self.is_target_area(mat_image, target_rgb3, 0) or self.is_target_area(mat_image, target_rgb4, 0)):
+                return
+            
+            self.count_colors(mat_image)
+
+            self.logger.debug("[斗兽场]打架中...")
             time.sleep(.6)
 
 
@@ -858,7 +896,11 @@ class InfoReader:
         stacked_img = np.vstack(resized_imgs)
         
         # 获取窗口参数
-        winX, winY, winWidth, winHeight = self.get_win_info()
+        try:
+            winX, winY, winWidth, winHeight = self.get_win_info()
+        except RuntimeError as e:
+            winX, winY, winWidth, winHeight = (0, 0, 0, 0)
+
 
         # 显示结果
         cv2.imshow("VerticalStack", stacked_img)
