@@ -284,6 +284,7 @@ class CardsMaster:
 
         # 找到位置
         if(not is_entered_interface and not self.reader.is_show_back2town_btn()):
+            self.logger.debug("准备移动到招募大厅")
             self.virtual_map.move2recruit()
             # 定位到，点击绿色泡泡
             self.cs.clickGreenPop()

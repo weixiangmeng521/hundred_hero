@@ -103,6 +103,7 @@ class TreasureHunt:
     def work(self):
         # 找到位置
         if(not self.reader.is_show_back2town_btn()):
+            self.logger.debug("准备移动到传送阵.")
             self.virtual_map.move2protal()
         
         # self.reader.close_30s_ads()
