@@ -11,8 +11,8 @@ import numpy as np
 import math
 from lib.controll_wechat import ControllWechat
 from lib.logger import init_logger
+from lib.virtual_map import init_virtual_map
 from lib.visual_track import VisualTrack
-
 
 
 cPos = [222 , 696]
@@ -72,6 +72,10 @@ closeBtnPos = [85, 840]
 giveUpRebornBtn = [315, 740]
 
 
+# 元素塔的pos
+elementTowerTabPos = [399, 847]
+
+
 
 # 选择关卡
 class ChallengeSelect:
@@ -82,6 +86,7 @@ class ChallengeSelect:
         self.app_name = config["APP"]["Name"]
         self.logger = init_logger(config)
         self.wechat = ControllWechat(self.config)
+        self.virtual_map = init_virtual_map(config)
 
 
     # 获取窗口信息
@@ -165,7 +170,7 @@ class ChallengeSelect:
         # self.logger.info(f"黑石堡垒被点击")
         time.sleep(self.waitTime)
         pyautogui.click(centerHallBtnPos[0], centerHallBtnPos[1])
-        # self.logger.info(f"中央走廊被点击")
+        self.logger.info(f"进入[中央走廊]")
 
 
     # 刷木头
@@ -190,7 +195,7 @@ class ChallengeSelect:
         pyautogui.click(forestMapBtnPos[0], forestMapBtnPos[1])        
         time.sleep(self.waitTime)
         pyautogui.click(pollutionOutpostBtnPos[0], pollutionOutpostBtnPos[1])
-        
+        self.logger.info("进入[污染前哨]")
     
     # [打金]刷前哨平原的副本
     def selectFrontFlatland(self):
@@ -310,6 +315,12 @@ class ChallengeSelect:
         self.logger.info("进入[炎火之狱]")
 
 
+    # 选择元素塔
+    def selectElementTower(self):
+        pyautogui.click(elementTowerTabPos[0], elementTowerTabPos[1])
+        self.logger.info("选择[元素塔的TAB]")
+
+
     # 放弃
     def clickGiveUpRebornBtn(self):
         self.check_window_handler()
@@ -336,6 +347,7 @@ class ChallengeSelect:
         time.sleep(self.waitTime)
         pyautogui.click(yesBtnPos[0], yesBtnPos[1])
         self.logger.info(f"打道回府！")
+        self.virtual_map.reposition()
 
 
     # 把窗口移动到（0，0）

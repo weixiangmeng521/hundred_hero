@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>WebServer</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body>
+    <!-- navigation begin -->
+    <nav class="aws-navigation navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">百炼英雄挂机系统</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="切换导航">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/controll">控制面板</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logger">日志</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- navigation end -->
+    <!-- controll page begin -->
+    <div class="container">
+        <div class="row pt-5">
+
+            <!-- graph last 7 days begin -->
+            <div class="col-12 col-md-6 mt-5">
+                <canvas id="last7days_cards_chart" width="100%" height="400px"></canvas>
+            </div>
+            <!-- graph last 7 days end -->
+
+            <!-- graph last 7 days coin begin -->
+            <div class="col-12 col-md-6 mt-5">
+                <canvas id="last7days_coin_chart" width="100%" height="400px"></canvas>
+            </div>
+            <!-- graph last 7 days coin end -->
+
+            <!-- task list begin -->
+            <div class="col-12 col-md-6 mt-5">
+                <div class="table-container">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th colspan="3" class="text-center aws-table-header fw-bold">每日任务</th>
+                            </tr>                            
+                            <tr>
+                                <th>项目名</th>
+                                <th>下次检查时间</th>
+                                <th>当前状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="task_table"></tbody>
+                    </table>
+                    
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th colspan="2" class="text-center aws-table-header fw-bold">系统设置</th>
+                            </tr>                              
+                            <tr>
+                                <th>项目</th>
+                                <th>当前状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="system_table"></tbody>
+                    </table>                    
+                </div>
+            </div>
+            <!-- task list end -->
+
+            <!-- config list begin -->
+            <div class="col-12 col-md-6 mt-5">
+                <div class="table-container">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th colspan="2" class="text-center aws-table-header fw-bold">用户设置</th>
+                            </tr>                               
+                            <tr>
+                                <th>项目</th>
+                                <th>当前状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="config_table"></tbody>
+                    </table>                    
+                </div>
+            </div>
+            <!-- config list end -->            
+
+
+
+        </div>
+    </div>
+    <!-- controll page end -->
+
+    <!-- footer begin -->
+    <div class="aws-footer mt-5">
+        <p>&copy; 2024冷锋.保留所有权利。</p>
+    </div>
+    <!-- footer end -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="./js/common.js"></script>
+<script>
+// 初始化chart
+const init_last7days_cards_chart = (data) => {
+    // 提取日期和卡片类型
+    const labels = Object.keys(data);  // 日期
+    const cardTypes = ['蓝卡', '紫卡', '橙卡', '垃圾', '红卡'];  // 可能的卡片类型
+    // 定义卡片类型与颜色的映射
+    const cardTypeColors = {
+        '蓝卡': 'rgb(105, 187, 255)',  // 蓝色
+        '紫卡': 'rgb(209, 6, 131)',  // 紫色
+        '橙卡': '#FFA500',  // 橙色
+        '垃圾': 'rgb(204, 204, 204)',  // 灰色
+        '红卡': '#FF0000'   // 红色
+    };
+
+    // 数据准备：每个卡片类型的数量
+    const datasets = cardTypes.map(cardType => ({
+        label: cardType,
+        data: labels.map(date => data[date][cardType] || 0),  // 获取每个日期对应卡片类型的数量，若没有则为0
+        borderColor: getColor(cardType),
+        backgroundColor: getColor(cardType),
+        fill: false
+    }));
+
+    // 随机颜色生成函数
+    function getColor(cardType) {
+        return cardTypeColors[cardType];
+    }
+
+    // 创建图表
+    const ctx = document.getElementById('last7days_cards_chart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',  // 折线图
+        data: {
+            labels: labels,  // X 轴为日期
+            datasets: datasets  // Y 轴为不同的卡片类型
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,  // 取消保持比例
+            plugins: {
+                title: {
+                    display: true,  // 显示标题
+                    text: '近7日的抽卡情况',  // 标题内容
+                    font: {
+                        size: 18,  // 标题字体大小
+                        weight: 'bold',  // 标题字体加粗
+                    },
+                    color: '#333',  // 标题颜色
+                    padding: {
+                        top: 20,  // 上边距
+                        bottom: 20  // 下边距
+                    }
+                }
+            },            
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: '日期'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: '数量'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+
+
+// 初始化chart
+const init_last7days_coins_chart = (data) => {
+    // 提取日期和金币数量
+    const labels = Object.keys(data);  // 日期
+    // 数据准备：每个日期的金币数量
+    const datasets = [{
+        label: "金币",
+        data: labels.map(date => data[date] || 0),  // 获取每个日期对应金币数量，若没有则为0
+        borderColor: '#FFA500',
+        backgroundColor: '#FFA500',
+        fill: false
+    }];
+
+    // 创建图表
+    const ctx = document.getElementById('last7days_coin_chart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',  // 折线图
+        data: {
+            labels: labels,  // X 轴为日期
+            datasets: datasets  // Y 轴为不同的卡片类型
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,  // 取消保持比例
+            plugins: {
+                title: {
+                    display: true,  // 显示标题
+                    text: '近7日的打金情况',  // 标题内容
+                    font: {
+                        size: 18,  // 标题字体大小
+                        weight: 'bold',  // 标题字体加粗
+                    },
+                    color: '#333',  // 标题颜色
+                    padding: {
+                        top: 20,  // 上边距
+                        bottom: 20  // 下边距
+                    }
+                }
+            },            
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: '日期'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: '金币'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+(function(){
+    document.addEventListener('dblclick', function(event) {
+        event.preventDefault();  // 阻止双击缩放
+    });
+
+    const translationMap = new Map();
+    translationMap.set("1", "工会任务")
+    translationMap.set("2", "每日30个宝箱")
+    translationMap.set("3", "每日决斗场")
+    translationMap.set("4", "每日元素塔")
+
+    translationMap.set("enableautoabilityimporve", "无限训练营")
+    translationMap.set("enableautocoin", "无限打钱")
+    translationMap.set("enableautodaliycase", "刷每日箱子")
+    translationMap.set("enableautofight", "每日格斗")
+    translationMap.set("enableautogacha", "无限抽卡")
+    translationMap.set("enableautouniontask", "刷工会副本")
+    translationMap.set("enableautowoodandmine", "无限刷资源")
+    translationMap.set("enablevirtualmap", "虚拟地图")
+    translationMap.set("isloadingads", "是否有加载广告")
+    translationMap.set("iswakeupapp", "是否唤醒")
+    translationMap.set("enabledeamon", "是否守护线程")
+    translationMap.set("restartwaittime", "系统重启时间")
+    translationMap.set("enableautodaliyelementtower", "每日元素塔")
+    
+    
+    const upBtn = document.getElementById("up_btn");
+    const downBtn = document.getElementById("down_btn");
+    const leftBtn = document.getElementById("left_btn");
+    const rightBtn = document.getElementById("right_btn");
+
+    const findTrainingNPCBtn = document.getElementById("find_training_npc");
+    const findRecruitNPCBtn = document.getElementById("find_recruit_npc");
+    const findPortalBtn = document.getElementById("find_portal");
+    const findArena = document.getElementById("find_arena");
+    const taskTable = document.getElementById("task_table");
+    const configTable = document.getElementById("config_table");
+    const systemTable = document.getElementById("system_table");
+
+    
+    
+    // 是不是数字
+    const isNumeric = (status) => {
+        return /^[+-]?\d+(\.\d+)?$/.test(status);
+    }
+    
+    // 时间转化
+    const formate_time = (timestamp) => {
+        // 转换为毫秒并创建 Date 对象
+        let date = new Date(timestamp * 1000);
+        // 提取各个部分
+        let year = date.getFullYear();
+        let month = String(date.getMonth() + 1).padStart(2, '0');  // 月份从0开始，所以加1，并补充前导零
+        let day = String(date.getDate()).padStart(2, '0');
+        let hours = String(date.getHours()).padStart(2, '0');
+        // 拼接成目标格式
+        return `${year}-${month}-${day} ${hours}h`
+    }
+
+    // 处理reponse
+    const handle_response = (res) => {
+        if(Number(res.code) === -1){
+            alert(res.message)
+        }
+        console.log(res)
+    }
+
+
+    // 读取task
+    request("task/list").then((res) => {
+        let htmlString = "";
+        for(const key in res.data){
+            htmlString += `
+                <tr>
+                    <td>${translationMap.get(key)}</td>
+                    <td>${formate_time(res.data[key]["expiry"])}</td>
+                    <td>
+                        ${Number(res.data[key]["value"]) === 1 ? 
+                            "<span class='aws-circle-success'></span>已完成" : 
+                            "<span class='aws-circle-warning'></span>未完成"
+                        }
+                    </td>
+                </tr>
+            `
+        }
+        taskTable.innerHTML = htmlString
+    })
+
+
+    // 读取配置
+    request("system/config").then((res) => {
+        console.log(res)
+
+        let htmlString = "";
+        // 用户配置
+        for(const key in res.data["TASK"]){    
+            htmlString += `
+                <tr>
+                    <td>${translationMap.get(key)}</td>
+                    <td>
+                        ${res.data["TASK"][key] === 'True' ? 
+                            "<span class='aws-circle-success'></span>已启用" : 
+                            "<span class='aws-circle-warning'></span>未启用"
+                        }
+                    </td>
+                </tr>
+            `
+        }
+        configTable.innerHTML = htmlString
+
+
+        // 系统配置
+        htmlString = "";
+        // 系统配置
+        for(const key in res.data["THREADS"]){
+            let status = res.data["THREADS"][key];
+            let cell;
+
+            // 根据不同的状态设置内容
+            switch (status) {
+                case 'True':
+                    cell = "<span class='aws-circle-success'></span>已启用";
+                    break;
+                case 'False':
+                    cell = "<span class='aws-circle-warning'></span>未启用";
+                    break;
+                default:
+                    cell = `${status}`;
+            }
+
+            htmlString += `
+                <tr>
+                    <td>${translationMap.get(key)}</td>
+                    <td>${cell}</td>
+                </tr>
+            `
+        }
+        systemTable.innerHTML = htmlString
+    })
+
+    request("graph/last7days_coins_data").then((res) => {
+        init_last7days_coins_chart(res.data)
+    })
+
+    request("graph/last7days_cards_map").then((res) => {
+        init_last7days_cards_chart(res.data)
+    })
+})();
+</script>
+</body>
+</html>

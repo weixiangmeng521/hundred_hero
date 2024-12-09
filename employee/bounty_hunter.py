@@ -10,6 +10,7 @@ from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
 from lib.move_controller import MoveControll
+from lib.virtual_map import init_virtual_map
 from lib.visual_track import VisualTrack
 
 
@@ -24,6 +25,7 @@ class BountyHunter:
         self.logger = init_logger(config)
         self.vt = VisualTrack(config)
         self.mc = MoveControll(config)
+        self.virtual_map = init_virtual_map(config)
 
 
     # 打第一个巨人boss
@@ -114,6 +116,17 @@ class BountyHunter:
         return 10
 
 
+    # 打双头蛇怪
+    def killTwoHeadSnake(self):
+        self.cs.selectDiamondInstance()
+        instance = SnowZone(self.config)
+        self.reader.wait_tranported()
+        instance.killTwoHeadSnakeBoss()
+        self.cs.back2Town()
+        self.reader.wait_tranported()
+        return 10
+
+
     # 单个打金任务
     def task(self):
         gold = 0
@@ -135,8 +148,9 @@ class BountyHunter:
 
     # 循环打金
     def work(self):
-        # 也许有那么一点点位置偏移，就会偏航
-        # self.move_2_port()
+        # 找到位置
+        if(not self.reader.is_show_back2town_btn()):
+            self.virtual_map.move2protal()
 
         total = 0
         while True:

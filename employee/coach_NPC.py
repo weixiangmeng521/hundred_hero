@@ -8,6 +8,7 @@ from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
 from lib.move_controller import MoveControll
+from lib.virtual_map import init_virtual_map
 from lib.visual_track import VisualTrack
 
 
@@ -20,10 +21,15 @@ class CoachNPC:
         self.mc = MoveControll(config)
         self.cs = ChallengeSelect(config)
         self.reader = InfoReader(config)
-
+        self.virtual_map = init_virtual_map(config)
 
     # 无限升级训练营
     def work(self):
+        # 找到位置
+        if(not self.reader.is_show_back2town_btn()):
+            self.virtual_map.move2training_npc()
+
+
         # 流水线速度
         waitSec = 3.3
         _, isMineFull = self.reader.read_screen()
