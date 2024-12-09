@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from defined import DOWN_MOVE_CMD, FIND_ARENA, FIND_PORTAL, FIND_RECRUIT_NPC, FIND_TRAINING_NPC, LEFT_MOVE_CMD, RIGHT_MOVE_CMD, UP_MOVE_CMD
+from defined import DOWN_MOVE_CMD, FIND_ARENA, FIND_PORTAL, FIND_RECRUIT_NPC, FIND_TOWER, FIND_TRAINING_NPC, LEFT_MOVE_CMD, RIGHT_MOVE_CMD, UP_MOVE_CMD
 from lib.cache import get_cache_manager_instance
 from lib.logger import init_logger
 from pathlib import Path
@@ -46,6 +46,7 @@ class WebServer:
         self.app.get("/find/recruit_npc")(self.find_recruit_npc) 
         self.app.get("/find/protal")(self.find_portal) 
         self.app.get("/find/arena")(self.find_arena) 
+        self.app.get("/find/tower")(self.find_tower) 
 
         self.app.get("/task/list")(self.get_task_list)
 
@@ -168,6 +169,15 @@ class WebServer:
         
         self.event_queue.put(FIND_ARENA)
         return {"code": 1, "message": "success"}
+    
+
+    # 找到塔
+    async def find_tower(self):
+        if(not self.event_queue):
+            return {"code": -1, "message": "event_queue cannot be null pointer"}
+        
+        self.event_queue.put(FIND_TOWER)
+        return {"code": 1, "message": "success"}
 
 
     # 输出最后300行
@@ -207,7 +217,10 @@ class WebServer:
             allow_methods=["*"],
             allow_headers=["*"],
         )
-
         # 输出日志
         self.logger.debug(f"Server is running on: {self.host}:{self.port}")
+        
+        ENABLE_VIRTUAL_MAP = self.config.getboolean('TASK', 'EnableVirtualMap')
+        if(ENABLE_VIRTUAL_MAP): self.logger.debug("当前为虚拟MAP测试模式.")
+        
         uvicorn.run(self.app, host=self.host, port=int(self.port))

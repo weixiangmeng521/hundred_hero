@@ -38,7 +38,6 @@ class Fighter:
 
     # 选择菜单
     def auto_fight(self):
-        fight_duration = 3
         self.cs.clickGreenPop()
         self.logger.debug("进入[竞技场]选择菜单界面")
         time.sleep(.3)
@@ -46,7 +45,7 @@ class Fighter:
         # 点击能点击的按钮
         while(self.click_avalible_btn()):
             # 进入游戏
-            self.reader.wait_arena_entered()
+            self.reader.wait_selected_level_entered()
 
             # 战斗
             self.mc.move_right(.2)
@@ -56,7 +55,7 @@ class Fighter:
             self.reader.clear_rewards(3)
 
             # 返回
-            self.reader.wait_arena_leaved()
+            self.reader.wait_selected_level_leave()
             time.sleep(.3)
 
         # 关闭win

@@ -781,15 +781,15 @@ class InfoReader:
 
 
     # 等待离开斗兽场
-    def wait_arena_leaved(self):
-        self.logger.debug("等待离开斗兽场...")
+    def wait_selected_level_leave(self, level_name = "斗兽场"):
+        self.logger.debug(f"等待离开[{level_name}]...")
         start_time = time.time()  # 记录开始时间
         timeout = 60 * 2  # 超时时间，单位为秒\
 
         while True:
             elapsed_time = time.time() - start_time  # 计算已过去的时间
             if elapsed_time > timeout:
-                raise TimeoutError("等待超时: 等待离开斗兽场超时。")
+                raise TimeoutError(f"等待超时: 等待离开[{level_name}]超时。")
             
             window = self.get_specific_window_info()
             if(window == None): 
@@ -805,20 +805,20 @@ class InfoReader:
             target_rgb = (246,199,77)   # RGB 格式
             if(self.is_target_area(mat_image, target_rgb, 0)):
                 break
-            self.logger.debug("离开斗兽场: 等待中...")
+            self.logger.debug(f"离开[{level_name}]: 等待中...")
             time.sleep(.6)
 
 
     # 等待进入斗兽场
-    def wait_arena_entered(self):
-        self.logger.debug("等待进入[斗兽场]...")
+    def wait_selected_level_entered(self, level_name = "斗兽场"):
+        self.logger.debug(f"等待进入[{level_name}]...")
         start_time = time.time()  # 记录开始时间
         timeout = 60  # 超时时间，单位为秒\
 
         while True:
             elapsed_time = time.time() - start_time  # 计算已过去的时间
             if elapsed_time > timeout:
-                raise TimeoutError(f"等待超时: {timeout}s等待进入斗兽场超时。")
+                raise TimeoutError(f"等待超时: {timeout}s等待进入[{level_name}]超时。")
             
             window = self.get_specific_window_info()
             if(window == None): 
@@ -841,14 +841,14 @@ class InfoReader:
             if(self.is_target_area(mat_image, target_rgb3, 0) or self.is_target_area(mat_image, target_rgb4, 0)):
                 return
 
-            self.logger.debug("进入[斗兽场]: 等待中...")
+            self.logger.debug(f"进入[{level_name}]: 等待中...")
             time.sleep(.6)
 
 
 
     # 等待战斗结束
-    def wait_fight_over(self):
-        self.logger.debug("等待[斗兽场]战斗结束...")
+    def wait_fight_over(self, level_name = "斗兽场"):
+        self.logger.debug(f"等待[{level_name}]战斗结束...")
         start_time = time.time()  # 记录开始时间
         timeout = 60  # 超时时间，单位为秒\
 
@@ -873,11 +873,32 @@ class InfoReader:
             if(self.is_target_area(mat_image, target_rgb3, 0) or self.is_target_area(mat_image, target_rgb4, 0)):
                 return
             
-            self.count_colors(mat_image)
+            # self.count_colors(mat_image)
 
-            self.logger.debug("[斗兽场]打架中...")
+            self.logger.debug(f"[{level_name}]打架中...")
             time.sleep(.6)
 
+
+    # 是否能挑战塔
+    def is_challenge_tower_available(self):
+        window = self.get_specific_window_info()
+        if(window == None): 
+            raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+        
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        # 获取目标定位
+        flagPos = (int((winWidth // 2) - 3 + winX), int(winY + 702), 20, 11)
+        screenshot = pyautogui.screenshot(region=(flagPos))
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+        target_rgb = (233, 94, 84)
+        return not self.is_target_area(mat_image, target_rgb, 0)
+
+
+    # 读取安第一个竞技场按钮的坐标
+    def get_tower_challenge_btn_pos(self):
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        return (int((winWidth // 2) - 55 + winX + 55), int(winY + 695 + 22.5))
 
 
     # 纵向排列三张图片

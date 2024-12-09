@@ -7,6 +7,7 @@ from employee.cards_master import CardsMaster
 from employee.coach_NPC import CoachNPC
 from employee.fighter import Fighter
 from employee.task_excutor import TaskExcutor
+from employee.tower_warrior import TowerWarrior
 from employee.treasure_hunter import TreasureHunt
 from exception.game_status import GameStatusError
 from employee.farmer import Farmer
@@ -45,6 +46,8 @@ trace = AppTrace(config)
 coachNPC = CoachNPC(config)
 treasureHunter = TreasureHunt(config)
 fighter = Fighter(config)
+warrior = TowerWarrior(config)
+
 # web服务
 webServer = WebServer(config)
 # 虚拟map
@@ -71,6 +74,8 @@ ENABLE_AUTO_ABILITY_IMPROVE = config.getboolean('TASK', 'EnableAutoAbilityImporv
 ENABLE_AUTO_GACHA = config.getboolean('TASK', 'EnableAutoGaCha')
 # 刷每日箱子
 ENABLE_AUTO_DAILY_CASE = config.getboolean('TASK', 'EnableAutoDaliyCase')
+# 刷每日元素塔
+ENABLE_AUTO_DAILY_ELEMENT_TOWER = config.getboolean('TASK', 'EnableAutoDaliyElementTower')
 # 无限格斗
 ENABLE_AUTO_FRIGHT = config.getboolean("TASK", "EnableAutoFight")
 # 无限打钱
@@ -101,6 +106,8 @@ def work_thread(event_queue):
         if(ENABLE_AUTO_UNION_TASK): taskExcutor.work()
         # 打架
         if(ENABLE_AUTO_FRIGHT): fighter.work()        
+        # 刷每日元素塔
+        if(ENABLE_AUTO_DAILY_ELEMENT_TOWER): warrior.work()               
         # 抽卡
         if(ENABLE_AUTO_GACHA): cardsMaster.work()
         # 刷30个箱子
