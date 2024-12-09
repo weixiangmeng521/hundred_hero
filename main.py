@@ -146,12 +146,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
 
-    # webServer.run(queue)
+    webServer.run(queue)
 
     # vc.test_for_find_object_in_image()
     # print(pyautogui.position())
-
-    # log_analysis = get_logger_analysis_instance(config)
-    # log_analysis.test()

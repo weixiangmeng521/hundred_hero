@@ -32,17 +32,23 @@
     </nav>
     <!-- navigation end -->
     <!-- controll page begin -->
-    <div class="container aws-container">
+    <div class="container">
         <div class="row pt-5">
 
             <!-- graph last 7 days begin -->
-            <div class="col-12 mt-5">
+            <div class="col-12 col-md-6 mt-5">
                 <canvas id="last7days_cards_chart" width="100%" height="400px"></canvas>
             </div>
             <!-- graph last 7 days end -->
 
+            <!-- graph last 7 days coin begin -->
+            <div class="col-12 col-md-6 mt-5">
+                <canvas id="last7days_coin_chart" width="100%" height="400px"></canvas>
+            </div>
+            <!-- graph last 7 days coin end -->
+
             <!-- task list begin -->
-            <div class="col-12 mt-5">
+            <div class="col-12 col-md-6 mt-5">
                 <div class="table-container">
                     <table class="table table-bordered">
                         <thead>
@@ -57,12 +63,25 @@
                         </thead>
                         <tbody id="task_table"></tbody>
                     </table>
+                    
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th colspan="2" class="text-center aws-table-header fw-bold">系统设置</th>
+                            </tr>                              
+                            <tr>
+                                <th>项目</th>
+                                <th>当前状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="system_table"></tbody>
+                    </table>                    
                 </div>
             </div>
             <!-- task list end -->
 
             <!-- config list begin -->
-            <div class="col-12 mt-5">
+            <div class="col-12 col-md-6 mt-5">
                 <div class="table-container">
                     <table class="table table-bordered">
                         <thead>
@@ -75,31 +94,13 @@
                             </tr>
                         </thead>
                         <tbody id="config_table"></tbody>
-                    </table>
+                    </table>                    
                 </div>
             </div>
             <!-- config list end -->            
 
 
-            <!-- system list begin -->
-            <div class="col-12 mt-5">
-                <div class="table-container">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th colspan="2" class="text-center aws-table-header fw-bold">系统设置</th>
-                            </tr>                              
-                            <tr>
-                                <th>项目</th>
-                                <th>当前状态</th>
-                            </tr>
-                        </thead>
-                        <tbody id="system_table"></tbody>
-                    </table>
-                </div>
-            </div>
-            <!-- system list end --> 
-            
+
         </div>
     </div>
     <!-- controll page end -->
@@ -156,7 +157,7 @@ const init_last7days_cards_chart = (data) => {
             plugins: {
                 title: {
                     display: true,  // 显示标题
-                    text: '最近7日的抽卡情况',  // 标题内容
+                    text: '近7日的抽卡情况',  // 标题内容
                     font: {
                         size: 18,  // 标题字体大小
                         weight: 'bold',  // 标题字体加粗
@@ -179,6 +180,66 @@ const init_last7days_cards_chart = (data) => {
                     title: {
                         display: true,
                         text: '数量'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+
+
+// 初始化chart
+const init_last7days_coins_chart = (data) => {
+    // 提取日期和金币数量
+    const labels = Object.keys(data);  // 日期
+    // 数据准备：每个日期的金币数量
+    const datasets = [{
+        label: "金币",
+        data: labels.map(date => data[date] || 0),  // 获取每个日期对应金币数量，若没有则为0
+        borderColor: '#FFA500',
+        backgroundColor: '#FFA500',
+        fill: false
+    }];
+
+    // 创建图表
+    const ctx = document.getElementById('last7days_coin_chart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',  // 折线图
+        data: {
+            labels: labels,  // X 轴为日期
+            datasets: datasets  // Y 轴为不同的卡片类型
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,  // 取消保持比例
+            plugins: {
+                title: {
+                    display: true,  // 显示标题
+                    text: '近7日的打金情况',  // 标题内容
+                    font: {
+                        size: 18,  // 标题字体大小
+                        weight: 'bold',  // 标题字体加粗
+                    },
+                    color: '#333',  // 标题颜色
+                    padding: {
+                        top: 20,  // 上边距
+                        bottom: 20  // 下边距
+                    }
+                }
+            },            
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: '日期'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: '金币'
                     },
                     beginAtZero: true
                 }
@@ -210,7 +271,7 @@ const init_last7days_cards_chart = (data) => {
     translationMap.set("iswakeupapp", "是否唤醒")
     translationMap.set("enabledeamon", "是否守护线程")
     translationMap.set("restartwaittime", "系统重启时间")
-    translationMap.set("EnableAutoDaliyElementTower", "每日元素塔")
+    translationMap.set("enableautodaliyelementtower", "每日元素塔")
     
     
     const upBtn = document.getElementById("up_btn");
@@ -225,6 +286,8 @@ const init_last7days_cards_chart = (data) => {
     const taskTable = document.getElementById("task_table");
     const configTable = document.getElementById("config_table");
     const systemTable = document.getElementById("system_table");
+
+    
     
     // 是不是数字
     const isNumeric = (status) => {
@@ -325,6 +388,9 @@ const init_last7days_cards_chart = (data) => {
         systemTable.innerHTML = htmlString
     })
 
+    request("graph/last7days_coins_data").then((res) => {
+        init_last7days_coins_chart(res.data)
+    })
 
     request("graph/last7days_cards_map").then((res) => {
         init_last7days_cards_chart(res.data)

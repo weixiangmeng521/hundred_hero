@@ -60,7 +60,7 @@ class TowerWarrior:
         
         # 设置默认值
         if(not is_finished):
-            self.cache.set(IS_DALIY_TOWER_FINISHED, 0)
+            self.cache.set(IS_DALIY_TOWER_FINISHED, 0, 7)
 
         # 找到位置
         if(not self.reader.is_show_back2town_btn()):

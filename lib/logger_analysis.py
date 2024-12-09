@@ -3,6 +3,7 @@ from collections import defaultdict
 import datetime
 import os
 from pathlib import Path
+import re
 
 
 instance = None
@@ -84,3 +85,42 @@ class LoggerAnalysis:
             last7day_map[day] = self.get_single_logger_cards_count_map(path)
         return last7day_map
     
+
+    # 获取单个文件里面coin获取的数量
+    def get_single_logger_coin_count(self, path):
+        _list = []
+        target = "总打金:"
+        total = 0
+
+        # 逐块读取文件内容
+        for content in self.get_file_content(path):
+            # 按行分割
+            lines = content.splitlines()
+            for line in lines:
+                if target in line:
+                    # 提取目标字符串后的数字
+                    match = re.search(r'总打金:\s*(\d+)', line)
+                    if match:
+                        current_value = int(match.group(1))
+                        # 检查断裂点并累加
+                        if _list and _list[-1] > current_value:
+                            total += _list[-1]
+                        _list.append(current_value)
+
+        # 处理最后一个断裂点值（如适用）
+        if _list:
+            total += _list[-1]
+
+        return total
+
+
+    # 分析最近7天的金币获取数量
+    def get_last7days_coin_count_data(self):
+        files_list = self.get_recent_logs()
+        last7day_map = {}
+        for filename in files_list:
+            day = filename.replace('app_', '').replace('.log', '')
+            path = self.logs_path  / filename
+            last7day_map[day] = self.get_single_logger_coin_count(path)
+            
+        return last7day_map        
