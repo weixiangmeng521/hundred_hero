@@ -937,6 +937,23 @@ class InfoReader:
         return (int((winWidth // 2) - 55 + winX + 55), int(winY + 695 + 22.5))
 
 
+    # 是不是带全了人
+    def is_team_member_full(self):
+        window = self.get_specific_window_info()
+        if(window == None): 
+            raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+        
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        # 获取目标定位
+        flagPos = (int(20 + winX), int(winY + 790), 13, 11)
+        screenshot = pyautogui.screenshot(region=(flagPos))
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+        target_rgb1 = (222, 89, 80)
+        target_rgb2 = (226, 91, 81)
+        return not self.is_target_area(mat_image, target_rgb1, 0) and not self.is_target_area(mat_image, target_rgb2, 0)
+
+
     # 纵向排列三张图片
     def v_stack_show(self, *imgs):
         # 确保所有图片的宽度一致，否则调整为相同宽度
