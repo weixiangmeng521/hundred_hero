@@ -79,14 +79,13 @@ elementTowerTabPos = [399, 847]
 
 # 选择关卡
 class ChallengeSelect:
-    waitTime = .3
-
     def __init__(self, config):
         self.config = config
         self.app_name = config["APP"]["Name"]
         self.logger = init_logger(config)
         self.wechat = ControllWechat(self.config)
         self.virtual_map = init_virtual_map(config)
+        self.waitTime = .1
 
 
     # 获取窗口信息

@@ -92,7 +92,6 @@ def wake_up_window():
 
 
 # 工作线程
-# TODO: 加入1h检测机制
 def work_thread(event_queue):
     try:
         # 唤醒
@@ -112,6 +111,8 @@ def work_thread(event_queue):
         if(ENABLE_AUTO_GACHA): cardsMaster.work()
         # 刷30个箱子
         if(ENABLE_AUTO_DAILY_CASE): treasureHunter.work()
+        
+        # TODO: 下面的划分为重任务，也叫体力任务。体力任务执行的时候加上检测
         # 训练营
         if(ENABLE_AUTO_ABILITY_IMPROVE): coachNPC.work()        
         # 打钱
@@ -144,7 +145,7 @@ def main():
     if(not ENABLE_DEAMON):
         work_thread(event_queue)
 
-
+# TODO: 获取当前钱的数量,并放入缓存里
 if __name__ == "__main__":
     main()
 
