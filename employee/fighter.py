@@ -70,7 +70,7 @@ class Fighter:
         is_finished = self.cache.get(IS_DALIY_ARENA_FINISHED)
         # 如果没有值，就设置默认值
         if(not is_finished):
-            self.cache.set(IS_DALIY_ARENA_FINISHED, 0)
+            self.cache.set(IS_DALIY_ARENA_FINISHED, 0, 7)
         
         # 如果完成了任务就直接结束。
         if(is_finished and int(is_finished) == 1):

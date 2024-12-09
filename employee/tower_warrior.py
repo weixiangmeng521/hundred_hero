@@ -44,10 +44,10 @@ class TowerWarrior:
                 self.logger.debug("已脱离战斗, 等待5s自动进入下层挑战")
                 time.sleep(5)
 
-        self.cache.set(IS_DALIY_TOWER_FINISHED, 1)
+        self.cache.set(IS_DALIY_TOWER_FINISHED, 1, 7)
         self.logger.debug("已经打完今日的元素之塔, 无需再打.")
         self.cs.closeWin()
-            
+        time.sleep(3)
 
     
     # 工作

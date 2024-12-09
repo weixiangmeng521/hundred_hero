@@ -124,7 +124,8 @@ class InfoReader:
         while(self.click_complete_task_btn()):
             time.sleep(.3)
             self.clear_rewards()
-            time.sleep(1)
+            # 因为有缓动动画，所以要延迟2秒
+            time.sleep(2)
 
         # 获取task的list，判断是不是已经提交了
         task_list = self.read_task_list()
