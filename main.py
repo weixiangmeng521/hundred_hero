@@ -1,12 +1,13 @@
 import queue
 import traceback
-import cv2
-import numpy as np
+
 import pyautogui
 from employee.bounty_hunter import BountyHunter
 from employee.cards_master import CardsMaster
 from employee.coach_NPC import CoachNPC
+from employee.fighter import Fighter
 from employee.task_excutor import TaskExcutor
+from employee.tower_warrior import TowerWarrior
 from employee.treasure_hunter import TreasureHunt
 from exception.game_status import GameStatusError
 from employee.farmer import Farmer
@@ -14,12 +15,16 @@ from instance.union_task import UnionTask
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
+from lib.logger_analysis import get_logger_analysis_instance
 from lib.message_service import MessageService
 from lib.move_controller import MoveControll
 from lib.app_trace import AppTrace
 from lib.threads_manager import ThreadsManager
+from lib.virtual_map import init_virtual_map
 from lib.visual_track import VisualTrack
 import configparser
+
+from server.web_server import WebServer
 
 
 # 读取配置文件
@@ -40,13 +45,19 @@ taskExcutor = TaskExcutor(config)
 trace = AppTrace(config)
 coachNPC = CoachNPC(config)
 treasureHunter = TreasureHunt(config)
+fighter = Fighter(config)
+warrior = TowerWarrior(config)
 
+# web服务
+webServer = WebServer(config)
+# 虚拟map
+virtualMap = init_virtual_map(config)
 # 配置twilio
 pusher = MessageService(config)
 # 定义队列用于线程间通信
 event_queue = queue.Queue()
 # 初始化多线程管理器
-threadsManager = ThreadsManager(config, event_queue)
+threads_manager = ThreadsManager(config, event_queue)
 
 
 # 是否守护线程
@@ -63,12 +74,16 @@ ENABLE_AUTO_ABILITY_IMPROVE = config.getboolean('TASK', 'EnableAutoAbilityImporv
 ENABLE_AUTO_GACHA = config.getboolean('TASK', 'EnableAutoGaCha')
 # 刷每日箱子
 ENABLE_AUTO_DAILY_CASE = config.getboolean('TASK', 'EnableAutoDaliyCase')
+# 刷每日元素塔
+ENABLE_AUTO_DAILY_ELEMENT_TOWER = config.getboolean('TASK', 'EnableAutoDaliyElementTower')
+# 无限格斗
+ENABLE_AUTO_FRIGHT = config.getboolean("TASK", "EnableAutoFight")
 # 无限打钱
 ENABLE_AUTO_COIN = config.getboolean('TASK', 'EnableAutoCoin')
 # 无限刷资源
 ENABLE_AUTO_WOOD_AND_MINE = config.getboolean('TASK', 'EnableAutoWoodAndMine')
-
-
+# 虚拟地图
+ENABLE_VIRTUAL_MAP = config.getboolean('TASK', 'EnableVirtualMap')
 
 # wake up
 def wake_up_window():
@@ -77,22 +92,33 @@ def wake_up_window():
 
 
 # 工作线程
+# TODO: 加入1h检测机制
 def work_thread(event_queue):
     try:
         # 唤醒
         if(IS_WAKE_UP_APP): wake_up_window()
+        # 虚拟map, 测试用
+        if(ENABLE_VIRTUAL_MAP): 
+            virtualMap.work(event_queue)
+            return
+
         # 打工会
         if(ENABLE_AUTO_UNION_TASK): taskExcutor.work()
-        # 训练营
-        if(ENABLE_AUTO_ABILITY_IMPROVE): coachNPC.work()
+        # 打架
+        if(ENABLE_AUTO_FRIGHT): fighter.work()        
+        # 刷每日元素塔
+        if(ENABLE_AUTO_DAILY_ELEMENT_TOWER): warrior.work()               
         # 抽卡
         if(ENABLE_AUTO_GACHA): cardsMaster.work()
         # 刷30个箱子
         if(ENABLE_AUTO_DAILY_CASE): treasureHunter.work()
+        # 训练营
+        if(ENABLE_AUTO_ABILITY_IMPROVE): coachNPC.work()        
         # 打钱
         if(ENABLE_AUTO_COIN): bountyHunter.work()
         # 刷资源
         if(ENABLE_AUTO_WOOD_AND_MINE): farmer.work()
+
 
     except (RuntimeError, GameStatusError, TimeoutError) as e:
         stack_info = traceback.format_exc()
@@ -108,9 +134,12 @@ def work_thread(event_queue):
 # 入口函数
 def main():
     if(ENABLE_DEAMON):
-        threadsManager.add_task("WorkThread", work_thread)
-        # threadsManager.add_task("KeyBoardMonitor", keyboradMonitor.work)
-        threadsManager.run()
+        threads_manager.add_task("WorkThread", work_thread)
+        # 是否需要添加web server
+        if config.getboolean('WEB_SERVER', 'Enable'):
+            threads_manager.add_task("WebServer", webServer.run)
+
+        threads_manager.run()
 
     if(not ENABLE_DEAMON):
         work_thread(event_queue)
@@ -119,7 +148,7 @@ def main():
 if __name__ == "__main__":
     main()
 
+    # webServer.run(queue)
 
     # vc.test_for_find_object_in_image()
-
     # print(pyautogui.position())

@@ -270,3 +270,14 @@ class SnowZone:
         def lamd():
             mc.move_up(4.5)
         return lamd
+    
+    # 杀双头蛇
+    def killTwoHeadSnakeBoss(self):
+        mc = self.mc
+
+        mc.move_left_down(3)
+        mc.move_left(8)
+        mc.move_down(1)
+
+        time.sleep(3)
+        

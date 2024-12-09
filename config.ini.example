@@ -2,14 +2,25 @@
 Name = 百炼英雄
 WechatName = 微信
 EnableScreenShot = True
-EnableSound = False
+EnableSound = True
+
+[THREADS]
+EnableDeamon = True
+RestartWaitTime = 3
+
+[WEB_SERVER]
+Enable = False
+WebServer = True
+Host = 0.0.0.0
+Port = 8000
+
 
 [TWILIO]
-Enable = True
-AccountSid = xxx
-AuthToken = xxx
-PhoneNumber = xxx
-ToNumber = xxx
+Enable = False
+AccountSid = 
+AuthToken = 
+PhoneNumber = 
+ToNumber = 
 
 
 [TASK]
@@ -18,5 +29,11 @@ IsLoadingAds = True
 EnableAutoUnionTask = True
 EnableAutoAbilityImporve = False
 EnableAutoGaCha = True
+EnableAutoDaliyCase = True
 EnableAutoCoin = True
 EnableAutoWoodAndMine = False
+EnableVirtualMap = False
+
+[CACHE]
+FileName = .cache
+

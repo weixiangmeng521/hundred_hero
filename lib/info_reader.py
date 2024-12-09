@@ -1,13 +1,15 @@
+from collections import defaultdict
 import hashlib
 import math
 import time
 import uuid
+import mss
 import pyautogui
 import Quartz
 import pytesseract
 import cv2
 import numpy as np
-from defined import IS_UNION_TASK_FINISHED
+from defined import IS_DALIY_CASE_FINISHED
 from exception.game_status import GameStatusError
 from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
@@ -119,12 +121,16 @@ class InfoReader:
             raise ValueError("Err: task_name cannot not be empty.")
         
         # 获取三个位置，如果是变绿了，就点击。
-        self.click_complete_task_btn()
+        while(self.click_complete_task_btn()):
+            time.sleep(.3)
+            self.clear_rewards()
+            # 因为有缓动动画，所以要延迟2秒
+            time.sleep(2)
 
         # 获取task的list，判断是不是已经提交了
         task_list = self.read_task_list()
         for key, value in task_list.items():
-            if(key == task_name and not bool(value)):
+            if(key == task_name and bool(value)):
                 return True
         return False
     
@@ -155,30 +161,22 @@ class InfoReader:
 
         # 点击完成按钮
         green_color = (97, 198, 98)
+        # 只点击第一个
         if(self.is_target_area(task_1_img, green_color, 0)):
             pyautogui.click(btn1[0], btn1[1])
-            time.sleep(.3)
-            self.clearRewards()
-            time.sleep(.3)
-            self.click_complete_task_btn()
-        
-        if(self.is_target_area(task_2_img, green_color, 0)):
-            pyautogui.click(btn2[0], btn2[1])
-            time.sleep(.3)
-            self.clearRewards()
-            time.sleep(.3)
-            self.click_complete_task_btn()
+            return True        
+        # if(self.is_target_area(task_2_img, green_color, 0)):
+        #     pyautogui.click(btn2[0], btn2[1])
+        #     return True
 
-        if(self.is_target_area(task_3_img, green_color, 0)):
-            pyautogui.click(btn3[0], btn3[1])
-            time.sleep(.3)
-            self.clearRewards()
-            time.sleep(.3)
-            self.click_complete_task_btn()
-    
+        # if(self.is_target_area(task_3_img, green_color, 0)):
+        #     pyautogui.click(btn3[0], btn3[1])
+        #     return True
+        return False
+
 
     # 关闭奖励弹窗
-    def clearRewards(self, times = 1):
+    def clear_rewards(self, times = 1):
         self.logger.info("关闭奖励显示。")
         window = self.get_specific_window_info()
         if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
@@ -204,6 +202,34 @@ class InfoReader:
         return cv2.countNonZero(mask) > 0
 
 
+    # 统计颜色出现的次数
+    def count_colors(self, bgr_image):
+        if bgr_image is None:
+            print("图片加载失败！请检查路径。")
+            return None
+
+        # 将图片转换为 RGB 模式
+        image_rgb = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
+
+        # 统计颜色出现的次数
+        color_counts = defaultdict(int)
+
+        # 遍历每个像素点
+        for row in image_rgb:
+            for pixel in row:
+                color_tuple = tuple(map(int, pixel))  # 转换为整数元组 (R, G, B)
+                color_counts[color_tuple] += 1
+
+        # 打印结果（示例前 10 种颜色）
+        sorted_colors = sorted(color_counts.items(), key=lambda x: x[1], reverse=True)
+        print("前 10 种最常见的颜色:")
+        for color, count in sorted_colors[:10]:
+            print(f"颜色 {color}: 出现 {count} 次")
+
+        return color_counts
+
+
+
     # 输出图片每个色块
     def print_img(self, mat_image):
         for row in range(mat_image.shape[0]):  # 遍历行
@@ -215,68 +241,125 @@ class InfoReader:
     # 读取屏幕中的任务列表
     def read_task_list(self):
         winX, winY, winWidth, winHeight = self.get_win_info()
-        # 读取指定位置
-        screenshot = pyautogui.screenshot(region=(
-            int(winX + 50), 
-            int(winY + 325), 
-            int(winWidth - 100), 
-            int(winHeight - 650)
-        ))
-        mat_image = np.array(screenshot)
-        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
-        task_img_heigt = int((winHeight - 650 - 15) / 3)
-        task_img_width = int(winWidth - 100 - 100)
-        gutter = 30
-        # start_y:end_y, start_x:end_x
-        task_1_img = mat_image[0:task_img_heigt - 5 - gutter - 3, 130:task_img_width]
-        task_2_img = mat_image[task_img_heigt + 5 + 3:task_img_heigt * 2 - gutter, 130:task_img_width]
-        task_3_img = mat_image[task_img_heigt * 2 + 18:task_img_heigt * 3 + 3 - gutter, 130:task_img_width]
+        # # 读取指定位置
+        # screenshot = pyautogui.screenshot(region=(
+        #     int(winX + 50), 
+        #     int(winY + 325), 
+        #     int(winWidth - 100), 
+        #     int(winHeight - 650)
+        # ))
+        
+        # 创建 mss 实例
+        with mss.mss() as sct:
+            region = {
+                "top": int(winY + 325), 
+                "left": int(winX + 50),
+                "width": int(winWidth - 100), 
+                "height": int(winHeight - 650)
+            }
+            # 截取屏幕
+            screenshot = sct.grab(region)
+            
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+            task_img_heigt = int((winHeight - 650 - 15) / 3)
+            task_img_width = int(winWidth + 80)
+            gutter = 30
+            # start_y:end_y, start_x:end_x
+            task_1_img = mat_image[20:task_img_heigt - 5 - gutter - 3 + 23, 255:task_img_width]
+            task_2_img = mat_image[task_img_heigt * 2 + 38:task_img_heigt * 3 + 26 - gutter, 255:task_img_width]
+            task_3_img = mat_image[task_img_heigt * 3 + 122:task_img_heigt * 3 + 179 - gutter, 255:task_img_width]
 
-        # 保存
-        self.save_task_sample_img(task_1_img, task_2_img, task_3_img)
+            # self.v_stack_show(
+            #     self.preprocess_img(task_1_img),
+            #     self.preprocess_img(task_2_img),
+            #     self.preprocess_img(task_3_img),
+            # )
 
-        return {
-            self.recognize_chinese_text(task_1_img): self.is_task_complete_by_color_percent(task_1_img),
-            self.recognize_chinese_text(task_2_img): self.is_task_complete_by_color_percent(task_2_img),
-            self.recognize_chinese_text(task_3_img): self.is_task_complete_by_color_percent(task_3_img),
-        }
+            return {
+                self.recognize_chinese_text(task_1_img): self.is_task_complete_by_color_percent(task_1_img),
+                self.recognize_chinese_text(task_2_img): self.is_task_complete_by_color_percent(task_2_img),
+                self.recognize_chinese_text(task_3_img): self.is_task_complete_by_color_percent(task_3_img),
+            }
+
+
+    # 保存今日工会任务的img
+    def save_union_task_img(self):
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        # 创建 mss 实例
+        with mss.mss() as sct:
+            region = {
+                "top": int(winY + 325), 
+                "left": int(winX + 50),
+                "width": int(winWidth - 100), 
+                "height": int(winHeight - 650)
+            }
+            # 截取屏幕
+            screenshot = sct.grab(region)
+            
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+            task_img_heigt = int((winHeight - 650 - 15) / 3)
+            task_img_width = int(winWidth + 80)
+            gutter = 30
+            # start_y:end_y, start_x:end_x
+            task_1_img = mat_image[20:task_img_heigt - 5 - gutter - 3 + 23, 255:task_img_width]
+            task_2_img = mat_image[task_img_heigt * 2 + 38:task_img_heigt * 3 + 26 - gutter, 255:task_img_width]
+            task_3_img = mat_image[task_img_heigt * 3 + 122:task_img_heigt * 3 + 179 - gutter, 255:task_img_width]
+            task_map = {
+                self.recognize_chinese_text(task_1_img): task_1_img,
+                self.recognize_chinese_text(task_2_img): task_2_img,
+                self.recognize_chinese_text(task_3_img): task_3_img,
+            }
+            for key, img in task_map.items():
+                # 找到需要完成的任务
+                if(key.find("击杀") != -1):
+                    self.save_task_sample_img(img)
+
 
 
     # 通过颜色占比来判断是否完成任务
     def is_task_complete_by_color_percent(self, bgr_img):
-        complete_color = (218,224,230)
+        complete_color = (229,223,217)
         rate = self.get_color_ratio(bgr_img, complete_color)
-        return rate > 0.3
+        # self.print_img(bgr_img)
+        return rate <= 0.5
 
 
     # 读取中文
-    # TODO: 优化
     def recognize_chinese_text(self, bgr_image):
         pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
         # 读取图片
         image = self.preprocess_img(bgr_image)
-        # 转换为灰度图像
-        gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        # 进行二值化，提升OCR识别效果
-        binary_image = cv2.adaptiveThreshold(
-            gray_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 5, 2
-        )
-        blended_image = cv2.addWeighted(gray_image, 0.7, binary_image, 0.3, 0)
 
         # 识别中文文字，使用简体中文语言包 'chi_sim'
-        text = pytesseract.image_to_string(blended_image, lang='chi_sim',  config='--psm 6')  # 使用简体中文语言包
+        text = pytesseract.image_to_string(image, lang='chi_sim',  config='--psm 6')  # 使用简体中文语言包
         return correct_text_handler(text)
     
 
     # 提高图像
     def preprocess_img(self, bgr_image):
+        scale_factor = 2.0  # 宽和高均放大两倍
         # Laplacian 算子
         laplacian = cv2.Laplacian(bgr_image, cv2.CV_64F)
         # 将拉普拉斯算子的结果转换为 uint8
         laplacian = cv2.convertScaleAbs(laplacian)
         # 应用加权合成     
         sharp = cv2.addWeighted(bgr_image, 1.7, laplacian, -0.3, 0)
-        return sharp
+        # 扩大一倍
+        # resized_img = cv2.resize(sharp, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_CUBIC)
+        # 转换为灰度图像
+        gray_image = cv2.cvtColor(sharp, cv2.COLOR_BGR2GRAY)
+        # 进行二值化，提升OCR识别效果
+        binary_image = cv2.adaptiveThreshold(
+            gray_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 7, 3
+        )
+        # # 轻微膨胀一次
+        # kernel = np.ones((2, 2), np.uint8)  # 高度为1，宽度为15的矩阵
+        # dilated = cv2.dilate(binary_image, kernel, iterations=1)
+
+        blended_image = cv2.addWeighted(gray_image, 0.6, binary_image, 0.4, 0)
+        return blended_image
 
 
     # 保存到sample的图片
@@ -355,6 +438,22 @@ class InfoReader:
         return cv2.countNonZero(mask) > 0
 
 
+    # 读取竞技场第一个按钮
+    def read_arena_first_btn(self):
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        btnPos = (int(winX + 316), int(winY + 498), 85, 38)
+        # 读取指定位置
+        screenshot = pyautogui.screenshot(region=(btnPos))
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+        return mat_image
+
+
+    # 读取安第一个竞技场按钮的坐标
+    def get_arena_first_btn_pos(self):
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        return (int(winX + 316 + 85 // 2),  int(winY + 498 + 38 // 2))
+
 
     # 判读是不是死了
     def is_dead(self):
@@ -393,10 +492,10 @@ class InfoReader:
 
 
     # 直到出现箱子
-    def till_find_treasure(self, treasure_num = 1):
+    def till_find_treasure(self, treasure_num = 1, wait_max_time = 60 * 3):
         # 计划设置10分钟系统超时
         start_time = time.time()  # 记录开始时间
-        timeout = 60 * 3 # 超时时间，单位为秒
+        timeout = wait_max_time # 超时时间，单位为秒
         # 如果有爆宝箱，却达不到treasure_num的标准，就降低标准
         tolerate_timeout = 30
 
@@ -407,7 +506,7 @@ class InfoReader:
 
             elapsed_time = time.time() - start_time  # 计算已过去的时间
             if elapsed_time > timeout:
-                self.cache.set(IS_UNION_TASK_FINISHED, 1)      
+                self.cache.set(IS_DALIY_CASE_FINISHED, 1)
                 raise TimeoutError(f"找宝箱超时: 未在{timeout}s内找到宝箱。")                
 
             # 死亡监控
@@ -479,24 +578,24 @@ class InfoReader:
             # print(winX, winY)
             # 如果有广告就不看广告
             is_contain_ads = self.is_target_area(mat_image, ads_btn, 0)
-            if(self.is_treasure_pop_up()):
-                self.logger.debug(f"宝箱按钮为: [{'广告' if is_contain_ads else '普通' }]按钮")
-            if(is_contain_ads and self.is_treasure_pop_up()):
+            self.logger.debug(f"宝箱按钮为: [{'广告' if is_contain_ads else '普通' }]按钮")
+            if(is_contain_ads):
                 # Point(x=244, y=674)
                 pyautogui.click(int(winX + winWidth // 2), int(winY + 560) + 90)
                 self.logger.debug("点击跳过广告。")
-            if(not is_contain_ads and self.is_treasure_pop_up()):
+                time.sleep(.3)
+                self.clear_rewards()
+                break
+
+            if(not is_contain_ads):
                 pyautogui.click(int(winX + winWidth // 2), int(winY + 560) + 12)
                 self.logger.debug("领取奖励。")
-            
-            time.sleep(.3)
-            self.clearRewards()
-            time.sleep(.3)
-            # 如果消失了，就算成功
-            if(not self.is_treasure_pop_up()):
+                time.sleep(.3)
+                self.clear_rewards()
                 break
-            
-            time.sleep(.3)
+
+            # 这个延迟很有必要
+            time.sleep(1.2)
 
 
 
@@ -543,9 +642,20 @@ class InfoReader:
         pyautogui.click(clicks=3)
         self.logger.debug("点击广告静音按钮")
 
+
+    # 遍历目标颜色，检查比例是否超过阈值
+    def is_target_color_present(self, mat_image, target_colors, threshold=0.7):
+        for color in target_colors:
+            result = self.get_color_ratio(mat_image, color)
+            # print(f"Color {color}: {result}")
+            # if result > threshold:
+            if math.isclose(result, threshold, rel_tol=1e-9):
+                return True
+        return False
+
     
     # 是否显示了宝箱内容
-    def is_treasure_pop_up(self, threshold = 0):
+    def is_treasure_pop_up(self):
         window = self.get_specific_window_info()
         if(window == None): 
             raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
@@ -566,23 +676,20 @@ class InfoReader:
         target_color2 = (60,134,117)
         target_color3 = (59,132,116)
 
-        result1 = self.get_color_ratio(mat_image, target_color)
-        result2 = self.get_color_ratio(mat_image, target_color2)
-        result3 = self.get_color_ratio(mat_image, target_color3)
-        return result1 >= 0.7 or result2 >= 0.7 or result3 >= 0.7
+        target_colors = [target_color, target_color2, target_color3]
+        return self.is_target_color_present(mat_image, target_colors)
         
 
     # 等待出现pop up
-    def wait_treasure_pop_up(self, threshold = 0):
+    def wait_treasure_pop_up(self, timeout = 30):
         start_time = time.time()  # 记录开始时间
-        timeout = 30  # 超时时间，单位为秒
         
         # 等待出现弹窗
-        while self.is_treasure_pop_up(threshold):
+        while self.is_treasure_pop_up():
             elapsed_time = time.time() - start_time  # 计算已过去的时间
             if elapsed_time > timeout:
                 raise TimeoutError(f"等待超时: {timeout}s内寻找的宝箱弹窗。")
-            time.sleep(1)
+            time.sleep(.5)
 
 
     # 等待传送完成
@@ -709,8 +816,129 @@ class InfoReader:
         self.__wait_ads_do(True)
 
 
+    # 等待离开斗兽场
+    def wait_selected_level_leave(self, level_name = "斗兽场"):
+        self.logger.debug(f"等待离开[{level_name}]...")
+        start_time = time.time()  # 记录开始时间
+        timeout = 60 * 2  # 超时时间，单位为秒\
+
+        while True:
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError(f"等待超时: 等待离开[{level_name}]超时。")
+            
+            window = self.get_specific_window_info()
+            if(window == None): 
+                raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+            
+            winX, winY, winWidth, winHeight = self.get_win_info()
+            # 获取目标定位
+            flagPos = (int(287 + winX), int(53 + winY), 20, 20)
+            screenshot = pyautogui.screenshot(region=(flagPos))
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+            # 金币的颜色
+            target_rgb = (246,199,77)   # RGB 格式
+            if(self.is_target_area(mat_image, target_rgb, 0)):
+                break
+            self.logger.debug(f"离开[{level_name}]: 等待中...")
+            time.sleep(.6)
+
+
+    # 等待进入斗兽场
+    def wait_selected_level_entered(self, level_name = "斗兽场"):
+        self.logger.debug(f"等待进入[{level_name}]...")
+        start_time = time.time()  # 记录开始时间
+        timeout = 60  # 超时时间，单位为秒\
+
+        while True:
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError(f"等待超时: {timeout}s等待进入[{level_name}]超时。")
+            
+            window = self.get_specific_window_info()
+            if(window == None): 
+                raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+            
+            winX, winY, winWidth, winHeight = self.get_win_info()
+            # 获取目标定位
+            flagPos = (int((winWidth // 2) - 30 + winX), int(100 + winY), 45, 50)
+            screenshot = pyautogui.screenshot(region=(flagPos))
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+            # VS标志的颜色
+            target_rgb1 = (80, 140, 215)   # 正常模式
+            target_rgb2 = (72, 137, 233)   # 正常模式
+            target_rgb3 = (24, 48, 82)     # 出现pk结果时，会变暗
+            target_rgb4 = (30, 54, 83)     # 出现pk结果时，会变暗
+            if(self.is_target_area(mat_image, target_rgb1, 0) or self.is_target_area(mat_image, target_rgb2, 0)):
+                return
+            
+            if(self.is_target_area(mat_image, target_rgb3, 0) or self.is_target_area(mat_image, target_rgb4, 0)):
+                return
+
+            self.logger.debug(f"进入[{level_name}]: 等待中...")
+            time.sleep(.6)
+
+
+
+    # 等待战斗结束
+    def wait_fight_over(self, level_name = "斗兽场"):
+        self.logger.debug(f"等待[{level_name}]战斗结束...")
+        start_time = time.time()  # 记录开始时间
+        timeout = 60  # 超时时间，单位为秒\
+
+        while True:
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError(f"等待超时: {timeout}s等待战斗结束超时。")
+            
+            window = self.get_specific_window_info()
+            if(window == None): 
+                raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+            
+            winX, winY, winWidth, winHeight = self.get_win_info()
+            # 获取目标定位
+            flagPos = (int((winWidth // 2) - 30 + winX), int(100 + winY), 45, 50)
+            screenshot = pyautogui.screenshot(region=(flagPos))
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+            # VS标志的颜色
+            target_rgb3 = (24, 48, 82)     # 出现pk结果时，会变暗
+            target_rgb4 = (30, 54, 83)     # 出现pk结果时，会变暗
+            if(self.is_target_area(mat_image, target_rgb3, 0) or self.is_target_area(mat_image, target_rgb4, 0)):
+                return
+            
+            # self.count_colors(mat_image)
+
+            self.logger.debug(f"[{level_name}]打架中...")
+            time.sleep(.6)
+
+
+    # 是否能挑战塔
+    def is_challenge_tower_available(self):
+        window = self.get_specific_window_info()
+        if(window == None): 
+            raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+        
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        # 获取目标定位
+        flagPos = (int((winWidth // 2) - 3 + winX), int(winY + 702), 20, 11)
+        screenshot = pyautogui.screenshot(region=(flagPos))
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+        target_rgb = (233, 94, 84)
+        return not self.is_target_area(mat_image, target_rgb, 0)
+
+
+    # 读取安第一个竞技场按钮的坐标
+    def get_tower_challenge_btn_pos(self):
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        return (int((winWidth // 2) - 55 + winX + 55), int(winY + 695 + 22.5))
+
+
     # 纵向排列三张图片
-    def v_stack_show(self, *imgs):  
+    def v_stack_show(self, *imgs):
         # 确保所有图片的宽度一致，否则调整为相同宽度
         widths = [img.shape[1] for img in imgs]
         max_width = max(widths)
@@ -724,8 +952,16 @@ class InfoReader:
         # 纵向堆叠图片
         stacked_img = np.vstack(resized_imgs)
         
+        # 获取窗口参数
+        try:
+            winX, winY, winWidth, winHeight = self.get_win_info()
+        except RuntimeError as e:
+            winX, winY, winWidth, winHeight = (0, 0, 0, 0)
+
+
         # 显示结果
-        cv2.imshow("Vertical Stack", stacked_img)
+        cv2.imshow("VerticalStack", stacked_img)
+        cv2.moveWindow("VerticalStack", int(winX + winWidth), - 100)  
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 

@@ -13,6 +13,7 @@ def get_cache_manager_instance(config):
     if(cache_manager_instance):
         return cache_manager_instance
     cache_manager_instance = CacheManager(config)
+    return cache_manager_instance
     
 
 # 缓存管理
@@ -63,16 +64,16 @@ class CacheManager:
 
 
     # 计算下一次过期时间（第二天凌晨 1 点）。
-    def _get_next_expiry(self):
+    def _get_next_expiry(self, extra_time = 0):
         now = datetime.datetime.now()
         next_day = now + datetime.timedelta(days=1)  # 修复此处的 timedelta 引用
-        expiry_time = datetime.datetime(next_day.year, next_day.month, next_day.day, 1, 0, 0)
+        expiry_time = datetime.datetime(next_day.year, next_day.month, next_day.day, 1 + extra_time, 0, 0)
         return int(expiry_time.timestamp())
 
 
     # 存储键值对到缓存中，设置过期时间为第二天凌晨 1 点。
-    def set(self, key, value):
-        expiry_time = self._get_next_expiry()
+    def set(self, key, value, extra_expire_time = 0):
+        expiry_time = self._get_next_expiry(extra_expire_time)
         with self.lock:
             self.cache[key] = {"value": value, "expiry": expiry_time}
             self._save_cache()  # 每次更新缓存时保存到文件
@@ -89,6 +90,11 @@ class CacheManager:
                     del self.cache[key]  # 删除已过期的键
                     self._save_cache()  # 保存更新后的缓存
             return None
+        
+    
+    # 读取全部缓存
+    def all(self):
+        return self.cache
 
 
     # 清理所有过期的键。

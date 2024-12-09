@@ -11,6 +11,7 @@ from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
+from lib.virtual_map import init_virtual_map
 
 # 每日30个箱子
 class TreasureHunt:
@@ -21,7 +22,10 @@ class TreasureHunt:
         self.cs = ChallengeSelect(config)
         self.reader = InfoReader(config)
         self.cache = get_cache_manager_instance(config)
-
+        self.virtual_map = init_virtual_map(config)
+        # 最大等待击杀怪物时间
+        self.wait_max_time = 60 * 2
+        
     
     # 死亡处理
     def dead_hander(self):
@@ -39,7 +43,7 @@ class TreasureHunt:
         self.logger.info("已经移动到BOSS面前")
 
         # killboss, till find two of treasure
-        self.reader.till_find_treasure(2)
+        self.reader.till_find_treasure(treasure_num = 2, wait_max_time = self.wait_max_time)
         self.logger.info("成功击杀双蜈蚣")
         # 等到获得宝箱的东西
         self.till_get_treasure()
@@ -79,9 +83,9 @@ class TreasureHunt:
                 
                 # 判断是否点击成功并处理弹窗
                 self.logger.debug("等待弹出宝箱内容...")
-                self.reader.wait_treasure_pop_up(10)
-                self.logger.debug("宝箱内容已弹出。")
-                time.sleep(.5)
+                self.reader.wait_treasure_pop_up()
+                self.logger.debug("宝箱内容已弹出。等待2s")
+                time.sleep(2) # 因为有缓动动画，所以等2s
                 self.reader.click_rewards()
                 # self.cs.clearAds(3)
 
@@ -97,6 +101,11 @@ class TreasureHunt:
     
     # 工作
     def work(self):
+        # 找到位置
+        if(not self.reader.is_show_back2town_btn()):
+            self.logger.debug("准备移动到传送阵.")
+            self.virtual_map.move2protal()
+        
         # self.reader.close_30s_ads()
         # time.sleep(20)
         while True:
@@ -105,6 +114,9 @@ class TreasureHunt:
                 if(is_finished and int(is_finished) == 1):
                     self.logger.debug("已完成每日30个箱子,无需再打")
                     break
+                # 设置默认值
+                if(not is_finished):
+                    self.cache.set(IS_DALIY_CASE_FINISHED, 0)
 
                 self.move_2_two_centipede()
                 self.reader.wait_tranported()

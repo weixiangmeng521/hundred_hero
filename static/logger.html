@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>WebServer</title>
+    <link rel="stylesheet" href="./css/common.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body>
+    <!-- navigation begin -->
+    <nav class="aws-navigation navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">百炼英雄挂机系统</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="切换导航">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/controll">控制面板</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/logger">日志</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- navigation end -->
+    <!-- controll page begin -->
+    <div class="container aws-container">
+        <div class="row pt-5">
+
+            <!-- logs begin -->
+            <div class="container mt-5">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="aws-card shadow-lg rounded-3">
+                            <div class="aws-card-header bg-transparent fw-bold fs-5">
+                                日志显示
+                            </div>
+                            <hr style="margin: 0px;"/>
+                            <div class="aws-card-body log-pane p-4">
+                                <pre id="log_content" class="aws-log-content mb-0">加载中，请稍候...</pre>
+                            </div>
+                            <hr style="margin: 0px;"/>
+                            <div class="aws-card-footer text-end">
+                                <button class="btn btn-neumorphism" onclick="refreshLogs()">刷新日志</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- logs end -->
+        </div>
+    </div>
+    <!-- controll page end -->
+
+    <!-- scroll btn begin -->
+    <div id="scrollBtn" class="aws-scroll-down">
+        <img src="https://cdn-icons-png.flaticon.com/512/32/32195.png" alt="向下">
+    </div>
+    <!-- scroll btn end -->
+
+    <!-- footer begin -->
+    <div class="aws-footer mt-5" id="pageBottom">
+        <p>&copy; 2024冷锋.保留所有权利。</p>
+    </div>
+    <!-- footer end -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>    
+<script src="./js/common.js"></script>
+<script>
+// 加载数据
+const load_data = (dom) => {
+    // 清空
+    dom.innerHTML = `<p>加载中，请稍候...</p>`
+
+    // 读取task
+    request("system/logs").then((res) => {
+        let htmlString = "";
+        for(const index in res.data){
+            htmlString += `<p>${res.data[index]}</p>`
+        }
+        dom.innerHTML = htmlString
+    })
+}
+
+// 更新日志
+const refreshLogs = () => {
+    const logContent = document.getElementById("log_content");
+    load_data(logContent)
+}
+
+
+(function(){
+    document.addEventListener('dblclick', function(event) {
+        event.preventDefault();  // 阻止双击缩放
+    });
+
+    // 跳转到页面最下面
+    document.getElementById("scrollBtn").addEventListener("click", function() {
+        document.getElementById("pageBottom").scrollIntoView({ behavior: "smooth" });
+    });
+
+    const logContent = document.getElementById("log_content");
+
+    load_data(logContent);
+})();
+</script>
+</body>
+</html>
