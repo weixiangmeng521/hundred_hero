@@ -283,6 +283,41 @@ class InfoReader:
             }
 
 
+    # 保存今日工会任务的img
+    def save_union_task_img(self):
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        # 创建 mss 实例
+        with mss.mss() as sct:
+            region = {
+                "top": int(winY + 325), 
+                "left": int(winX + 50),
+                "width": int(winWidth - 100), 
+                "height": int(winHeight - 650)
+            }
+            # 截取屏幕
+            screenshot = sct.grab(region)
+            
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+            task_img_heigt = int((winHeight - 650 - 15) / 3)
+            task_img_width = int(winWidth + 80)
+            gutter = 30
+            # start_y:end_y, start_x:end_x
+            task_1_img = mat_image[20:task_img_heigt - 5 - gutter - 3 + 23, 255:task_img_width]
+            task_2_img = mat_image[task_img_heigt * 2 + 38:task_img_heigt * 3 + 26 - gutter, 255:task_img_width]
+            task_3_img = mat_image[task_img_heigt * 3 + 122:task_img_heigt * 3 + 179 - gutter, 255:task_img_width]
+            task_map = {
+                self.recognize_chinese_text(task_1_img): task_1_img,
+                self.recognize_chinese_text(task_2_img): task_2_img,
+                self.recognize_chinese_text(task_3_img): task_3_img,
+            }
+            for key, img in task_map.items():
+                # 找到需要完成的任务
+                if(key.find("击杀") != -1):
+                    self.save_task_sample_img(img)
+
+
+
     # 通过颜色占比来判断是否完成任务
     def is_task_complete_by_color_percent(self, bgr_img):
         complete_color = (229,223,217)

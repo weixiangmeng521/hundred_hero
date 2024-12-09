@@ -1,3 +1,4 @@
+import difflib
 import time
 from defined import IS_UNION_TASK_FINISHED
 from instance.union_task import UnionTask
@@ -40,7 +41,15 @@ class TaskExcutor:
         # self.unionTask.farmingSnowfield()
         # self.unionTask.farmingPollutionOutpost()
         # self.unionTask.farmingColdWindCamp()
-
+    
+    
+    # 获取与输入字符串最相似的键
+    def find_best_match(self, input_str, task_mapping):
+        best_match = difflib.get_close_matches(input_str, task_mapping.keys(), n=1, cutoff=0.5)
+        if best_match:
+            return best_match[0], task_mapping[best_match[0]]
+        else:
+            return None, None
 
 
     # 截取图片，取样
@@ -54,20 +63,33 @@ class TaskExcutor:
         for key, value in task_map.items():
             # 找到需要完成的任务
             if(key.find("击杀") != -1):
-                fn = self.task_mapping.get(key)
-                self.target_task_fn = fn
-                self.target_task_name = key
-                self.logger.info(f"今天需要完成的工会任务:[{ key }]")
-                if(fn == None):
-                    raise RuntimeError(f"[{ key }]的功能还没有完善.")
-    
+                # 直接取值
+                task = self.task_mapping.get(key)        
+                if(task):
+                    self.target_task_fn = task
+                    self.target_task_name = key                    
+                    self.logger.info(f"今天需要完成的工会任务:[{ key }]")
+                    return
+
+                # 模糊匹配
+                best_key, task = self.find_best_match(key, self.task_mapping)
+                if(best_key):
+                    self.target_task_fn = task
+                    self.target_task_name = key
+                    self.logger.info(f"[模糊匹配]今天需要完成的工会任务:[{ key }]")
+                    return
+
+                # 匹配失败
+                self.reader.save_union_task_img()
+                raise RuntimeError(f"[{ key }]的功能还没有完善.")
+
 
     # 刷工会副本
     def for_union_task(self):
         while True:
             self.check_union_task_list()
             # 检测是否完成工会副本
-            if(self.reader.is_task_complete(self.target_task_name)):
+            if(self.reader.is_task_complete(self.target_task_name)):                
                 self.reader.close_task_menu(True)
                 # 设置缓存
                 self.cache.set(IS_UNION_TASK_FINISHED, 1)

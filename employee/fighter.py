@@ -24,15 +24,26 @@ class Fighter:
         self.cs = ChallengeSelect(config)
 
 
-    # 点击能点击的按钮
+    # 点击能点击的按钮，点击如果无效5次，就算今日无法挑战
     def click_avalible_btn(self):
+        tolerate_times = 5
         # awalys click first one
         target_color = (221,200,75)
         mat_img = self.reader.read_arena_first_btn()
-        if(self.reader.is_target_area(mat_img, target_color)):
+        while(self.reader.is_target_area(mat_img, target_color)):
+            # 超过点击无效的次数，返回
+            if(tolerate_times < 1):
+                return False
+
             btn_pos = self.reader.get_arena_first_btn_pos()
             pyautogui.click(btn_pos[0], btn_pos[1])
-            return True
+            time.sleep(.3)
+
+            if(not self.reader.is_target_area(mat_img, target_color)):
+                return True
+            tolerate_times -= 1 
+            time.sleep(.3)
+
         return False
     
 
@@ -65,7 +76,6 @@ class Fighter:
 
     
     # 工作
-    # TODO: 还可以更精准点
     def work(self):
         is_finished = self.cache.get(IS_DALIY_ARENA_FINISHED)
         # 如果没有值，就设置默认值
