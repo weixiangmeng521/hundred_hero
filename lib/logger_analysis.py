@@ -114,6 +114,31 @@ class LoggerAnalysis:
         return total
 
 
+    # 获取当天的执行异常的data
+    def get_today_error_message_data(self):
+        filename_list = self.get_recent_logs()
+        current_date_filename = filename_list[-1]
+        
+        data_map = {hour: 0 for hour in range(1, 25)}
+        path = self.logs_path  / current_date_filename
+        target = "Traceback"
+        # 逐块读取文件内容
+        for content in self.get_file_content(path):
+            # 按行分割
+            lines = content.splitlines()
+            for line in lines:
+                if target in line:
+                    # 使用正则表达式提取时间部分
+                    match = re.search(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}", line)
+                    if match:
+                        time_str = match.group(0)
+                        log_time = datetime.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S,%f")
+                        hour = log_time.hour + 1  # 将小时数转换为1-24
+                        data_map[hour] += 1                
+        return dict(data_map)
+        
+
+
     # 分析最近7天的金币获取数量
     def get_last7days_coin_count_data(self):
         files_list = self.get_recent_logs()
