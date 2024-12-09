@@ -29,16 +29,16 @@ class Fighter:
         # awalys click first one
         target_color = (221,200,75)
         mat_img = self.reader.read_arena_first_btn()
-        # TODO: 可能颜色不准
         if(self.reader.is_target_area(mat_img, target_color)):
             btn_pos = self.reader.get_arena_first_btn_pos()
             pyautogui.click(btn_pos[0], btn_pos[1])
             return True
-        
         return False
+    
 
     # 选择菜单
     def auto_fight(self):
+        fight_duration = 3
         self.cs.clickGreenPop()
         self.logger.debug("进入[竞技场]选择菜单界面")
         time.sleep(.3)
@@ -47,12 +47,11 @@ class Fighter:
         while(self.click_avalible_btn()):
             # 进入游戏
             self.reader.wait_arena_entered()
-            time.sleep(1)
 
             # 战斗
-            self.mc.move_right(.3)
-            time.sleep(10)
-            
+            self.mc.move_right(.2)
+            self.reader.wait_fight_over()
+            self.logger.debug("已脱离战斗")
             # 战斗结束
             self.reader.clear_rewards(3)
 
@@ -62,6 +61,7 @@ class Fighter:
 
         # 关闭win
         self.cs.closeWin()
+        self.logger.debug("每日竞技场完成, 无需再打")
         self.cache.set(IS_DALIY_ARENA_FINISHED, 1, 7)
 
     
