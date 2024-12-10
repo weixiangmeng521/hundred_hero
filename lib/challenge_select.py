@@ -101,6 +101,16 @@ class ChallengeSelect:
                 return window  # 返回指定窗口的信息
         return None
     
+    
+    # 获取窗口信息
+    def get_win_info(self):
+        window = self.get_specific_window_info()
+        if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+        window_bounds = window.get('kCGWindowBounds', {})
+        winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
+        winWidth, winHeight = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
+        return winX, winY, winWidth, winHeight
+    
 
     # 点击最近的绿色冒泡
     def clickGreenPop(self):
@@ -337,6 +347,18 @@ class ChallengeSelect:
         self.check_window_handler()
         pyautogui.click(closeBtnPos[0], closeBtnPos[1])
         self.logger.info("关闭对话窗")
+
+
+    # 挑战下一关旁边的确认按钮
+    def click_arena_comfirm_btn(self):
+        # macos的自带25px的边
+        # macos自带图片查看器的边框为（80 - 25）px
+        # 微信小程序百炼英雄的白条win的宽为（125 - 80）px
+        # 图片查看模式下，下一关按钮的定位为 Point(x=316, y=746)
+        # 由此可知: 他的坐标为 winX + 316, winY - (80 - 25) - 25 + 746
+        self.check_window_handler()
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        pyautogui.click(int(winX + 153), (winY - (80 - 25) - 25 + 746))
 
 
     # 打道回府

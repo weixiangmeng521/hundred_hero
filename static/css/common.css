@@ -23,6 +23,7 @@ button[type="button"].btn-primary:focus{
 
 .aws-navigation{
     box-shadow: 7px 7px 14px #ccc, -7px -7px 14px #fff;
+    position: fixed;
 }
 
 .btn-neumorphism {
