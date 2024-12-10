@@ -98,6 +98,46 @@ class InfoReader:
         return cv2.countNonZero(mask) > 0
 
 
+    # 获取钱的数量
+    def get_coin_num(self, is_debug = False) -> int:
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        with mss.mss() as sct:
+            # Point(x=311, y=82)
+            region = {
+                "top": int(winY + 57), 
+                "left": int(winX + 309),
+                "width": int(45), 
+                "height": int(15)
+            }
+            # 截取屏幕
+            screenshot = sct.grab(region)
+            mat_image = np.array(screenshot)
+            num = self.recognize_number_text(mat_image)
+            # 如果识别失败，就保存图片
+            if(is_debug and num is None):
+                self.save_task_sample_img(mat_image)
+            
+            # 设置默认值
+            if(num is None):
+                return 0
+            
+            return int(num)
+    
+
+    # 是不是显示了元素塔塔的宝箱宝箱
+    def is_show_tower_treasure(self):
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        screenshot = pyautogui.screenshot(region=(
+            int(winX + 340), 
+            int(winY + 214 - 77), 
+            int(25), 
+            int(10)
+        ))
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+        target_color = (109, 228, 96)
+        return self.is_target_area(mat_image, target_color)
+
 
     # 读截图
     # 直接判断是不是黄色，黄色，就是打满了的情况
@@ -336,6 +376,41 @@ class InfoReader:
         text = pytesseract.image_to_string(image, lang='chi_sim',  config='--psm 6')  # 使用简体中文语言包
         return correct_text_handler(text)
     
+
+    # 读取数字
+    def recognize_number_text(self, bgr_image):
+        pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
+        # 读取图片
+        image = self.preprocess_num_text_img(bgr_image)
+        # self.save_task_sample_img(image)
+        text = pytesseract.image_to_string(image, config='--psm 6')
+        return text
+        
+
+    # 处理代数字的图片
+    def preprocess_num_text_img(self, bgr_img):
+        scale_factor = 2.0  # 宽和高均放大两倍        
+        # 转换为HSV颜色空间
+        hsv_image = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
+        # 扩大一倍
+        resized_hsv_img = cv2.resize(hsv_image, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_CUBIC)
+        resized_bgr_img = cv2.resize(bgr_img, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_CUBIC)
+
+        # 定义白色的HSV颜色范围（例如：0-180度的色调，0-255的饱和度，200-255的明度）
+        lower_white = np.array([0, 0, 200])
+        upper_white = np.array([180, 20, 255])
+
+        # 使用cv2.inRange()创建白色区域的掩模
+        mask = cv2.inRange(resized_hsv_img, lower_white, upper_white)
+        
+        # 将白色区域设为白色，其他区域设为黑色
+        final_image = cv2.bitwise_and(resized_bgr_img, resized_bgr_img, mask=mask)
+        # 变成三维
+        final_image = final_image[:, :, :-1]
+        # 翻转
+        inverted_image = cv2.bitwise_not(final_image)
+        return inverted_image
+
 
     # 提高图像
     def preprocess_img(self, bgr_image):

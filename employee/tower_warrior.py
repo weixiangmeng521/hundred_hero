@@ -29,20 +29,37 @@ class TowerWarrior:
         time.sleep(1)
         self.cs.selectElementTower()
         time.sleep(1)
-        if(self.reader.is_challenge_tower_available()):
+        while(self.reader.is_challenge_tower_available()):
+            # 普通点击
             btn_pos = self.reader.get_tower_challenge_btn_pos()
+
+            # 判断是不是有宝箱，有宝箱就点击宝箱，再挑战下一轮
+            if(self.reader.is_show_tower_treasure()):
+                pyautogui.click(btn_pos[0], btn_pos[1])
+                time.sleep(.3)
+                self.reader.clear_rewards()
+                time.sleep(.3)
+
             pyautogui.click(btn_pos[0], btn_pos[1])
+            time.sleep(.3)
 
-            # 进入刷题循环
-            while self.reader.is_challenge_tower_available():
-                # 进入游戏
-                self.reader.wait_selected_level_entered("元素之塔")
+            # 进入游戏
+            self.reader.wait_selected_level_entered("元素之塔")
+            time.sleep(1.6)
+            # 战斗
+            self.mc.move_right(.3)
+            self.reader.wait_fight_over("元素之塔")
+            self.logger.debug("已脱离战斗, 继续挑战")
+            time.sleep(.3)
 
-                # 战斗
-                self.mc.move_right(.2)
-                self.reader.wait_fight_over("元素之塔")
-                self.logger.debug("已脱离战斗, 等待5s自动进入下层挑战")
-                time.sleep(5)
+            # 点击确认按钮，安全退出到塔的界面
+            self.cs.click_arena_comfirm_btn()
+            time.sleep(.3)
+            self.reader.wait_selected_level_leave("元素之塔")
+            time.sleep(1.2)
+        
+
+
 
         self.cache.set(IS_DALIY_TOWER_FINISHED, 1, 7)
         self.logger.debug("已经打完今日的元素之塔, 无需再打.")

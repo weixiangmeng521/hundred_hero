@@ -147,7 +147,9 @@ def main():
 
 # TODO: 获取当前钱的数量,并放入缓存里
 if __name__ == "__main__":
-    main()
+    # main()
+
+    reader.is_show_tower_treasure()
 
     # webServer.run(queue)
 

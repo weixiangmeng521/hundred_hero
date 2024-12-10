@@ -29,6 +29,7 @@ class CardsMaster:
     }
 
     def __init__(self, config):
+        self.config = config
         self.app_name = config["APP"]["Name"]
         self.reader = InfoReader(config)
         self.cs = ChallengeSelect(config)
@@ -280,6 +281,13 @@ class CardsMaster:
 
     # 自动抽卡
     def work(self):
+        coin_threshold = int(self.config["TASK"]["GaChaCoinThreshold"])
+        # 如果是None,说明识别失败,所以保存到sample
+        coin_num = self.reader.get_coin_num(is_debug = True)
+        if(coin_threshold > coin_num):
+            self.logger.info(f"当前金币为{coin_num},低于抽卡设定的阈值{coin_threshold}.")
+            return
+
         is_entered_interface = self.is_entered()
 
         # 找到位置
