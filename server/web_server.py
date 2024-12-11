@@ -224,13 +224,13 @@ class WebServer:
         # 读取静态文件夹
         static_dir = os.path.join(os.path.dirname(__file__), "../static/")
         self.app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
-        self.app.add_middleware(
-            CORSMiddleware,
-            allow_origins=['*'],
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
-        )
+        # self.app.add_middleware(
+        #     CORSMiddleware,
+        #     allow_origins=['*'],
+        #     allow_credentials=True,
+        #     allow_methods=["*"],
+        #     allow_headers=["*"],
+        # )
         # 输出日志
         self.logger.debug(f"Server is running on: {self.host}:{self.port}")
         
