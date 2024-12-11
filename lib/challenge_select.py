@@ -359,6 +359,10 @@ class ChallengeSelect:
         self.check_window_handler()
         winX, winY, winWidth, winHeight = self.get_win_info()
         pyautogui.click(int(winX + 153), (winY - (80 - 25) - 25 + 746))
+        time.sleep(.3)
+        # 中间也点一下
+        pyautogui.click(int(winX + (winWidth // 2)), (winY - (80 - 25) - 25 + 746))
+
 
 
     # 打道回府

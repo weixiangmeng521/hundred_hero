@@ -35,12 +35,13 @@ class TowerWarrior:
 
             # 判断是不是有宝箱，有宝箱就点击宝箱，再挑战下一轮
             if(self.reader.is_show_tower_treasure()):
+                self.logger.debug("有宝箱需要领取")
                 pyautogui.click(btn_pos[0], btn_pos[1])
                 time.sleep(.3)
                 self.reader.clear_rewards()
-                time.sleep(.3)
+                time.sleep(6)
 
-            pyautogui.click(btn_pos[0], btn_pos[1])
+            pyautogui.click(btn_pos[0], btn_pos[1], clicks=3)
             time.sleep(.3)
 
             # 进入游戏
@@ -56,7 +57,8 @@ class TowerWarrior:
             self.cs.click_arena_comfirm_btn()
             time.sleep(.3)
             self.reader.wait_selected_level_leave("元素之塔")
-            time.sleep(1.2)
+            self.logger.debug("等待5s进入下一轮.")
+            time.sleep(6)
         
 
 

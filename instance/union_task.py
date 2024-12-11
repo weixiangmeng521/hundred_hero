@@ -79,8 +79,8 @@ class UnionTask:
         instance.crossRoom3Loop()
 
 
-    # 刷腐烂沼泽
-    def farmingRottingSwamp(self):
+    # 刷腐烂沼泽，下圈
+    def farmingSouthRottingSwamp(self):
         self.cs.selectWoodInstance()
         # 等待
         self.reader.wait_tranported()
@@ -92,6 +92,22 @@ class UnionTask:
         self.cs.back2Town()
         # 等待
         self.reader.wait_tranported()
+
+
+    # 刷腐烂沼泽，上圈
+    def farmingNorthRottingSwamp(self):
+        self.cs.selectWoodInstance()
+        # 等待
+        self.reader.wait_tranported()
+        instance = forest.RottenSwamp(self.config)
+
+        # instance.crossRoom1()
+        instance.crossRoom1(should_check = False)
+
+        self.cs.back2Town()
+        # 等待
+        self.reader.wait_tranported()
+
 
     
     # 刷寒风营地
