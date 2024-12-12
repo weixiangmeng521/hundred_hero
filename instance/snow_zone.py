@@ -280,4 +280,18 @@ class SnowZone:
         mc.move_down(1)
 
         time.sleep(3)
-        
+
+
+    # 击杀猛犸巨像
+    def killMammoth(self):
+        mc = self.mc
+
+        mc.move_down(.9)
+        mc.move_left(1.6)
+        mc.move_down(.9)
+        mc.move_left(6.6)
+        mc.move_top(2.3)
+
+        time.sleep(3)
+
+

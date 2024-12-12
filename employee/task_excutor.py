@@ -35,6 +35,7 @@ class TaskExcutor:
             "击杀100名树精守卫": self.unionTask.farmingColdWindCamp,
             "击杀BOSS冰雪巨人": self.unionTask.farmingIceGiant,
             "击杀BOSS三头怪蛇": self.unionTask.farmingTwoHeadSnake,
+            "击杀BOSS猛犸巨像": self.unionTask.farmingMammoth,
             "击杀100只红眼蝙蝠": self.unionTask.farmingPollutionOutpost,
             "击杀100只剧毒黑蜂": self.unionTask.farmingPollutionOutpost,
         }
