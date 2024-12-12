@@ -61,7 +61,7 @@ fireMineLandTabPos = [121, 260]
 twoCentipedePos = [302, 360]
 
 # 任务列表
-taskListBtnPos = [445, 385]
+taskListBtnPos = [445, 385 - 50]
 unionTaskTabPos = [390 , 840]
 completeUnionTaskTabPos = [370 , 385]
 

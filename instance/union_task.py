@@ -149,4 +149,11 @@ class UnionTask:
         # 去刷新
         self.cs.selectIcecrownThrone()
         self.reader.wait_tranported()
-        
+    
+
+    # 刷猛犸巨象
+    def farmingMammoth(self):
+        self.bountyHunter.killMammoth()
+        # 去刷新
+        self.cs.selectIcecrownThrone()
+        self.reader.wait_tranported()        

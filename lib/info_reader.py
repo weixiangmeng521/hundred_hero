@@ -121,7 +121,12 @@ class InfoReader:
             if(num is None):
                 return 0
             
-            return int(num)
+            int_num = 0
+            try:
+                int_num = int(num)
+            except ValueError:
+                int_num = 0
+            return int_num
     
 
     # 是不是显示了元素塔塔的宝箱宝箱

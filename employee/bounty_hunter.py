@@ -137,6 +137,17 @@ class BountyHunter:
         self.reader.wait_tranported()
         return 10
 
+    
+    # 击杀猛犸巨象
+    def killMammoth(self):
+        self.cs.selectSnowInstance()
+        instance = SnowZone(self.config)
+        self.reader.wait_tranported()
+        instance.killMammoth()
+        self.cs.back2Town()
+        self.reader.wait_tranported()        
+        return 10
+
 
     # 单个打金任务
     def task(self):
