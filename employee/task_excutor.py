@@ -38,6 +38,7 @@ class TaskExcutor:
             "击杀BOSS猛犸巨像": self.unionTask.farmingMammoth,
             "击杀100只红眼蝙蝠": self.unionTask.farmingPollutionOutpost,
             "击杀100只剧毒黑蜂": self.unionTask.farmingPollutionOutpost,
+            "击杀100只霜狼": self.unionTask.farmingMagicRing,
         }
 
         # self.unionTask.farmingMagicRing()
@@ -110,16 +111,17 @@ class TaskExcutor:
             self.logger.info(f"工会任务没有完成，打工会任务。")
             
             # 刷副本
-            time.sleep(1)
+            time.sleep(.1)
 
             # 执行目标对象
             if(self.target_task_fn):
                 self.target_task_fn()
-            time.sleep(1)
+            time.sleep(.1)
             
 
 
     # 执行任务
+    # TODO: 检测效率
     def work(self):
         # 找到位置
         if(not self.reader.is_show_back2town_btn()):
