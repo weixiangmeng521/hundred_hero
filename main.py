@@ -13,6 +13,7 @@ from exception.game_status import GameStatusError
 from employee.farmer import Farmer
 from instance.union_task import UnionTask
 from lib.challenge_select import ChallengeSelect
+from lib.controll_wechat import init_controll_wechat
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
 from lib.logger_analysis import get_logger_analysis_instance
@@ -35,6 +36,7 @@ config.read('config.ini')
 cs = ChallengeSelect(config)
 vc = VisualTrack(config)
 mc = MoveControll(config)
+wechat = init_controll_wechat(config)
 reader = InfoReader(config)
 unionTask = UnionTask(config)
 cardsMaster = CardsMaster(config)
@@ -147,11 +149,13 @@ def main():
 
 # TODO: 获取当前钱的数量,并放入缓存里
 if __name__ == "__main__":
-    main()
+    # main()
+
+    # wechat.wake_up()
 
     # unionTask.farmingMammoth()
 
-    # webServer.run(queue)
+    webServer.run(queue)
 
     # vc.test_for_find_object_in_image()
     # print(pyautogui.position())
