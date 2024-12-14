@@ -9,7 +9,7 @@ from lib.logger import init_logger
 # 控制类
 class MoveControll:
 
-    def __init__(self, config):
+    def __init__(self, config, taskQueue = None):
         curX, curY = pyautogui.position()
         self.config = config
         self.app_name = config["APP"]["Name"]
@@ -19,7 +19,14 @@ class MoveControll:
         self.cPos = [262 , 696]
         self.xPos = self.cPos[0]
         self.yPos = self.cPos[1]
+        self.taskQueue = taskQueue
         # self.get_window_info()
+
+    # TODO: 检查任务队列
+    def check_task_queue(self):
+        if(not self.taskQueue): 
+            return
+
 
     # 获取窗口信息
     def get_specific_window_info(self):

@@ -11,3 +11,4 @@ logs
 config.ini
 .DS_Store
 .cache
+QR_code

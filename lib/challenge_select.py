@@ -9,7 +9,7 @@ import cv2
 from PIL import Image
 import numpy as np
 import math
-from lib.controll_wechat import ControllWechat
+from lib.controll_wechat import init_controll_wechat
 from lib.logger import init_logger
 from lib.virtual_map import init_virtual_map
 from lib.visual_track import VisualTrack
@@ -83,7 +83,7 @@ class ChallengeSelect:
         self.config = config
         self.app_name = config["APP"]["Name"]
         self.logger = init_logger(config)
-        self.wechat = ControllWechat(self.config)
+        self.wechat = init_controll_wechat(self.config)
         self.virtual_map = init_virtual_map(config)
         self.waitTime = .1
 

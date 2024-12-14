@@ -105,7 +105,11 @@
             </div>
             <!-- config list end -->            
 
-
+            <div class="col-12 col-md-6 mt-5">
+                <div class="img_container" id="QRcode">
+                    QRcode
+                </div>
+            </div>
 
         </div>
     </div>
@@ -263,6 +267,15 @@
     request("graph/today_error_data").then((res) => {
         init_today_error_data(res.data)
     })    
+
+    request("system/qr_code").then((res) => {
+       const node = document.getElementById("QRcode")
+       node.innerHTML = "";
+       const img = document.createElement("img");
+       img.setAttribute("src", res.data.img)
+       img.setAttribute("style", "width:150px;height:150px;")
+       Number(res.data.state) === 0 &&  node.appendChild(img)
+    })
 })();
 </script>
 </body>
