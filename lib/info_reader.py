@@ -165,18 +165,24 @@ class InfoReader:
         if(len(task_name) == 0):
             raise ValueError("Err: task_name cannot not be empty.")
         
+        is_clicked = False
         # 获取三个位置，如果是变绿了，就点击。
         while(self.click_complete_task_btn()):
             time.sleep(.3)
             self.clear_rewards()
-            # 因为有缓动动画，所以要延迟2秒
-            time.sleep(2)
+            is_clicked = True
 
-        # 获取task的list，判断是不是已经提交了
-        task_list = self.read_task_list()
-        for key, value in task_list.items():
-            if(key == task_name and bool(value)):
-                return True
+        # 如果有点击
+        if is_clicked:
+            # TODO: 这里可能识别错误
+            # 因为有缓动动画，所以要延迟3秒
+            time.sleep(3)            
+            # 获取task的list，判断是不是已经提交了
+            task_list = self.read_task_list()
+            for key, value in task_list.items():
+                if(key == task_name and value):
+                    return True
+        
         return False
     
 
