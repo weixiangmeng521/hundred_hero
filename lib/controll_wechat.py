@@ -92,7 +92,7 @@ class ControllWechat:
             
             # 判断是不是直接进入微信
             if self.is_directly_login(self.login_win_name):
-                xBtn, yBtn = self.get_login_btn_pos()
+                xBtn, yBtn = self.get_login_btn_pos(self.login_win_name)
                 pyautogui.click(xBtn, yBtn)
                 # 等待是否登录OK
                 self.wait_enter()
