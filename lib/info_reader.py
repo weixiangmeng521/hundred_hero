@@ -165,24 +165,26 @@ class InfoReader:
         if(len(task_name) == 0):
             raise ValueError("Err: task_name cannot not be empty.")
         
-        is_clicked = False
         # 获取三个位置，如果是变绿了，就点击。
+        isClicked = False
         while(self.click_complete_task_btn()):
             time.sleep(.3)
             self.clear_rewards()
-            is_clicked = True
+            time.sleep(.3)
+            isClicked = True
+            
+        if isClicked:
+            return True
 
         # 如果有点击
-        if is_clicked:
-            # TODO: 这里可能识别错误
-            # 因为有缓动动画，所以要延迟3秒
-            time.sleep(3)            
-            # 获取task的list，判断是不是已经提交了
-            task_list = self.read_task_list()
-            for key, value in task_list.items():
-                if(key == task_name and value):
-                    return True
-        
+        # TODO: 这里可能识别错误
+        # 因为有缓动动画，所以要延迟2秒
+        time.sleep(2)            
+        # 获取task的list，判断是不是已经提交了
+        task_list = self.read_task_list()
+        for key, value in task_list.items():
+            if(key == task_name and bool(value)):
+                return True
         return False
     
 
@@ -215,7 +217,8 @@ class InfoReader:
         # 只点击第一个
         if(self.is_target_area(task_1_img, green_color, 0)):
             pyautogui.click(btn1[0], btn1[1])
-            return True        
+            return True
+        
         # if(self.is_target_area(task_2_img, green_color, 0)):
         #     pyautogui.click(btn2[0], btn2[1])
         #     return True
@@ -293,14 +296,6 @@ class InfoReader:
     def read_task_list(self):
         winX, winY, winWidth, winHeight = self.get_win_info()
         # # 读取指定位置
-        # screenshot = pyautogui.screenshot(region=(
-        #     int(winX + 50), 
-        #     int(winY + 325), 
-        #     int(winWidth - 100), 
-        #     int(winHeight - 650)
-        # ))
-        
-        # 创建 mss 实例
         with mss.mss() as sct:
             region = {
                 "top": int(winY + 325), 
