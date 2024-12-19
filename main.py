@@ -1,4 +1,5 @@
 import queue
+import time
 import traceback
 
 import pyautogui
@@ -152,8 +153,6 @@ if __name__ == "__main__":
     main()
 
     # wechat.wake_up()
-
-    # unionTask.farmingMammoth()
 
     # webServer.run(queue)
 

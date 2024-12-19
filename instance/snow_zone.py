@@ -39,11 +39,27 @@ class SnowZone:
         time.sleep(wait_time)        
 
         self.check_handle(is_check)
-        mc.move_left(3.2)
+        mc.move_left(2.2)
         time.sleep(wait_time)     
 
+
         self.check_handle(is_check)
-        mc.move_left(2)
+        mc.move_top(1.2)
+        time.sleep(wait_time)     
+
+
+        self.check_handle(is_check)
+        mc.move_down(2.4)
+        time.sleep(wait_time * 1.5)   
+
+
+        self.check_handle(is_check)
+        mc.move_top(1.2)
+        time.sleep(wait_time * 0)   
+
+
+        self.check_handle(is_check)
+        mc.move_left(3)
         time.sleep(wait_time * 1.5)     
 
         self.check_handle(is_check)

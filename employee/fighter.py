@@ -3,6 +3,7 @@ import time
 import cv2
 import pyautogui
 from defined import IS_DALIY_ARENA_FINISHED
+from exception.game_status import GameStatusError
 from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
@@ -24,7 +25,7 @@ class Fighter:
         self.cs = ChallengeSelect(config)
 
 
-    # ! 点击能点击的按钮，点击如果无效5次，就算今日无法挑战 BUG
+    # 如果不能点击，就直接报错
     def click_avalible_btn(self):
         # awalys click first one
         target_color = (221,200,75)
@@ -33,6 +34,9 @@ class Fighter:
             btn_pos = self.reader.get_arena_first_btn_pos()
             pyautogui.click(btn_pos[0], btn_pos[1])
             time.sleep(.3)
+            if(not self.reader.is_enable_enter_arena()):
+                self.cache.set_next_hour(IS_DALIY_ARENA_FINISHED)
+                raise GameStatusError("还无法进入竞技场, 1h后重试...")
             return True
         return False
     

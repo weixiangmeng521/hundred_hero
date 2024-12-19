@@ -39,6 +39,7 @@ class TaskExcutor:
             "击杀100只红眼蝙蝠": self.unionTask.farmingPollutionOutpost,
             "击杀100只剧毒黑蜂": self.unionTask.farmingPollutionOutpost,
             "击杀100只霜狼": self.unionTask.farmingMagicRing,
+            "击杀100名海豹人法师": self.unionTask.farmingSnowfield,
         }
 
         # self.unionTask.farmingMagicRing()
