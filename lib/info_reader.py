@@ -536,6 +536,22 @@ class InfoReader:
         return (int(winX + 316 + 85 // 2),  int(winY + 498 + 38 // 2))
 
 
+    # 是否能进入竞技场
+    def is_enable_enter_arena(self):
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        popupArea = (
+            int(winX + 130),
+            int(winY + winHeight // 2 - 5),
+            180,
+            10,
+        )
+        screenshot = pyautogui.screenshot(region=(popupArea))
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)     
+        targetColor = (147, 152, 156)
+        return not self.is_target_area(mat_image, targetColor, 0)
+
+
     # 判读是不是死了
     def is_dead(self):
         btnPos = (100, 720, 100, 40)
