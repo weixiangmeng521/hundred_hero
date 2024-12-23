@@ -23,6 +23,7 @@ class Fighter:
         self.cache = get_cache_manager_instance(config)
         self.mc = MoveControll(config)
         self.cs = ChallengeSelect(config)
+        self.tryAfterFlag = False
 
 
     # 如果不能点击，就直接报错
@@ -35,8 +36,9 @@ class Fighter:
             pyautogui.click(btn_pos[0], btn_pos[1])
             time.sleep(.3)
             if(not self.reader.is_enable_enter_arena()):
-                self.cache.set_next_hour(IS_DALIY_ARENA_FINISHED)
-                raise GameStatusError("还无法进入竞技场, 1h后重试...")
+                self.tryAfterFlag = True
+                return False
+            
             return True
         return False
     
@@ -65,8 +67,16 @@ class Fighter:
 
         # 关闭win
         self.cs.closeWin()
-        self.logger.debug("每日竞技场完成, 无需再打")
-        self.cache.set(IS_DALIY_ARENA_FINISHED, 1, 7)
+
+        # 打完了竞技场，无需再打
+        if(not self.tryAfterFlag):
+            self.logger.debug("每日竞技场完成, 无需再打")
+            self.cache.set(IS_DALIY_ARENA_FINISHED, 1, 7)
+
+        # 再一小时后重试
+        if(self.tryAfterFlag):
+            self.logger.debug("还无法进入竞技场, 1h后自动重试...")
+            self.cache.set_next_hour(IS_DALIY_ARENA_FINISHED)
 
     
     # 工作

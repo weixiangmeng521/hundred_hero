@@ -223,8 +223,7 @@ class BountyHunter:
     # 自动匹配模式，快速模式，和默认模式
     def work(self):
         # 找到位置
-        if(not self.reader.is_show_back2town_btn()):
-            self.virtual_map.move2protal()
+        self.virtual_map.move2protal()
         
         is_full = self.reader.is_team_member_full()
         if(is_full):

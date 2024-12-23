@@ -308,7 +308,7 @@ class ChallengeSelect:
         pyautogui.click(taskListBtnPos[0], taskListBtnPos[1])
         time.sleep(self.waitTime)
         pyautogui.click(unionTaskTabPos[0], unionTaskTabPos[1])
-        self.logger.info("进入[工会任务列表]")
+        # self.logger.info("进入[工会任务列表]")
 
 
     # 选择炎火之狱副本
@@ -396,7 +396,7 @@ class ChallengeSelect:
         time.sleep(.3)
 
         if(isContainAds):
-            self.clearAds(5)
+            self.clearAds(10)
 
 
     # 清除广告
