@@ -52,9 +52,40 @@ class TreasureHunt:
         self.cs.back2Town()
         
 
+    # 检查30个宝箱是不是已经被点击
+    def check_daliy_treasure_task_is_done(self):
+        self.logger.debug("读取任务列表, 判断每日30个宝箱是否领取完...")
+        # 打开list
+        self.cs.openTaskList()
+        time.sleep(.6)
+        # 读取list
+        task_map = self.reader.read_task_list()
+        for key, value in task_map.items():
+            # 尽可能点击完成按钮
+            isClicked = False
+            while(self.reader.click_complete_task_btn()):
+                isClicked = True
+                time.sleep(.3)
+            
+            # 如发生点击了任务完成按钮，就重新读取当前状态
+            if(isClicked):
+                self.logger.debug("发生点击完成按钮事件.")
+                self.reader.close_task_menu()
+                time.sleep(.3)
+                self.check_daliy_treasure_task_is_done()
+                return
+            
+            # 判断是否已经完成任务
+            if(key.find("开启") != -1 and bool(value)):
+                self.logger.debug("每日30次宝箱已经完成。")
+                self.cache.set(IS_DALIY_CASE_FINISHED, 1)
+                self.reader.close_task_menu()
+                return
+
+
     # 点击宝箱
     # 点击，因为旁边有小怪，也可能失效，点击不上
-    # TODO: 判断今日是否已经领取完30个奖励
+    # 判断今日是否已经领取完30个奖励 => 通过每日任务判断 [2024.12.23]
     def till_get_treasure(self):
         start_time = time.time()  # 记录开始时间
         timeout = 60 * 2  # 超时时间，单位为秒
@@ -109,15 +140,19 @@ class TreasureHunt:
         # self.reader.close_30s_ads()
         # time.sleep(20)
         while True:
-            try:
+            try:                
+                # 查看是否任务已经完成
+                self.check_daliy_treasure_task_is_done()
+
                 is_finished = self.cache.get(IS_DALIY_CASE_FINISHED)
                 if(is_finished and int(is_finished) == 1):
                     self.logger.debug("已完成每日30个箱子,无需再打")
                     break
+
                 # 设置默认值
                 if(not is_finished):
                     self.cache.set(IS_DALIY_CASE_FINISHED, 0)
-
+                    
                 self.move_2_two_centipede()
                 self.reader.wait_tranported()
                 time.sleep(.3)

@@ -109,6 +109,22 @@ class ControllWechat:
         return 1
 
 
+    # 保证电脑不熄屏
+    click_place = "right_bottom"
+    def keep_alive(self):
+        if(self.click_place == "right_bottom"):
+            winX, winY, winWidth, winHeight = self.get_win_info(self.login_win_name)
+            pyautogui.click(int(winX + winWidth - 10), int(winY + winHeight - 10))
+            self.click_place = "left_bottom"
+            return
+
+        if(self.click_place == "left_bottom"):
+            winX, winY, winWidth, winHeight = self.get_win_info(self.login_win_name)
+            pyautogui.click(int(winX + 10), int(winY + winHeight - 10))
+            self.click_place = "right_bottom"
+            return 
+
+
     # 是不是显示，你已退出微信
     def is_logout(self, win_name):
         winX, winY, winWidth, winHeight = self.get_win_info(win_name)
@@ -147,6 +163,8 @@ class ControllWechat:
                 time.sleep(10)
                 continue
             
+            self.keep_alive()
+            self.logger.debug("等待进入主界面...")
             self.screenshot_wechat(self.login_win_name)
             time.sleep(10)
 
