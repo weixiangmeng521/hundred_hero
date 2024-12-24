@@ -328,6 +328,7 @@ class ControllWechat:
         pyautogui.click(winX + 25, winY + winHeight - 150)
         time.sleep(.3)
         pyautogui.click(winX + 25 + 85, winY + winHeight - 150 - 70)
+        time.sleep(.3)
 
 
 

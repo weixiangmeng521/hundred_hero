@@ -34,6 +34,7 @@ twoPeakPosBtnPos = [302, 365]
 # 黑石系
 blackRockBtnPos = [142, 630]
 centerHallBtnPos = [302, 440]
+hallwayBtnPos = [302, 365]
 
 # 严寒地带系
 snwoMapBtnPos = [121, 440]
@@ -329,6 +330,17 @@ class ChallengeSelect:
         pyautogui.click(elementTowerTabPos[0], elementTowerTabPos[1])
         self.logger.info("选择[元素塔的TAB]")
 
+
+    # 选择大厅楼道
+    def selectBlackRockHallway(self):
+        self.check_window_handler()
+        self.clickGreenPop()
+        time.sleep(self.waitTime)
+        pyautogui.click(blackRockBtnPos[0], blackRockBtnPos[1])
+        time.sleep(self.waitTime)
+        pyautogui.click(hallwayBtnPos[0], hallwayBtnPos[1])
+        self.logger.info("进入[大厅楼道]")
+    
 
     # 放弃
     def clickGiveUpRebornBtn(self):

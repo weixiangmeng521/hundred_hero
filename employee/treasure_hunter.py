@@ -54,6 +54,11 @@ class TreasureHunt:
 
     # 检查30个宝箱是不是已经被点击
     def check_daliy_treasure_task_is_done(self):
+        is_finished = self.cache.get(IS_DALIY_CASE_FINISHED)
+        if(is_finished and int(is_finished) == 1):
+            self.logger.debug("已完成每日30个箱子,无需再打")
+            return
+
         self.logger.debug("读取任务列表, 判断每日30个宝箱是否领取完...")
         # 打开list
         self.cs.openTaskList()
@@ -69,7 +74,7 @@ class TreasureHunt:
             
             # 如发生点击了任务完成按钮，就重新读取当前状态
             if(isClicked):
-                self.logger.debug("发生点击完成按钮事件.")
+                self.logger.debug("发生点击完成按钮事件...")
                 self.reader.close_task_menu()
                 time.sleep(.3)
                 self.check_daliy_treasure_task_is_done()
@@ -81,6 +86,10 @@ class TreasureHunt:
                 self.cache.set(IS_DALIY_CASE_FINISHED, 1)
                 self.reader.close_task_menu()
                 return
+            
+            if(key.find("开启") != -1 and not bool(value)):
+                self.logger.debug("没有打完30个宝箱,准备完成任务...")
+                self.reader.close_task_menu()
 
 
     # 点击宝箱
@@ -132,6 +141,7 @@ class TreasureHunt:
     
     # 工作
     def work(self):
+        self.logger.info("准备每日30宝箱")
         # 找到位置
         if(not self.reader.is_show_back2town_btn()):
             self.logger.debug("准备移动到传送阵.")
@@ -146,8 +156,7 @@ class TreasureHunt:
 
                 is_finished = self.cache.get(IS_DALIY_CASE_FINISHED)
                 if(is_finished and int(is_finished) == 1):
-                    self.logger.debug("已完成每日30个箱子,无需再打")
-                    break
+                    return
 
                 # 设置默认值
                 if(not is_finished):

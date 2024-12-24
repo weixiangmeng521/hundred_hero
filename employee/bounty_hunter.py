@@ -1,6 +1,7 @@
 
 
 import time
+from instance.black_rock import CenterHall
 from instance.forest import RottenSwamp
 from instance.front_flatland import FrontFlatland
 from instance.poor_zone import PoorZone
@@ -148,6 +149,17 @@ class BountyHunter:
         self.reader.wait_tranported()        
         return 10
 
+    
+    # 打黑石四大天王
+    def killBackRock4Boss(self):
+        self.cs.selectBlackRockHallway()
+        instance = CenterHall(self.config)
+        self.reader.wait_tranported()
+        instance.kill4Boss()
+        self.cs.back2Town()
+        self.reader.wait_tranported()    
+        return 40
+
 
     # 单个打金任务
     def task(self):
@@ -199,6 +211,28 @@ class BountyHunter:
             self.trace.record_time_formate(end_time - start_time, earned)
 
 
+    # 一次性杀四个boss
+    def general_mode_for_kill_4_boss(self):
+        total = 0
+        while True:
+            # 开始计时
+            start_time = time.time()
+
+            # 秒杀boss
+            earned = self.killBackRock4Boss()
+            total += earned
+            self.logger.info(f"💰总打金:{ total }")
+            
+            # 进入5-1刷新
+            self.cs.back2Town()
+            self.reader.wait_tranported()
+            
+            # 结束计时
+            end_time = time.time()
+            self.trace.record_time_formate(end_time - start_time, earned)        
+
+
+
     # 进入快速模式
     def fast_mode(self):
         total = 0
@@ -228,7 +262,7 @@ class BountyHunter:
         is_full = self.reader.is_team_member_full()
         if(is_full):
             self.logger.debug("匹配[普通刷金]模式")
-            self.genral_mode()
+            self.general_mode_for_kill_4_boss()
 
         if(not is_full):
             self.logger.debug("匹配[极速刷金]模式")

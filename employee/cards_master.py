@@ -281,6 +281,7 @@ class CardsMaster:
 
     # 自动抽卡
     def work(self):
+        self.logger.info("准备抽卡")
         coin_threshold = int(self.config["TASK"]["GaChaCoinThreshold"])
         # 如果是None,说明识别失败,所以保存到sample
         coin_num = self.reader.get_coin_num(is_debug = True)
