@@ -61,8 +61,6 @@ class TowerWarrior:
             time.sleep(6)
         
 
-
-
         self.cache.set(IS_DALIY_TOWER_FINISHED, 1, 7)
         self.logger.debug("已经打完今日的元素之塔, 无需再打.")
         self.cs.closeWin()
@@ -70,8 +68,9 @@ class TowerWarrior:
 
     
     # 工作
-    # TODO: 刷到10次的时候会出现领取奖励的情况，要判断
+    # 刷到10次的时候会出现领取奖励的情况，要判断 [完成]
     def work(self):
+        self.logger.info("准备刷塔")
         is_finished = self.cache.get(IS_DALIY_TOWER_FINISHED)
         if(is_finished and int(is_finished) == 1):
             self.logger.debug("已经完成今日刷塔挑战, 无需再打")

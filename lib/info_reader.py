@@ -588,6 +588,105 @@ class InfoReader:
         return is_contain_reborn_btn and is_contain_give_up_btn
 
 
+    # 检测图片
+    def detect_template(self, main_image, template_image_path, threshold=0.8):
+        # 加载主图和模板图
+        template = cv2.imread(template_image_path)
+        
+        if main_image is None or template is None:
+            raise ValueError("无法加载主图或模板图，请检查路径是否正确。")
+        
+        # 转为灰度图
+        main_gray = cv2.cvtColor(main_image, cv2.COLOR_BGR2GRAY)
+        template_gray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+        
+        # 模板匹配
+        result = cv2.matchTemplate(main_gray, template_gray, cv2.TM_CCOEFF_NORMED)
+        
+        # 获取匹配结果中的最大值和位置
+        _, max_val, _, max_loc = cv2.minMaxLoc(result)
+        print(round(max_val, 2))
+        # 判断是否匹配
+        return round(max_val, 2) >= threshold
+
+
+    # 知道boss死亡
+    def till_boss_die(self, wait_max_time = 60 * 1):
+        # 计划设置10分钟系统超时
+        start_time = time.time()  # 记录开始时间
+        timeout = wait_max_time # 超时时间，单位为秒
+
+        while True:
+            window = self.get_specific_window_info()
+            if(window == None): 
+                raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError(f"找宝箱超时: 未在{timeout}s内找到宝箱。")                
+
+            # 死亡监控
+            if(self.is_dead()):
+                raise GameStatusError("泼街了，准备复活。")
+
+            winX, winY, winWidth, winHeight = self.get_win_info()
+            # 获取目标定位
+            flagPos = (
+                int(winX),
+                int(winY + 110), 
+                int(winWidth - winX),  # 宽度
+                int(winHeight - winY - 110)  # 高度
+            )
+            screenshot = pyautogui.screenshot(region=flagPos)
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
+            
+            # self.save_task_sample_img(mat_image)
+            bloodColor = (213,70,66)
+            isShowBlood = self.is_target_area(mat_image, bloodColor)
+            # self.find_red_values(mat_image)
+            if(not isShowBlood):
+                self.logger.info("击杀boss成功.")
+                return
+
+            self.logger.info("等待击杀boss成功...")
+
+
+    # 检测图片中出现的红色，并输出这些红色的像素值。
+    def find_red_values(self, image_bgr):
+        if image_bgr is None:
+            raise ValueError("无法加载图片，请检查路径是否正确。")
+
+        # 转换为 HSV 颜色空间
+        hsv = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2HSV)
+
+        # 定义红色的 HSV 范围（红色有两个区域）
+        lower_red1 = np.array([0, 100, 100])     # 第一区间
+        upper_red1 = np.array([10, 255, 255])
+        lower_red2 = np.array([160, 100, 100])   # 第二区间
+        upper_red2 = np.array([179, 255, 255])
+
+        # 创建掩膜
+        mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
+        mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
+        red_mask = cv2.bitwise_or(mask1, mask2)
+
+        # 使用掩膜提取红色区域的像素
+        red_pixels = image_bgr[red_mask > 0]  # 提取红色区域的 BGR 值
+
+        # 去重以获取唯一的红色值
+        unique_red_values = np.unique(red_pixels, axis=0)
+        
+        # 输出检测结果
+        if unique_red_values.size == 0:
+            print("图片中未检测到红色。")
+            return
+
+        for color in unique_red_values:
+            b, g, r = color  # BGR 格式
+            self.print_color(f"{r},{g},{b}", r, g, b)
+
+
     # 直到出现箱子
     def till_find_treasure(self, treasure_num = 1, wait_max_time = 60 * 3):
         # 计划设置10分钟系统超时
