@@ -90,6 +90,9 @@ class TreasureHunt:
             if(key.find("开启") != -1 and not bool(value)):
                 self.logger.debug("没有打完30个宝箱,准备完成任务...")
                 self.reader.close_task_menu()
+                return
+
+        self.reader.close_task_menu()
 
 
     # 点击宝箱
@@ -100,6 +103,7 @@ class TreasureHunt:
         timeout = 60 * 2  # 超时时间，单位为秒
         
         # 如果出现五次，点击，宝箱没有消失，就说明，30次到期了
+        max_clicked_times = 5
         over_time = 0
 
         while True:
@@ -108,7 +112,8 @@ class TreasureHunt:
                 raise TimeoutError(f"点击宝箱时: 未在 {timeout}s 内点击宝箱。")
 
             # 30次宝箱完成
-            if(over_time >= 5):
+            if(over_time >= max_clicked_times):
+                self.check_daliy_treasure_task_is_done()
                 self.logger.debug("30次宝箱完成")
                 self.cache.set(IS_DALIY_CASE_FINISHED, 1)
                 return
