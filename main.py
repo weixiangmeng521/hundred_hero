@@ -21,6 +21,7 @@ from lib.logger_analysis import get_logger_analysis_instance
 from lib.message_service import MessageService
 from lib.move_controller import MoveControll
 from lib.app_trace import AppTrace
+from lib.select_hero import SelectHero
 from lib.threads_manager import ThreadsManager
 from lib.virtual_map import init_virtual_map
 from lib.visual_track import VisualTrack
@@ -50,6 +51,8 @@ coachNPC = CoachNPC(config)
 treasureHunter = TreasureHunt(config)
 fighter = Fighter(config)
 warrior = TowerWarrior(config)
+selectHero = SelectHero(config)
+
 
 # web服务
 webServer = WebServer(config)
@@ -150,7 +153,10 @@ def main():
 
 # TODO: 获取当前钱的数量,并放入缓存里
 if __name__ == "__main__":
-    main()
+    # main()
+
+    wechat.wake_up()
+    selectHero.test()
 
     # wechat.wake_up()
 

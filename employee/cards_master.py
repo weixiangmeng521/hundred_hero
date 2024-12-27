@@ -281,7 +281,7 @@ class CardsMaster:
 
     # 自动抽卡
     def work(self):
-        self.logger.info("准备抽卡")
+        self.logger.info("准备抽卡...")
         coin_threshold = int(self.config["TASK"]["GaChaCoinThreshold"])
         # 如果是None,说明识别失败,所以保存到sample
         coin_num = self.reader.get_coin_num(is_debug = True)
@@ -289,15 +289,12 @@ class CardsMaster:
             self.logger.info(f"当前金币为{coin_num},低于抽卡设定的阈值{coin_threshold}.")
             return
 
-        is_entered_interface = self.is_entered()
-
         # 找到位置
-        if(not is_entered_interface and not self.reader.is_show_back2town_btn()):
-            self.logger.debug("准备移动到招募大厅")
-            self.virtual_map.move2recruit()
-            # 定位到，点击绿色泡泡
-            self.cs.clickGreenPop()
-            time.sleep(.3)
+        self.logger.debug("准备移动到招募大厅...")
+        self.virtual_map.move2recruit()
+        # 定位到，点击绿色泡泡
+        self.cs.clickGreenPop()
+        time.sleep(.3)
 
         while True:
             # 如果不能点击了，就结束

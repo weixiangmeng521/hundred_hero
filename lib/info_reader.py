@@ -131,6 +131,9 @@ class InfoReader:
 
     # 是不是显示了元素塔塔的宝箱宝箱
     def is_show_tower_treasure(self):
+        window = self.get_specific_window_info()
+        if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")        
+        
         winX, winY, winWidth, winHeight = self.get_win_info()
         screenshot = pyautogui.screenshot(region=(
             int(winX + 340), 
@@ -498,6 +501,7 @@ class InfoReader:
 
     # 是否有显示回城图标
     def is_show_back2town_btn(self):
+        
         btnPos = (410, 785, 38, 27)
         # 读取指定位置
         screenshot = pyautogui.screenshot(region=(btnPos))
@@ -505,18 +509,10 @@ class InfoReader:
         mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
 
         # 定义目标颜色并转换为 BGR 格式
-        target_rgb = (89,106,116)   # RGB 格式
-        target_bgr = target_rgb[::-1]      # 转换为 BGR 格式
-
-        # 定义颜色的容差上下界，并转换为 uint8 类型
-        lower_bound = np.array(target_bgr) - 20
-        upper_bound = np.array(target_bgr) + 20
-
-        # 创建掩码，找到接近目标颜色的区域
-        mask = cv2.inRange(mat_image, lower_bound, upper_bound)
-
-        # 检查掩码中是否包含目标颜色
-        return cv2.countNonZero(mask) > 0
+        target_rgb = (112,205,242)
+        target_rgb1 = (74,166,212)
+        target_rgb2 = (217,186,76)
+        return self.is_target_area(mat_image, target_rgb, 0) and self.is_target_area(mat_image, target_rgb1, 0) and self.is_target_area(mat_image, target_rgb2, 0)
 
 
     # 读取竞技场第一个按钮
