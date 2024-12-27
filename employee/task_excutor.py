@@ -127,7 +127,14 @@ class TaskExcutor:
         # 找到位置
         if(not self.reader.is_show_back2town_btn()):
             self.virtual_map.move2protal()
+            
+        # 查看是否是全员上阵
+        is_full = self.reader.is_team_member_full()
+        if(not is_full):
+            self.logger.info("全部英雄上阵。")
+            self.selectHero.dispatch_all_hero()
 
+        # 判断是否是完成了任务
         is_finished = self.cache.get(IS_UNION_TASK_FINISHED)
         # 如果完成了任务就直接结束。
         if(is_finished and int(is_finished) == 1):
