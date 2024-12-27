@@ -81,7 +81,7 @@ class TaskExcutor:
                 if(best_key):
                     self.target_task_fn = task
                     self.target_task_name = key
-                    self.logger.info(f"[模糊匹配]今天需要完成的工会任务:[{ key }]")
+                    self.logger.info(f"[模糊匹配]今天需要完成的工会任务:[{ best_key }]")
                     return
 
                 # 匹配失败

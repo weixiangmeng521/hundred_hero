@@ -145,6 +145,7 @@ class TreasureHunt:
 
     
     # 工作
+    # TODO: 有读取miss的可能性
     def work(self):
         self.logger.info("准备每日30宝箱")
         # 找到位置
