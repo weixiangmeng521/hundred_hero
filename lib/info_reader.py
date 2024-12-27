@@ -1,6 +1,7 @@
 from collections import defaultdict
 import hashlib
 import math
+import re
 import time
 import uuid
 import mss
@@ -112,22 +113,16 @@ class InfoReader:
             # 截取屏幕
             screenshot = sct.grab(region)
             mat_image = np.array(screenshot)
-            num = self.recognize_number_text(mat_image)
-            # 如果识别失败，就保存图片
-            if(is_debug and num is None):
-                self.save_task_sample_img(mat_image)
-            
-            # 设置默认值
-            if(num is None):
-                return 0
-            
-            int_num = 0
+            num = 0
             try:
-                int_num = int(num)
-            except ValueError:
-                int_num = 0
-            return int_num
-    
+                num = self.recognize_number_text(mat_image)
+            except ValueError as e:
+                # 如果识别失败，就保存图片
+                if(is_debug):
+                    self.save_task_sample_img(mat_image)
+                raise ValueError(e)
+            return num
+
 
     # 是不是显示了元素塔塔的宝箱宝箱
     def is_show_tower_treasure(self):
@@ -260,7 +255,7 @@ class InfoReader:
 
 
     # 统计颜色出现的次数
-    def count_colors(self, bgr_image):
+    def count_colors(self, bgr_image, top_color_num=10):
         if bgr_image is None:
             print("图片加载失败！请检查路径。")
             return None
@@ -279,9 +274,10 @@ class InfoReader:
 
         # 打印结果（示例前 10 种颜色）
         sorted_colors = sorted(color_counts.items(), key=lambda x: x[1], reverse=True)
-        print("前 10 种最常见的颜色:")
-        for color, count in sorted_colors[:10]:
-            print(f"颜色 {color}: 出现 {count} 次")
+        print(f"前 {top_color_num} 种最常见的颜色:")
+        for color, count in sorted_colors[:top_color_num]:
+            r, g, b = color
+            print(f"颜色\033[48;2;{r};{g};{b}m{color}\033[0m, 出现 {count} 次")
 
         return color_counts
 
@@ -393,8 +389,15 @@ class InfoReader:
         image = self.preprocess_num_text_img(bgr_image)
         # self.save_task_sample_img(image)
         text = pytesseract.image_to_string(image, config='--psm 6')
-        return text
-        
+        cleaned_text = re.sub(r"\s+", "", text)
+        num = 0
+        try:
+            num = int(cleaned_text)
+        except ValueError:
+            self.logger.debug(f"recognize_number_text识别失败: {cleaned_text}")
+            raise ValueError(f"recognize_number_text识别失败: {cleaned_text}")               
+        return num
+
 
     # 处理代数字的图片
     def preprocess_num_text_img(self, bgr_img):
@@ -452,6 +455,8 @@ class InfoReader:
             name = self.calculate_md5_from_image(img)
             path = f"static/sample/{name}.png"            
             cv2.imwrite(path, img)
+
+            print(name)
 
 
 

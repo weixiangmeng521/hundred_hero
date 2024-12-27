@@ -156,11 +156,11 @@ if __name__ == "__main__":
     # main()
 
     wechat.wake_up()
-    selectHero.test()
+    selectHero.dispatch_target_hero()
 
     # wechat.wake_up()
 
     # webServer.run(queue)
 
     # vc.test_for_find_object_in_image()
-    # print(pyautogui.position())
+    print(pyautogui.position())
