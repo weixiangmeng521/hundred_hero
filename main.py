@@ -3,6 +3,7 @@ import time
 import traceback
 
 import pyautogui
+from defined import IS_DALIY_ARENA_FINISHED
 from employee.bounty_hunter import BountyHunter
 from employee.cards_master import CardsMaster
 from employee.coach_NPC import CoachNPC
@@ -13,6 +14,7 @@ from employee.treasure_hunter import TreasureHunt
 from exception.game_status import GameStatusError
 from employee.farmer import Farmer
 from instance.union_task import UnionTask
+from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
 from lib.controll_wechat import init_controll_wechat
 from lib.info_reader import InfoReader
@@ -153,14 +155,14 @@ def main():
 
 # TODO: 获取当前钱的数量,并放入缓存里
 if __name__ == "__main__":
-    # main()
+    main()
 
-    wechat.wake_up()
-    selectHero.dispatch_target_hero()
+    # wechat.wake_up()
+    # selectHero.dispatch_target_hero()
 
     # wechat.wake_up()
 
     # webServer.run(queue)
 
     # vc.test_for_find_object_in_image()
-    print(pyautogui.position())
+    # print(pyautogui.position())

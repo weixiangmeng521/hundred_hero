@@ -11,6 +11,7 @@ from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
 from lib.move_controller import MoveControll
+from lib.select_hero import SelectHero
 from lib.virtual_map import init_virtual_map
 from lib.visual_track import VisualTrack
 
@@ -27,6 +28,7 @@ class BountyHunter:
         self.vt = VisualTrack(config)
         self.mc = MoveControll(config)
         self.virtual_map = init_virtual_map(config)
+        self.selectHero = SelectHero(config)
 
 
     # 打第一个巨人boss
@@ -258,13 +260,20 @@ class BountyHunter:
     def work(self):
         # 找到位置
         self.virtual_map.move2protal()
-        
+
+        self.logger.info("进入极速模式打金！")
         is_full = self.reader.is_team_member_full()
         if(is_full):
-            self.logger.debug("匹配[普通刷金]模式")
-            self.general_mode_for_kill_4_boss()
+            self.selectHero.dispatch_target_hero()
+        
+        self.fast_mode()
 
-        if(not is_full):
-            self.logger.debug("匹配[极速刷金]模式")
-            self.fast_mode()
+
+        # if(is_full):
+        #     self.logger.debug("匹配[普通刷金]模式")
+        #     self.general_mode_for_kill_4_boss()
+
+        # if(not is_full):
+        #     self.logger.debug("匹配[极速刷金]模式")
+        #     self.fast_mode()
         

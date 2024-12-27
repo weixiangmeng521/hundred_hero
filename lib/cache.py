@@ -84,10 +84,10 @@ class CacheManager:
         _time = self.get(task_name)
         if _time is not None:
             # 确保 _time 是时间戳，转换为 datetime 对象
-            task_time = datetime.datetime.fromtimestamp(_time)
-            next_hour = task_time + datetime.timedelta(hours=1)
+            now = datetime.datetime.now()
+            next_hour = now + datetime.timedelta(hours=1)
             with self.lock:
-                self.cache[task_name] = {"value": 0, "expiry": next_hour}
+                self.cache[task_name] = {"value": 0, "expiry": next_hour.timestamp()}
                 self._save_cache()  # 每次更新缓存时保存到文件
         else:
             self.logger.debug(f"Task '{task_name}' not found.")

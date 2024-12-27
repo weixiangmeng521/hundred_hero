@@ -11,6 +11,7 @@ from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
+from lib.select_hero import SelectHero
 from lib.virtual_map import init_virtual_map
 
 # 每日30个箱子
@@ -23,6 +24,7 @@ class TreasureHunt:
         self.reader = InfoReader(config)
         self.cache = get_cache_manager_instance(config)
         self.virtual_map = init_virtual_map(config)
+        self.selectHero = SelectHero(config)        
         # 最大等待击杀怪物时间
         self.wait_max_time = 60 * 2
         
@@ -147,7 +149,13 @@ class TreasureHunt:
     # 工作
     # TODO: 有读取miss的可能性
     def work(self):
-        self.logger.info("准备每日30宝箱")
+        self.logger.info("准备每日30宝箱...")
+
+        is_full = self.reader.is_team_member_full()
+        if(not is_full):
+            self.logger.info("全部英雄上阵。")
+            self.selectHero.dispatch_all_hero()
+        
         # 找到位置
         if(not self.reader.is_show_back2town_btn()):
             self.logger.debug("准备移动到传送阵.")
