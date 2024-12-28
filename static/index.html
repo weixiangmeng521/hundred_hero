@@ -41,6 +41,14 @@
             </div>
             <!-- graph last 7 days end -->
 
+
+            <!-- graph last 7 days begin -->
+            <div class="col-12 col-md-6 mt-5">
+                <canvas id="last7days_recruited_cards_chart" width="100%" height="300px"></canvas>
+            </div>
+            <!-- graph last 7 days end -->
+
+
             <!-- graph last 7 days coin begin -->
             <div class="col-12 col-md-6 mt-5">
                 <canvas id="last7days_coin_chart" width="100%" height="300px"></canvas>
@@ -275,6 +283,10 @@
     request("graph/today_error_data").then((res) => {
         init_today_error_data(res.data)
     })    
+
+    request("/graph/today_recruited_hero_data").then((res) =>{
+        init_today_recruited_cards_data(res.data)
+    })
 
     request("system/qr_code").then((res) => {
         const node = document.getElementById("QRcode")
