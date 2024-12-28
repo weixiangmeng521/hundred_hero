@@ -300,18 +300,21 @@ button[type="button"].btn-primary:focus {
 .aws-modal-overlay.active {
     display: block;
 }
-.aws-modal-container{
+
+.aws-modal-container {
     position: relative;
     padding: 90px 0px 80px;
 }
-.aws-modal-container h2{
+
+.aws-modal-container h2 {
     font-size: 18px;
     padding-bottom: 30px;
     color: #43b382;
     font-weight: normal;
     text-align: center;
 }
-.aws-modal-container .img_container{
+
+.aws-modal-container .img_container {
     display: flex;
     justify-content: center;
     align-items: center;
