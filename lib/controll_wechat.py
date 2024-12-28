@@ -7,6 +7,7 @@ import subprocess
 import time
 import Quartz
 import cv2
+import mss
 import numpy as np
 import pyautogui
 from lib.logger import init_logger
@@ -220,14 +221,18 @@ class ControllWechat:
     # 截图微信
     def screenshot_wechat(self, win_name):
         winX, winY, winWidth, winHeight = self.get_win_info(win_name)
-        screenshot = pyautogui.screenshot(region=(
-            int(winX + 65), 
-            int(winY + 151), 
-            int(150), 
-            int(150)
-        ))
-        mat_image = np.array(screenshot)
-        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+
+        with mss.mss() as sct:
+            # Point(x=311, y=82)
+            region = {
+                "top": int(winY + 151),
+                "left": int(winX + 65),
+                "width": int(150),
+                "height": int(150),
+            }
+            # 截取屏幕
+            screenshot = sct.grab(region)
+            mat_image = np.array(screenshot)
 
         qr_folder = self.qr_folder
         self.clear_qr_folder(qr_folder)

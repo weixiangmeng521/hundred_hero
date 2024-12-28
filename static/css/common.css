@@ -1,5 +1,5 @@
 /* *{border: 1px solid #ccc;} */
-:root{
+:root {
     --var-font-color: #fff;
     --var-second-font-color: #eadede;
     --var-quote-font-color: #847f7f;
@@ -16,18 +16,20 @@ button[type="button"].btn-primary {
     background-color: var(--var-primary-color);
     border: var(--var-primary-color);
 }
-button[type="button"].btn-primary:focus{
+
+button[type="button"].btn-primary:focus {
     background-color: var(--var-primary-deep-color);
     border: var(--var-primary-deep-color);
 }
 
-.aws-navigation{
+.aws-navigation {
     box-shadow: 7px 7px 14px #ccc, -7px -7px 14px #fff;
     position: fixed;
 }
 
 .btn-neumorphism {
-    background: #e0e0e0; /* 按钮背景 */
+    background: #e0e0e0;
+    /* 按钮背景 */
     color: #333;
     border: none;
     padding: 10px 20px;
@@ -39,7 +41,8 @@ button[type="button"].btn-primary:focus{
     transition: all 0.2s ease-in-out;
 }
 
-.btn-neumorphism:active, .btn-neumorphism:hover {
+.btn-neumorphism:active,
+.btn-neumorphism:hover {
     box-shadow: inset 5px 5px 15px #bebebe, inset -5px -5px 15px #ffffff;
     transition: .3s;
 }
@@ -48,12 +51,12 @@ button[type="button"].btn-primary:focus{
     background: #f0f0f0;
 }
 
-.aws-container{
-    max-width: 600px!important;
+.aws-container {
+    max-width: 600px !important;
     min-height: 100vh;
 }
 
-.aws-controll-bar{
+.aws-controll-bar {
     width: 130px;
     height: 130px;
     position: relative;
@@ -61,39 +64,45 @@ button[type="button"].btn-primary:focus{
     box-shadow: 7px 7px 14px #ccc, -7px -7px 14px #fff;
     border-radius: 15px;
 }
-.aws-controll-bar .uarr{
+
+.aws-controll-bar .uarr {
     position: absolute;
     right: 0px;
     left: 50%;
-    transform: translate(-50%, 0px);  /* 水平和垂直居中 */
+    transform: translate(-50%, 0px);
+    /* 水平和垂直居中 */
     width: 42px;
 }
 
-.aws-controll-bar .darr{
+.aws-controll-bar .darr {
     position: absolute;
     bottom: 0px;
     left: 50%;
-    transform: translate(-50%, 0px);  /* 水平和垂直居中 */    
+    transform: translate(-50%, 0px);
+    /* 水平和垂直居中 */
     width: 42px;
 }
 
-.aws-controll-bar .larr{
+.aws-controll-bar .larr {
     position: absolute;
     left: 0px;
     top: 50%;
-    transform: translate(0%, -50%);  /* 水平和垂直居中 */
-    width: 42px;    
+    transform: translate(0%, -50%);
+    /* 水平和垂直居中 */
+    width: 42px;
 }
 
-.aws-controll-bar .rarr{
+.aws-controll-bar .rarr {
     position: absolute;
     right: 0px;
     top: 50%;
-    transform: translate(0%, -50%);  /* 水平和垂直居中 */
-    width: 42px;    
+    transform: translate(0%, -50%);
+    /* 水平和垂直居中 */
+    width: 42px;
 }
 
-.aws-circle-success, .aws-circle-warning{
+.aws-circle-success,
+.aws-circle-warning {
     width: 10px;
     height: 10px;
     display: inline-block;
@@ -101,19 +110,23 @@ button[type="button"].btn-primary:focus{
     border-radius: 100%;
     margin-right: 5px;
 }
-.aws-circle-success{
+
+.aws-circle-success {
     background-color: #35d48f;
 }
-.aws-circle-warning{
+
+.aws-circle-warning {
     background-color: rgb(230, 0, 81);
 }
 
 
 .aws-footer {
-    background: #e0e0e0; /* 背景色 */
+    background: #e0e0e0;
+    /* 背景色 */
     color: #333;
     padding: 15px 0;
-    box-shadow: 8px 8px 20px #bebebe, -8px -8px 20px #ffffff; /* 拟态风格阴影 */
+    box-shadow: 8px 8px 20px #bebebe, -8px -8px 20px #ffffff;
+    /* 拟态风格阴影 */
     border-radius: 15px;
     text-align: center;
 }
@@ -122,7 +135,7 @@ button[type="button"].btn-primary:focus{
     margin-top: 15px;
 }
 
-.aws-table-header{
+.aws-table-header {
     background-color: #e0e0e0;
 }
 
@@ -130,7 +143,8 @@ button[type="button"].btn-primary:focus{
 .aws-table-container {
     padding: 20px;
     background: #e0e0e0;
-    box-shadow: 8px 8px 20px #bebebe, -8px -8px 20px #ffffff; /* 拟态风格阴影 */
+    box-shadow: 8px 8px 20px #bebebe, -8px -8px 20px #ffffff;
+    /* 拟态风格阴影 */
     border-radius: 15px;
     margin-top: 50px;
 }
@@ -145,7 +159,8 @@ button[type="button"].btn-primary:focus{
 }
 
 /* 表格样式 */
-.aws-table-container td, .aws-table-container th {
+.aws-table-container td,
+.aws-table-container th {
     padding: 15px;
     text-align: center;
     vertical-align: middle;
@@ -171,32 +186,43 @@ button[type="button"].btn-primary:focus{
 
 /* 透明背景 + 模糊效果 */
 .aws-card {
-    background: rgba(255, 255, 255, 0.1); /* 半透明背景 */
-    backdrop-filter: blur(10px);           /* 背景模糊 */
-    border: none;                          /* 去掉默认边框 */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* 柔和阴影 */
+    background: rgba(255, 255, 255, 0.1);
+    /* 半透明背景 */
+    backdrop-filter: blur(10px);
+    /* 背景模糊 */
+    border: none;
+    /* 去掉默认边框 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    /* 柔和阴影 */
     box-shadow: 5px 5px 15px #bebebe, -5px -5px 15px #ffffff;
 }
 
 /* 透明的卡片标题 */
 .aws-card-header {
-    background: rgba(0, 0, 0, 0.5);  /* 背景透明 */
-    backdrop-filter: blur(5px);       /* 背景模糊 */
-    font-size: 1.2rem;                /* 字体大小 */
+    background: rgba(0, 0, 0, 0.5);
+    /* 背景透明 */
+    backdrop-filter: blur(5px);
+    /* 背景模糊 */
+    font-size: 1.2rem;
+    /* 字体大小 */
     padding: 15px;
 }
 
 /* 日志面板 */
 .aws-log-pane {
     height: 400px;
-    overflow-y: auto;                /* 垂直滚动条 */
+    overflow-y: auto;
+    /* 垂直滚动条 */
     font-family: 'Courier New', monospace;
-    background: rgba(255, 255, 255, 0.05); /* 半透明背景 */
-    color: #dcdcdc;                   /* 字体颜色 */
-    border-radius: 10px;              /* 边角圆滑 */
+    background: rgba(255, 255, 255, 0.05);
+    /* 半透明背景 */
+    color: #dcdcdc;
+    /* 字体颜色 */
+    border-radius: 10px;
+    /* 边角圆滑 */
 }
 
-.aws-card-footer{
+.aws-card-footer {
     padding: 15px;
 }
 
@@ -222,8 +248,71 @@ button[type="button"].btn-primary:focus{
     box-shadow: 5px 5px 15px #bebebe, -5px -5px 15px #ffffff;
     cursor: pointer;
 }
+
 .aws-scroll-down img {
     width: 15px;
     height: 15px;
     position: absolute;
+}
+
+
+/* Modal Background */
+.aws-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+/* Modal Container */
+.aws-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+    width: 90%;
+    max-width: 300px;
+}
+
+/* Close Button */
+.aws-modal-close {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #ff5656;
+    width: 13px;
+    height: 13px;
+    border-radius: 100%;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+/* Show Modal */
+.aws-modal-overlay.active {
+    display: block;
+}
+.aws-modal-container{
+    position: relative;
+    padding: 90px 0px 80px;
+}
+.aws-modal-container h2{
+    font-size: 18px;
+    padding-bottom: 30px;
+    color: #43b382;
+    font-weight: normal;
+    text-align: center;
+}
+.aws-modal-container .img_container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

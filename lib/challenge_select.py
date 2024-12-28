@@ -389,13 +389,16 @@ class ChallengeSelect:
 
     # 把窗口移动到（0，0）
     def move2LeftTop(self, waitFn, isContainAds):
+        # 没启动游戏
         win = self.get_specific_window_info()
 
         self.wechat.wake_up()
-        self.wechat.wake_up_game()
         time.sleep(.3)
-        # 没启动游戏
+        self.wechat.wake_up_game()
+        time.sleep(1)
+        
         if(win == None): 
+            self.logger.debug(f"是否跳过广告: {isContainAds}...")
             if(waitFn): waitFn(isContainAds)
 
         win = self.get_specific_window_info()

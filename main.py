@@ -160,8 +160,6 @@ if __name__ == "__main__":
     # wechat.wake_up()
     # selectHero.dispatch_target_hero()
 
-    # wechat.wake_up()
-
     # webServer.run(queue)
 
     # vc.test_for_find_object_in_image()
