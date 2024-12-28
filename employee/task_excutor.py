@@ -6,6 +6,7 @@ from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
+from lib.select_hero import SelectHero
 from lib.virtual_map import init_virtual_map
 
 
@@ -20,7 +21,8 @@ class TaskExcutor:
         self.reader = InfoReader(config)
         self.logger = init_logger(config)
         self.cache = get_cache_manager_instance(config)
-        self.virtual_map = init_virtual_map(config)        
+        self.virtual_map = init_virtual_map(config)
+        self.selectHero = SelectHero(config)
         # 今日目标任务
         self.target_task_fn = None
         # 今日的任务名称
