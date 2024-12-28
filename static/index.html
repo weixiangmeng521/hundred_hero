@@ -103,13 +103,7 @@
                     </table>                    
                 </div>
             </div>
-            <!-- config list end -->            
-
-            <div class="col-12 col-md-6 mt-5">
-                <div class="img_container" id="QRcode">
-                    QRcode
-                </div>
-            </div>
+            <!-- config list end --> 
 
         </div>
     </div>
@@ -120,6 +114,17 @@
         <p>&copy; 2024冷锋.保留所有权利。</p>
     </div>
     <!-- footer end -->
+
+    <div id="modalOverlay" class="aws-modal-overlay">
+        <div class="aws-modal">
+            <div id="closeModal" class="aws-modal-close"></div>
+            <div class="aws-modal-container">
+                <h2>扫码登录微信</h2>
+                <div class="img_container" id="QRcode"> QRcode </div>
+            </div>
+        </div>
+    </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -152,7 +157,10 @@
     translationMap.set("enablescreenshot", "是否运行截图")
     translationMap.set("enablesound", "是否允许播放声音")
     translationMap.set("gachacointhreshold", "抽卡的金币阈值")
-    
+
+    // Get elements
+    const closeModalBtn = document.getElementById("closeModal");
+    const modalOverlay = document.getElementById("modalOverlay");
     
     const upBtn = document.getElementById("up_btn");
     const downBtn = document.getElementById("down_btn");
@@ -269,13 +277,24 @@
     })    
 
     request("system/qr_code").then((res) => {
-       const node = document.getElementById("QRcode")
-       node.innerHTML = "";
-       const img = document.createElement("img");
-       img.setAttribute("src", res.data.img)
-       img.setAttribute("style", "width:150px;height:150px;")
-       Number(res.data.state) === 0 &&  node.appendChild(img)
+        const node = document.getElementById("QRcode")
+        node.innerHTML = "";
+        const img = document.createElement("img");
+        img.setAttribute("src", res.data.img)
+        img.setAttribute("style", "width:150px;height:150px;")
+        if(Number(res.data.state) === 0){ 
+            node.appendChild(img)
+            modalOverlay.style.display = "block";
+        }
+        console.log(res)
     })
+
+    // modal的关闭按钮
+    closeModalBtn.addEventListener("click", () => {
+        modalOverlay.style.display = "none";
+    })
+
+
 })();
 </script>
 </body>
