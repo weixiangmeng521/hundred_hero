@@ -3,6 +3,7 @@ import time
 import cv2
 import pyautogui
 from defined import IS_DALIY_ARENA_FINISHED
+from exception.game_status import GameStatusError
 from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
@@ -22,28 +23,23 @@ class Fighter:
         self.cache = get_cache_manager_instance(config)
         self.mc = MoveControll(config)
         self.cs = ChallengeSelect(config)
+        self.tryAfterFlag = False
 
 
-    # 点击能点击的按钮，点击如果无效5次，就算今日无法挑战
+    # 如果不能点击，就直接报错
     def click_avalible_btn(self):
-        tolerate_times = 5
         # awalys click first one
         target_color = (221,200,75)
         mat_img = self.reader.read_arena_first_btn()
         while(self.reader.is_target_area(mat_img, target_color)):
-            # 超过点击无效的次数，返回
-            if(tolerate_times < 1):
-                return False
-
             btn_pos = self.reader.get_arena_first_btn_pos()
             pyautogui.click(btn_pos[0], btn_pos[1])
             time.sleep(.3)
-
-            if(not self.reader.is_target_area(mat_img, target_color)):
-                return True
-            tolerate_times -= 1 
-            time.sleep(.3)
-
+            if(not self.reader.is_enable_enter_arena()):
+                self.tryAfterFlag = True
+                return False
+            
+            return True
         return False
     
 
@@ -71,8 +67,16 @@ class Fighter:
 
         # 关闭win
         self.cs.closeWin()
-        self.logger.debug("每日竞技场完成, 无需再打")
-        self.cache.set(IS_DALIY_ARENA_FINISHED, 1, 7)
+
+        # 打完了竞技场，无需再打
+        if(not self.tryAfterFlag):
+            self.logger.debug("每日竞技场完成, 无需再打")
+            self.cache.set(IS_DALIY_ARENA_FINISHED, 1, 7)
+
+        # 再一小时后重试
+        if(self.tryAfterFlag):
+            self.logger.debug("还无法进入竞技场, 1h后自动重试...")
+            self.cache.set_next_hour(IS_DALIY_ARENA_FINISHED)
 
     
     # 工作

@@ -6,6 +6,7 @@ from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
+from lib.select_hero import SelectHero
 from lib.virtual_map import init_virtual_map
 
 
@@ -20,7 +21,8 @@ class TaskExcutor:
         self.reader = InfoReader(config)
         self.logger = init_logger(config)
         self.cache = get_cache_manager_instance(config)
-        self.virtual_map = init_virtual_map(config)        
+        self.virtual_map = init_virtual_map(config)
+        self.selectHero = SelectHero(config)
         # 今日目标任务
         self.target_task_fn = None
         # 今日的任务名称
@@ -31,10 +33,15 @@ class TaskExcutor:
             "击杀100名兽人弓手": self.unionTask.farmingColdWindCamp,
             "击杀100只冰霜傀儡": self.unionTask.farmingSnowfield,
             "击杀100名娜迦法师": self.unionTask.farmingSnowfield,
-            "击杀100名树精斥候": self.unionTask.farmingColdWindCamp,
+            "击杀100名树精斥候": self.unionTask.farmingNorthRottingSwamp,
+            "击杀100名树精守卫": self.unionTask.farmingColdWindCamp,
             "击杀BOSS冰雪巨人": self.unionTask.farmingIceGiant,
             "击杀BOSS三头怪蛇": self.unionTask.farmingTwoHeadSnake,
+            "击杀BOSS猛犸巨像": self.unionTask.farmingMammoth,
             "击杀100只红眼蝙蝠": self.unionTask.farmingPollutionOutpost,
+            "击杀100只剧毒黑蜂": self.unionTask.farmingPollutionOutpost,
+            "击杀100只霜狼": self.unionTask.farmingMagicRing,
+            "击杀100名海豹人法师": self.unionTask.farmingSnowfield,
         }
 
         # self.unionTask.farmingMagicRing()
@@ -76,7 +83,7 @@ class TaskExcutor:
                 if(best_key):
                     self.target_task_fn = task
                     self.target_task_name = key
-                    self.logger.info(f"[模糊匹配]今天需要完成的工会任务:[{ key }]")
+                    self.logger.info(f"[模糊匹配]今天需要完成的工会任务:[{ best_key }]")
                     return
 
                 # 匹配失败
@@ -107,21 +114,29 @@ class TaskExcutor:
             self.logger.info(f"工会任务没有完成，打工会任务。")
             
             # 刷副本
-            time.sleep(1)
+            time.sleep(.1)
 
             # 执行目标对象
             if(self.target_task_fn):
                 self.target_task_fn()
-            time.sleep(1)
+            time.sleep(.1)
             
 
 
     # 执行任务
+    # TODO: 检测效率
     def work(self):
         # 找到位置
         if(not self.reader.is_show_back2town_btn()):
             self.virtual_map.move2protal()
+            
+        # 查看是否是全员上阵
+        is_full = self.reader.is_team_member_full()
+        if(not is_full):
+            self.logger.info("全部英雄上阵。")
+            self.selectHero.dispatch_all_hero()
 
+        # 判断是否是完成了任务
         is_finished = self.cache.get(IS_UNION_TASK_FINISHED)
         # 如果完成了任务就直接结束。
         if(is_finished and int(is_finished) == 1):

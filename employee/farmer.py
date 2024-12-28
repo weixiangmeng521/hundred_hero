@@ -33,13 +33,13 @@ class Farmer:
         instance.crossRoom1()
         
         self.cs.back2Town()
-        time.sleep(6)
+        self.reader.wait_tranported()
 
 
     # 第二套刷经验
     def for_experience2(self):
         self.cs.selectHellOfHell()
-        time.sleep(6)
+        self.reader.wait_tranported()
 
         instance = HellOfFire(self.config)
         try:
@@ -60,7 +60,7 @@ class Farmer:
     def for_wood(self):
         self.cs.selectWoodInstance()
         instance = RottenSwamp(self.config)
-        time.sleep(6)
+        self.reader.wait_tranported()
 
         try:
             while True:
@@ -70,13 +70,13 @@ class Farmer:
             self.logger.error(e)
 
         self.cs.back2Town()
-        time.sleep(6)
+        self.reader.wait_tranported()
 
 
     # 刷水晶
     def for_mine(self):
         self.cs.selectDiamondInstance()
-        time.sleep(6)
+        self.reader.wait_tranported()
 
         try:
             instance = SnowZone(self.config)
@@ -85,7 +85,7 @@ class Farmer:
             self.logger.error(e)
 
         self.cs.back2Town()
-        time.sleep(6)
+        self.reader.wait_tranported()
 
 
     # 自动打工，根据资源需求来打工
@@ -95,7 +95,7 @@ class Farmer:
             self.virtual_map.move2protal()
 
         # 流水线速度
-        waitSec = 3.3
+        waitSec = .3
 
         isWoodFull, isMineFull = self.reader.read_screen()
         self.logger.info(f"木头:{isWoodFull}, 蓝矿:{isMineFull}")

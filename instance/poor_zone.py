@@ -57,7 +57,7 @@ class PoorZone:
 
 
     # 根据某人的视频，做的优化，多人版本
-    def killBullBossQuickly(self):
+    def killBullBossOptimized(self):
         mc = self.mc
 
         mc.move_right(1.6)
@@ -71,6 +71,21 @@ class PoorZone:
         # 杀第二个boss
         time.sleep(.4)
 
+
+    # 根据某人的视频，做的优化，单人版本
+    def killBullBossQuickly(self):
+        mc = self.mc
+
+        mc.move_right(1.6)
+        mc.move_down(.9)
+        mc.move_left_down(2.1)
+        mc.move_down(1)
+        # 杀第一个boss
+        time.sleep(.4)
+
+        mc.move_down(5.2)
+        # 杀第二个boss
+        time.sleep(.4)
 
 
     # 杀牛魔王boss，适合只带两个人

@@ -5,9 +5,13 @@
 
 venv
 .venv
+dataset
 **/__pycache__
 screenshot
 logs
 config.ini
 .DS_Store
 .cache
+QR_code
+
+**/sample/**

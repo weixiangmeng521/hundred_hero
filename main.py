@@ -1,7 +1,9 @@
 import queue
+import time
 import traceback
 
 import pyautogui
+from defined import IS_DALIY_ARENA_FINISHED
 from employee.bounty_hunter import BountyHunter
 from employee.cards_master import CardsMaster
 from employee.coach_NPC import CoachNPC
@@ -12,13 +14,16 @@ from employee.treasure_hunter import TreasureHunt
 from exception.game_status import GameStatusError
 from employee.farmer import Farmer
 from instance.union_task import UnionTask
+from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
+from lib.controll_wechat import init_controll_wechat
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
 from lib.logger_analysis import get_logger_analysis_instance
 from lib.message_service import MessageService
 from lib.move_controller import MoveControll
 from lib.app_trace import AppTrace
+from lib.select_hero import SelectHero
 from lib.threads_manager import ThreadsManager
 from lib.virtual_map import init_virtual_map
 from lib.visual_track import VisualTrack
@@ -35,6 +40,7 @@ config.read('config.ini')
 cs = ChallengeSelect(config)
 vc = VisualTrack(config)
 mc = MoveControll(config)
+wechat = init_controll_wechat(config)
 reader = InfoReader(config)
 unionTask = UnionTask(config)
 cardsMaster = CardsMaster(config)
@@ -47,6 +53,8 @@ coachNPC = CoachNPC(config)
 treasureHunter = TreasureHunt(config)
 fighter = Fighter(config)
 warrior = TowerWarrior(config)
+selectHero = SelectHero(config)
+
 
 # web服务
 webServer = WebServer(config)
@@ -92,7 +100,6 @@ def wake_up_window():
 
 
 # 工作线程
-# TODO: 加入1h检测机制
 def work_thread(event_queue):
     try:
         # 唤醒
@@ -112,6 +119,8 @@ def work_thread(event_queue):
         if(ENABLE_AUTO_GACHA): cardsMaster.work()
         # 刷30个箱子
         if(ENABLE_AUTO_DAILY_CASE): treasureHunter.work()
+        
+        # TODO: 下面的划分为重任务，也叫体力任务。体力任务执行的时候加上检测
         # 训练营
         if(ENABLE_AUTO_ABILITY_IMPROVE): coachNPC.work()        
         # 打钱
@@ -144,9 +153,12 @@ def main():
     if(not ENABLE_DEAMON):
         work_thread(event_queue)
 
-
+# TODO: 获取当前钱的数量,并放入缓存里
 if __name__ == "__main__":
     main()
+
+    # wechat.wake_up()
+    # selectHero.dispatch_target_hero()
 
     # webServer.run(queue)
 

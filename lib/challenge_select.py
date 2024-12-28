@@ -9,7 +9,7 @@ import cv2
 from PIL import Image
 import numpy as np
 import math
-from lib.controll_wechat import ControllWechat
+from lib.controll_wechat import init_controll_wechat
 from lib.logger import init_logger
 from lib.virtual_map import init_virtual_map
 from lib.visual_track import VisualTrack
@@ -34,6 +34,7 @@ twoPeakPosBtnPos = [302, 365]
 # 黑石系
 blackRockBtnPos = [142, 630]
 centerHallBtnPos = [302, 440]
+hallwayBtnPos = [302, 365]
 
 # 严寒地带系
 snwoMapBtnPos = [121, 440]
@@ -61,7 +62,7 @@ fireMineLandTabPos = [121, 260]
 twoCentipedePos = [302, 360]
 
 # 任务列表
-taskListBtnPos = [445, 385]
+taskListBtnPos = [445, 385 - 50]
 unionTaskTabPos = [390 , 840]
 completeUnionTaskTabPos = [370 , 385]
 
@@ -79,14 +80,13 @@ elementTowerTabPos = [399, 847]
 
 # 选择关卡
 class ChallengeSelect:
-    waitTime = .3
-
     def __init__(self, config):
         self.config = config
         self.app_name = config["APP"]["Name"]
         self.logger = init_logger(config)
-        self.wechat = ControllWechat(self.config)
+        self.wechat = init_controll_wechat(self.config)
         self.virtual_map = init_virtual_map(config)
+        self.waitTime = .1
 
 
     # 获取窗口信息
@@ -101,6 +101,16 @@ class ChallengeSelect:
             if self.app_name in window_name:
                 return window  # 返回指定窗口的信息
         return None
+    
+    
+    # 获取窗口信息
+    def get_win_info(self):
+        window = self.get_specific_window_info()
+        if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+        window_bounds = window.get('kCGWindowBounds', {})
+        winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
+        winWidth, winHeight = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
+        return winX, winY, winWidth, winHeight
     
 
     # 点击最近的绿色冒泡
@@ -299,7 +309,7 @@ class ChallengeSelect:
         pyautogui.click(taskListBtnPos[0], taskListBtnPos[1])
         time.sleep(self.waitTime)
         pyautogui.click(unionTaskTabPos[0], unionTaskTabPos[1])
-        self.logger.info("进入[工会任务列表]")
+        # self.logger.info("进入[工会任务列表]")
 
 
     # 选择炎火之狱副本
@@ -321,6 +331,17 @@ class ChallengeSelect:
         self.logger.info("选择[元素塔的TAB]")
 
 
+    # 选择大厅楼道
+    def selectBlackRockHallway(self):
+        self.check_window_handler()
+        self.clickGreenPop()
+        time.sleep(self.waitTime)
+        pyautogui.click(blackRockBtnPos[0], blackRockBtnPos[1])
+        time.sleep(self.waitTime)
+        pyautogui.click(hallwayBtnPos[0], hallwayBtnPos[1])
+        self.logger.info("进入[大厅楼道]")
+    
+
     # 放弃
     def clickGiveUpRebornBtn(self):
         self.check_window_handler()
@@ -340,6 +361,22 @@ class ChallengeSelect:
         self.logger.info("关闭对话窗")
 
 
+    # 挑战下一关旁边的确认按钮
+    def click_arena_comfirm_btn(self):
+        # macos的自带25px的边
+        # macos自带图片查看器的边框为（80 - 25）px
+        # 微信小程序百炼英雄的白条win的宽为（125 - 80）px
+        # 图片查看模式下，下一关按钮的定位为 Point(x=316, y=746)
+        # 由此可知: 他的坐标为 winX + 316, winY - (80 - 25) - 25 + 746
+        self.check_window_handler()
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        pyautogui.click(int(winX + 153), (winY - (80 - 25) - 25 + 746))
+        time.sleep(.3)
+        # 中间也点一下
+        pyautogui.click(int(winX + (winWidth // 2)), (winY - (80 - 25) - 25 + 746))
+
+
+
     # 打道回府
     def back2Town(self):
         self.check_window_handler()
@@ -352,13 +389,16 @@ class ChallengeSelect:
 
     # 把窗口移动到（0，0）
     def move2LeftTop(self, waitFn, isContainAds):
+        # 没启动游戏
         win = self.get_specific_window_info()
 
         self.wechat.wake_up()
-        self.wechat.wake_up_game()
         time.sleep(.3)
-        # 没启动游戏
+        self.wechat.wake_up_game()
+        time.sleep(1)
+        
         if(win == None): 
+            self.logger.debug(f"是否跳过广告: {isContainAds}...")
             if(waitFn): waitFn(isContainAds)
 
         win = self.get_specific_window_info()
@@ -371,7 +411,7 @@ class ChallengeSelect:
         time.sleep(.3)
 
         if(isContainAds):
-            self.clearAds(5)
+            self.clearAds(10)
 
 
     # 清除广告

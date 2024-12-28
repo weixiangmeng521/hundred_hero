@@ -1,6 +1,7 @@
 from collections import defaultdict
 import hashlib
 import math
+import re
 import time
 import uuid
 import mss
@@ -98,6 +99,48 @@ class InfoReader:
         return cv2.countNonZero(mask) > 0
 
 
+    # 获取钱的数量
+    def get_coin_num(self, is_debug = False) -> int:
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        with mss.mss() as sct:
+            # Point(x=311, y=82)
+            region = {
+                "top": int(winY + 57), 
+                "left": int(winX + 309),
+                "width": int(45), 
+                "height": int(15)
+            }
+            # 截取屏幕
+            screenshot = sct.grab(region)
+            mat_image = np.array(screenshot)
+            num = 0
+            try:
+                num = self.recognize_number_text(mat_image)
+            except ValueError as e:
+                # 如果识别失败，就保存图片
+                if(is_debug):
+                    self.save_task_sample_img(mat_image)
+                raise ValueError(e)
+            return num
+
+
+    # 是不是显示了元素塔塔的宝箱宝箱
+    def is_show_tower_treasure(self):
+        window = self.get_specific_window_info()
+        if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")        
+        
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        screenshot = pyautogui.screenshot(region=(
+            int(winX + 340), 
+            int(winY + 214 - 77), 
+            int(25), 
+            int(10)
+        ))
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+        target_color = (109, 228, 96)
+        return self.is_target_area(mat_image, target_color)
+
 
     # 读截图
     # 直接判断是不是黄色，黄色，就是打满了的情况
@@ -121,12 +164,20 @@ class InfoReader:
             raise ValueError("Err: task_name cannot not be empty.")
         
         # 获取三个位置，如果是变绿了，就点击。
+        isClicked = False
         while(self.click_complete_task_btn()):
             time.sleep(.3)
             self.clear_rewards()
-            # 因为有缓动动画，所以要延迟2秒
-            time.sleep(2)
+            time.sleep(.3)
+            isClicked = True
+            
+        if isClicked:
+            return True
 
+        # 如果有点击
+        # TODO: 这里可能识别错误
+        # 因为有缓动动画，所以要延迟2秒
+        time.sleep(2)            
         # 获取task的list，判断是不是已经提交了
         task_list = self.read_task_list()
         for key, value in task_list.items():
@@ -164,7 +215,8 @@ class InfoReader:
         # 只点击第一个
         if(self.is_target_area(task_1_img, green_color, 0)):
             pyautogui.click(btn1[0], btn1[1])
-            return True        
+            return True
+        
         # if(self.is_target_area(task_2_img, green_color, 0)):
         #     pyautogui.click(btn2[0], btn2[1])
         #     return True
@@ -203,7 +255,7 @@ class InfoReader:
 
 
     # 统计颜色出现的次数
-    def count_colors(self, bgr_image):
+    def count_colors(self, bgr_image, top_color_num=10):
         if bgr_image is None:
             print("图片加载失败！请检查路径。")
             return None
@@ -222,9 +274,10 @@ class InfoReader:
 
         # 打印结果（示例前 10 种颜色）
         sorted_colors = sorted(color_counts.items(), key=lambda x: x[1], reverse=True)
-        print("前 10 种最常见的颜色:")
-        for color, count in sorted_colors[:10]:
-            print(f"颜色 {color}: 出现 {count} 次")
+        print(f"前 {top_color_num} 种最常见的颜色:")
+        for color, count in sorted_colors[:top_color_num]:
+            r, g, b = color
+            print(f"颜色\033[48;2;{r};{g};{b}m{color}\033[0m, 出现 {count} 次")
 
         return color_counts
 
@@ -242,14 +295,6 @@ class InfoReader:
     def read_task_list(self):
         winX, winY, winWidth, winHeight = self.get_win_info()
         # # 读取指定位置
-        # screenshot = pyautogui.screenshot(region=(
-        #     int(winX + 50), 
-        #     int(winY + 325), 
-        #     int(winWidth - 100), 
-        #     int(winHeight - 650)
-        # ))
-        
-        # 创建 mss 实例
         with mss.mss() as sct:
             region = {
                 "top": int(winY + 325), 
@@ -337,6 +382,48 @@ class InfoReader:
         return correct_text_handler(text)
     
 
+    # 读取数字
+    def recognize_number_text(self, bgr_image):
+        pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
+        # 读取图片
+        image = self.preprocess_num_text_img(bgr_image)
+        # self.save_task_sample_img(image)
+        text = pytesseract.image_to_string(image, config='--psm 6')
+        cleaned_text = re.sub(r"\s+", "", text)
+        num = 0
+        try:
+            num = int(cleaned_text)
+        except ValueError:
+            self.logger.debug(f"recognize_number_text识别失败: {cleaned_text}")
+            raise ValueError(f"recognize_number_text识别失败: {cleaned_text}")               
+        return num
+
+
+    # 处理代数字的图片
+    def preprocess_num_text_img(self, bgr_img):
+        scale_factor = 2.0  # 宽和高均放大两倍        
+        # 转换为HSV颜色空间
+        hsv_image = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2HSV)
+        # 扩大一倍
+        resized_hsv_img = cv2.resize(hsv_image, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_CUBIC)
+        resized_bgr_img = cv2.resize(bgr_img, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_CUBIC)
+
+        # 定义白色的HSV颜色范围（例如：0-180度的色调，0-255的饱和度，200-255的明度）
+        lower_white = np.array([0, 0, 200])
+        upper_white = np.array([180, 20, 255])
+
+        # 使用cv2.inRange()创建白色区域的掩模
+        mask = cv2.inRange(resized_hsv_img, lower_white, upper_white)
+        
+        # 将白色区域设为白色，其他区域设为黑色
+        final_image = cv2.bitwise_and(resized_bgr_img, resized_bgr_img, mask=mask)
+        # 变成三维
+        final_image = final_image[:, :, :-1]
+        # 翻转
+        inverted_image = cv2.bitwise_not(final_image)
+        return inverted_image
+
+
     # 提高图像
     def preprocess_img(self, bgr_image):
         scale_factor = 2.0  # 宽和高均放大两倍
@@ -368,6 +455,8 @@ class InfoReader:
             name = self.calculate_md5_from_image(img)
             path = f"static/sample/{name}.png"            
             cv2.imwrite(path, img)
+
+            print(name)
 
 
 
@@ -417,6 +506,7 @@ class InfoReader:
 
     # 是否有显示回城图标
     def is_show_back2town_btn(self):
+        
         btnPos = (410, 785, 38, 27)
         # 读取指定位置
         screenshot = pyautogui.screenshot(region=(btnPos))
@@ -424,18 +514,10 @@ class InfoReader:
         mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
 
         # 定义目标颜色并转换为 BGR 格式
-        target_rgb = (89,106,116)   # RGB 格式
-        target_bgr = target_rgb[::-1]      # 转换为 BGR 格式
-
-        # 定义颜色的容差上下界，并转换为 uint8 类型
-        lower_bound = np.array(target_bgr) - 20
-        upper_bound = np.array(target_bgr) + 20
-
-        # 创建掩码，找到接近目标颜色的区域
-        mask = cv2.inRange(mat_image, lower_bound, upper_bound)
-
-        # 检查掩码中是否包含目标颜色
-        return cv2.countNonZero(mask) > 0
+        target_rgb = (112,205,242)
+        target_rgb1 = (74,166,212)
+        target_rgb2 = (217,186,76)
+        return self.is_target_area(mat_image, target_rgb, 0) and self.is_target_area(mat_image, target_rgb1, 0) and self.is_target_area(mat_image, target_rgb2, 0)
 
 
     # 读取竞技场第一个按钮
@@ -453,6 +535,22 @@ class InfoReader:
     def get_arena_first_btn_pos(self):
         winX, winY, winWidth, winHeight = self.get_win_info()
         return (int(winX + 316 + 85 // 2),  int(winY + 498 + 38 // 2))
+
+
+    # 是否能进入竞技场
+    def is_enable_enter_arena(self):
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        popupArea = (
+            int(winX + 130),
+            int(winY + winHeight // 2 - 5),
+            180,
+            10,
+        )
+        screenshot = pyautogui.screenshot(region=(popupArea))
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)     
+        targetColor = (147, 152, 156)
+        return not self.is_target_area(mat_image, targetColor, 0)
 
 
     # 判读是不是死了
@@ -489,6 +587,105 @@ class InfoReader:
         is_contain_give_up_btn = cv2.countNonZero(mask) > 0
 
         return is_contain_reborn_btn and is_contain_give_up_btn
+
+
+    # 检测图片
+    def detect_template(self, main_image, template_image_path, threshold=0.8):
+        # 加载主图和模板图
+        template = cv2.imread(template_image_path)
+        
+        if main_image is None or template is None:
+            raise ValueError("无法加载主图或模板图，请检查路径是否正确。")
+        
+        # 转为灰度图
+        main_gray = cv2.cvtColor(main_image, cv2.COLOR_BGR2GRAY)
+        template_gray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+        
+        # 模板匹配
+        result = cv2.matchTemplate(main_gray, template_gray, cv2.TM_CCOEFF_NORMED)
+        
+        # 获取匹配结果中的最大值和位置
+        _, max_val, _, max_loc = cv2.minMaxLoc(result)
+        print(round(max_val, 2))
+        # 判断是否匹配
+        return round(max_val, 2) >= threshold
+
+
+    # 知道boss死亡
+    def till_boss_die(self, wait_max_time = 60 * 1):
+        # 计划设置10分钟系统超时
+        start_time = time.time()  # 记录开始时间
+        timeout = wait_max_time # 超时时间，单位为秒
+
+        while True:
+            window = self.get_specific_window_info()
+            if(window == None): 
+                raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+
+            elapsed_time = time.time() - start_time  # 计算已过去的时间
+            if elapsed_time > timeout:
+                raise TimeoutError(f"找宝箱超时: 未在{timeout}s内找到宝箱。")                
+
+            # 死亡监控
+            if(self.is_dead()):
+                raise GameStatusError("泼街了，准备复活。")
+
+            winX, winY, winWidth, winHeight = self.get_win_info()
+            # 获取目标定位
+            flagPos = (
+                int(winX),
+                int(winY + 110), 
+                int(winWidth - winX),  # 宽度
+                int(winHeight - winY - 110)  # 高度
+            )
+            screenshot = pyautogui.screenshot(region=flagPos)
+            mat_image = np.array(screenshot)
+            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
+            
+            # self.save_task_sample_img(mat_image)
+            bloodColor = (213,70,66)
+            isShowBlood = self.is_target_area(mat_image, bloodColor)
+            # self.find_red_values(mat_image)
+            if(not isShowBlood):
+                self.logger.info("击杀boss成功.")
+                return
+
+            self.logger.info("等待击杀boss成功...")
+
+
+    # 检测图片中出现的红色，并输出这些红色的像素值。
+    def find_red_values(self, image_bgr):
+        if image_bgr is None:
+            raise ValueError("无法加载图片，请检查路径是否正确。")
+
+        # 转换为 HSV 颜色空间
+        hsv = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2HSV)
+
+        # 定义红色的 HSV 范围（红色有两个区域）
+        lower_red1 = np.array([0, 100, 100])     # 第一区间
+        upper_red1 = np.array([10, 255, 255])
+        lower_red2 = np.array([160, 100, 100])   # 第二区间
+        upper_red2 = np.array([179, 255, 255])
+
+        # 创建掩膜
+        mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
+        mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
+        red_mask = cv2.bitwise_or(mask1, mask2)
+
+        # 使用掩膜提取红色区域的像素
+        red_pixels = image_bgr[red_mask > 0]  # 提取红色区域的 BGR 值
+
+        # 去重以获取唯一的红色值
+        unique_red_values = np.unique(red_pixels, axis=0)
+        
+        # 输出检测结果
+        if unique_red_values.size == 0:
+            print("图片中未检测到红色。")
+            return
+
+        for color in unique_red_values:
+            b, g, r = color  # BGR 格式
+            self.print_color(f"{r},{g},{b}", r, g, b)
 
 
     # 直到出现箱子
@@ -935,6 +1132,23 @@ class InfoReader:
     def get_tower_challenge_btn_pos(self):
         winX, winY, winWidth, winHeight = self.get_win_info()
         return (int((winWidth // 2) - 55 + winX + 55), int(winY + 695 + 22.5))
+
+
+    # 是不是带全了人
+    def is_team_member_full(self):
+        window = self.get_specific_window_info()
+        if(window == None): 
+            raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
+        
+        winX, winY, winWidth, winHeight = self.get_win_info()
+        # 获取目标定位
+        flagPos = (int(20 + winX), int(winY + 790), 13, 11)
+        screenshot = pyautogui.screenshot(region=(flagPos))
+        mat_image = np.array(screenshot)
+        mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
+        target_rgb1 = (222, 89, 80)
+        target_rgb2 = (226, 91, 81)
+        return not self.is_target_area(mat_image, target_rgb1, 0) and not self.is_target_area(mat_image, target_rgb2, 0)
 
 
     # 纵向排列三张图片
