@@ -60,6 +60,7 @@ class WebServer:
 
         self.app.get("/graph/last7days_cards_map")(self.get_recent7days_cards_data)
         self.app.get("/graph/last7days_coins_data")(self.get_recent7days_coins_data)
+        self.app.get("/graph/today_recruited_hero_data")(self.get_today_recruited_hero_count_map)
         self.app.get("/graph/today_error_data")(self.get_today_error_data)
 
     # index
@@ -109,6 +110,12 @@ class WebServer:
     # 获得最近7日的刷钱数据
     async def get_recent7days_coins_data(self):
         data = self.logger_analysis.get_last7days_coin_count_data()
+        return {"code": 1, "message": "success", "data": data}
+
+
+    # 获得最近7日被选中的卡牌数据
+    async def get_today_recruited_hero_count_map(self):
+        data = self.logger_analysis.get_today_recruited_hero_count_map()
         return {"code": 1, "message": "success", "data": data}
 
 

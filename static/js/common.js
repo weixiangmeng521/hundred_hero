@@ -184,6 +184,77 @@ const init_last7days_coins_chart = (data) => {
     });
 }
 
+// 获取最近7日被抽中的卡组情况
+const init_today_recruited_cards_data = (rawData) => {
+    // 提取数据
+    const labels = ['垃圾组合', '垃圾', '蓝卡', "紫卡", "橙卡", "红卡"]
+    const data = labels.map(label => rawData[label] || 0);
+
+    // 配置数据和选项
+    const chartData = {
+        labels: labels,
+        datasets: [{
+            data: data, // 使用提取的数据
+            backgroundColor: [
+                'rgb(245, 245, 245)',  // 垃圾组合
+                'rgb(204, 204, 204)',  // 灰色
+                'rgb(105, 187, 255)',  // 蓝色
+                'rgb(209, 6, 131)',  // 紫色
+                '#FFA500',  // 橙色
+                '#FF0000'   // 红色
+            ],
+            borderColor: [
+                'rgb(245, 245, 245)',  // 垃圾组合
+                'rgb(204, 204, 204)',  // 灰色
+                'rgb(105, 187, 255)',  // 蓝色
+                'rgb(209, 6, 131)',  // 紫色
+                '#FFA500',  // 橙色
+                '#FF0000'   // 红色
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    const ctx = document.getElementById('last7days_recruited_cards_chart').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie', // 饼图类型
+        data: chartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,  // 取消保持比例            
+            plugins: {
+                title: {
+                    display: true,  // 显示标题
+                    text: '今日招募成分',  // 标题内容
+                    font: {
+                        size: 18,  // 标题字体大小
+                        weight: 'bold',  // 标题字体加粗
+                    },
+                    color: '#333',  // 标题颜色
+                    padding: {
+                        top: 20,  // 上边距
+                        bottom: 20  // 下边距
+                    }
+                },                
+                legend: {
+                    position: 'top', // 图例位置
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            let label = tooltipItem.label || '';
+                            let value = tooltipItem.raw || 0;
+                            return `${label}: ${value}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+}
+
+
 
 // 初始化当天错误data信息
 const init_today_error_data = (data) => {
