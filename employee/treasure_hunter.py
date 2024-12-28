@@ -11,6 +11,7 @@ from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
+from lib.select_hero import SelectHero
 from lib.virtual_map import init_virtual_map
 
 # 每日30个箱子
@@ -23,6 +24,7 @@ class TreasureHunt:
         self.reader = InfoReader(config)
         self.cache = get_cache_manager_instance(config)
         self.virtual_map = init_virtual_map(config)
+        self.selectHero = SelectHero(config)        
         # 最大等待击杀怪物时间
         self.wait_max_time = 60 * 2
         
@@ -52,14 +54,58 @@ class TreasureHunt:
         self.cs.back2Town()
         
 
+    # 检查30个宝箱是不是已经被点击
+    def check_daliy_treasure_task_is_done(self):
+        is_finished = self.cache.get(IS_DALIY_CASE_FINISHED)
+        if(is_finished and int(is_finished) == 1):
+            self.logger.debug("已完成每日30个箱子,无需再打")
+            return
+
+        self.logger.debug("读取任务列表, 判断每日30个宝箱是否领取完...")
+        # 打开list
+        self.cs.openTaskList()
+        time.sleep(.6)
+        # 读取list
+        task_map = self.reader.read_task_list()
+        for key, value in task_map.items():
+            # 尽可能点击完成按钮
+            isClicked = False
+            while(self.reader.click_complete_task_btn()):
+                isClicked = True
+                time.sleep(.3)
+            
+            # 如发生点击了任务完成按钮，就重新读取当前状态
+            if(isClicked):
+                self.logger.debug("发生点击完成按钮事件...")
+                self.reader.close_task_menu()
+                time.sleep(.3)
+                self.check_daliy_treasure_task_is_done()
+                return
+            
+            # 判断是否已经完成任务
+            if(key.find("开启") != -1 and bool(value)):
+                self.logger.debug("每日30次宝箱已经完成。")
+                self.cache.set(IS_DALIY_CASE_FINISHED, 1)
+                self.reader.close_task_menu()
+                return
+            
+            if(key.find("开启") != -1 and not bool(value)):
+                self.logger.debug("没有打完30个宝箱,准备完成任务...")
+                self.reader.close_task_menu()
+                return
+
+        self.reader.close_task_menu()
+
+
     # 点击宝箱
     # 点击，因为旁边有小怪，也可能失效，点击不上
-    # TODO: 判断今日是否已经领取完30个奖励
+    # 判断今日是否已经领取完30个奖励 => 通过每日任务判断 [2024.12.23]
     def till_get_treasure(self):
         start_time = time.time()  # 记录开始时间
         timeout = 60 * 2  # 超时时间，单位为秒
         
         # 如果出现五次，点击，宝箱没有消失，就说明，30次到期了
+        max_clicked_times = 5
         over_time = 0
 
         while True:
@@ -68,7 +114,8 @@ class TreasureHunt:
                 raise TimeoutError(f"点击宝箱时: 未在 {timeout}s 内点击宝箱。")
 
             # 30次宝箱完成
-            if(over_time >= 5):
+            if(over_time >= max_clicked_times):
+                self.check_daliy_treasure_task_is_done()
                 self.logger.debug("30次宝箱完成")
                 self.cache.set(IS_DALIY_CASE_FINISHED, 1)
                 return
@@ -100,7 +147,15 @@ class TreasureHunt:
 
     
     # 工作
+    # TODO: 有读取miss的可能性
     def work(self):
+        self.logger.info("准备每日30宝箱...")
+
+        is_full = self.reader.is_team_member_full()
+        if(not is_full):
+            self.logger.info("全部英雄上阵。")
+            self.selectHero.dispatch_all_hero()
+        
         # 找到位置
         if(not self.reader.is_show_back2town_btn()):
             self.logger.debug("准备移动到传送阵.")
@@ -109,15 +164,18 @@ class TreasureHunt:
         # self.reader.close_30s_ads()
         # time.sleep(20)
         while True:
-            try:
+            try:                
+                # 查看是否任务已经完成
+                self.check_daliy_treasure_task_is_done()
+
                 is_finished = self.cache.get(IS_DALIY_CASE_FINISHED)
                 if(is_finished and int(is_finished) == 1):
-                    self.logger.debug("已完成每日30个箱子,无需再打")
-                    break
+                    return
+
                 # 设置默认值
                 if(not is_finished):
                     self.cache.set(IS_DALIY_CASE_FINISHED, 0)
-
+                    
                 self.move_2_two_centipede()
                 self.reader.wait_tranported()
                 time.sleep(.3)

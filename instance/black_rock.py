@@ -1,5 +1,7 @@
 import time
 
+from lib.info_reader import InfoReader
+from lib.logger import init_logger
 from lib.move_controller import MoveControll
 
 class CenterHall():
@@ -7,9 +9,11 @@ class CenterHall():
     def __init__ (self, config):
         self.config = config
         self.mc = MoveControll(config)
+        self.logger = init_logger(config)
+        self.reader = InfoReader(config)
+
     
     # 一块地砖需要走 0.3s
-
     def crossRoom1(self):
         mc = self.mc
         
@@ -134,3 +138,32 @@ class CenterHall():
         time.sleep(6)
 
         mc.recover()
+
+
+
+
+    # 杀四天王
+    def kill4Boss(self):
+        mc = self.mc
+
+        duration = 6
+
+        mc.move_down(1)
+        mc.move_left_down(2.4)
+        mc.move_down(.9)
+
+        time.sleep(duration)
+        self.logger.debug("已经击杀粉矛")
+
+        mc.move_left_down(1.6)
+        time.sleep(duration * 1.2)
+        self.logger.debug("已经击杀冰矛")
+
+        mc.move_left_top(2.1)
+        time.sleep(duration)
+        self.logger.debug("已经击杀火矛")
+
+        mc.move_right_top(.9)
+        time.sleep(duration)
+        self.logger.debug("已经击杀毒矛")
+

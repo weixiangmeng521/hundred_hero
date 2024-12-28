@@ -11,7 +11,7 @@ from lib.move_controller import MoveControll
 from lib.virtual_map import init_virtual_map
 from lib.visual_track import VisualTrack
 
-
+# 自动训练营
 class CoachNPC:
 
     def __init__(self, config):

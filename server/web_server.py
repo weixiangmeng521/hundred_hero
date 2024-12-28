@@ -1,3 +1,4 @@
+import base64
 import datetime
 import os
 import queue
@@ -7,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from defined import DOWN_MOVE_CMD, FIND_ARENA, FIND_PORTAL, FIND_RECRUIT_NPC, FIND_TOWER, FIND_TRAINING_NPC, LEFT_MOVE_CMD, RIGHT_MOVE_CMD, UP_MOVE_CMD
 from lib.cache import get_cache_manager_instance
+from lib.controll_wechat import init_controll_wechat
 from lib.logger import init_logger
 from pathlib import Path
 
@@ -25,7 +27,9 @@ class WebServer:
         self.cache = get_cache_manager_instance(config)
         self.html_path = Path(__file__).resolve().parent / "../static/"
         self.logs_path = Path(__file__).resolve().parent / "../logs/"
+        self.qr_code_path = Path(__file__).resolve().parent / "../QR_code/QRcode.png"
         self.logger_analysis = get_logger_analysis_instance(config)
+        self.controll_wechat = init_controll_wechat(config)
         self.setup_routes()
 
 
@@ -52,9 +56,11 @@ class WebServer:
 
         self.app.get("/system/config")(self.get_config)
         self.app.get("/system/logs")(self.get_logs)
+        self.app.get("/system/qr_code")(self.get_login_code)
 
         self.app.get("/graph/last7days_cards_map")(self.get_recent7days_cards_data)
         self.app.get("/graph/last7days_coins_data")(self.get_recent7days_coins_data)
+        self.app.get("/graph/today_error_data")(self.get_today_error_data)
 
     # index
     async def index(self):
@@ -68,6 +74,24 @@ class WebServer:
     async def logger_page(self):
         return FileResponse(self.html_path / "logger.html", media_type='text/html')
 
+    # 获取QR code
+    async def get_login_code(self):
+        code = self.controll_wechat.get_state()
+        base64Img = self.get_QRcode_img_base64()
+
+        return {
+            "code": 1,
+            "data": {
+                "state": code,
+                "img": base64Img,
+            }
+        }
+    
+    # 获取base64
+    def get_QRcode_img_base64(self):
+        with open(self.qr_code_path, "rb") as image_file:
+            img_base64 = base64.b64encode(image_file.read()).decode('utf-8')
+            return f"data:image/png;base64,{img_base64}"
 
 
     # 获取控制服务状态
@@ -85,6 +109,12 @@ class WebServer:
     # 获得最近7日的刷钱数据
     async def get_recent7days_coins_data(self):
         data = self.logger_analysis.get_last7days_coin_count_data()
+        return {"code": 1, "message": "success", "data": data}
+
+
+    # 获取当天的错误信息
+    async def get_today_error_data(self):
+        data = self.logger_analysis.get_today_error_message_data()
         return {"code": 1, "message": "success", "data": data}
 
 
@@ -217,13 +247,13 @@ class WebServer:
         # 读取静态文件夹
         static_dir = os.path.join(os.path.dirname(__file__), "../static/")
         self.app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
-        self.app.add_middleware(
-            CORSMiddleware,
-            allow_origins=['*'],
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
-        )
+        # self.app.add_middleware(
+        #     CORSMiddleware,
+        #     allow_origins=['*'],
+        #     allow_credentials=True,
+        #     allow_methods=["*"],
+        #     allow_headers=["*"],
+        # )
         # 输出日志
         self.logger.debug(f"Server is running on: {self.host}:{self.port}")
         

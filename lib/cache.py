@@ -79,6 +79,20 @@ class CacheManager:
             self._save_cache()  # 每次更新缓存时保存到文件
 
 
+    # 把过期时间延长一个小时
+    def set_next_hour(self, task_name):
+        _time = self.get(task_name)
+        if _time is not None:
+            # 确保 _time 是时间戳，转换为 datetime 对象
+            now = datetime.datetime.now()
+            next_hour = now + datetime.timedelta(hours=1)
+            with self.lock:
+                self.cache[task_name] = {"value": 0, "expiry": next_hour.timestamp()}
+                self._save_cache()  # 每次更新缓存时保存到文件
+        else:
+            self.logger.debug(f"Task '{task_name}' not found.")
+
+
     # 获取缓存中的值。如果键不存在或已过期，返回 None。
     def get(self, key):
         with self.lock:
