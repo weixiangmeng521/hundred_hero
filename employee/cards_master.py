@@ -33,7 +33,6 @@ class CardsMaster:
         self.app_name = config["APP"]["Name"]
         self.reader = InfoReader(config)
         self.cs = ChallengeSelect(config)
-        self.reader = InfoReader(config)
         self.logger = init_logger(config)
         self.mc = MoveControll(config)
         self.vt = VisualTrack(config)
@@ -240,6 +239,39 @@ class CardsMaster:
                 return        
 
 
+    # 获取被招募的英雄的index
+    def get_recruited_hero_index(self):
+        winX, winY, winWidth, winHeight = self.reader.get_win_info()
+
+        screenshot = pyautogui.screenshot(region=(int(winX + 215), int(winY + 490 - 35), int(30), int(30)))
+        middle_check_area = np.array(screenshot)
+        middle_check_area = cv2.cvtColor(middle_check_area, cv2.COLOR_RGB2BGR)
+
+        # Point(x=87, y=443)
+        screenshot = pyautogui.screenshot(region=(int(winX + 87), int(winY + 453 - 35), int(30), int(30)))
+        left_check_area = np.array(screenshot)
+        left_check_area = cv2.cvtColor(left_check_area, cv2.COLOR_RGB2BGR)        
+
+        # Point(x=352, y=445)
+        screenshot = pyautogui.screenshot(region=(int(winX + 352), int(winY + 455 - 35), int(30), int(30)))
+        right_check_area = np.array(screenshot)
+        right_check_area = cv2.cvtColor(right_check_area, cv2.COLOR_RGB2BGR)        
+
+        # 采样颜色
+        sample1_color = (117, 220, 71)
+        sample2_color = (119, 224, 72)
+        sample3_color = (118, 221, 71)
+
+        checked_area_list = [left_check_area, middle_check_area, right_check_area]
+        for index, area in enumerate(checked_area_list):
+            condition1 = self.reader.is_target_area(area, sample1_color)
+            condition2 = self.reader.is_target_area(area, sample2_color)
+            condition3 = self.reader.is_target_area(area, sample3_color)
+            if(condition1 and condition2 and condition3):
+                return index
+        return -1
+
+
     # 点击招募
     def auto_recruit_btn(self):
         card_list = self.read_three_cards()
@@ -260,15 +292,22 @@ class CardsMaster:
         is_contine = self.is_cost_green_mine()
 
         # 自动放弃
-        if(is_contine == True):
+        if is_contine:
+            # 获取选中英雄的信息
+            selected_index = self.get_recruited_hero_index()
+            if(selected_index > -1):
+                selected_card = card_list[selected_index]
+                self.logger.debug(f"抽卡结果: [{self.card_map[selected_card]}] 被选中.")            
+
             self.click_give_up()
 
         # 不消耗绿矿，招募
-        if(is_contine == False):
+        if not is_contine:
             # 输出
-            self.print_colored_cards(card_list)            
+            self.print_colored_cards(card_list)
             pyautogui.click(250, 690)
 
+            
 
     # 放弃按钮点击
     def click_give_up(self):

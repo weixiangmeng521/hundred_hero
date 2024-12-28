@@ -149,3 +149,95 @@ class LoggerAnalysis:
             last7day_map[day] = self.get_single_logger_coin_count(path)
             
         return last7day_map        
+    
+
+    # 判断是不是符合混合垃圾组合
+    def is_worst_cards_group(self, cards):
+        tar1, tar2 = '蓝卡', '垃圾'
+        # 去除卡片中的空格
+        cards = [card.strip() for card in cards]
+        # 检查是否所有卡片都在目标类型中
+        for card in cards:
+            if card not in (tar1, tar2):
+                return False
+        return True
+
+
+    # 判断是不是符合混合垃圾组合
+    def is_2worst_cards_and_1great_group(self, cards):
+        tar1, tar2 = '蓝卡', '垃圾'  # 白卡类型
+        special_cards = {'红卡', '黄卡', '紫卡'}  # 特定颜色卡片
+        # 去除卡片中的空格
+        cards = [card.strip() for card in cards]
+        
+        # 统计白卡数量
+        white_cards = [card for card in cards if card in (tar1, tar2)]
+        special_card = [card for card in cards if card in special_cards]
+
+        # 判断是否满足条件
+        return len(white_cards) == 2 and len(special_card) == 1
+
+
+    # 获得最好的卡
+    def get_greatest_card_in_group(self, cards):
+        special_cards = {'红卡', '黄卡', '紫卡'}  # 特定颜色卡片
+        # 去除卡片中的空格
+        cards = [card.strip() for card in cards]
+        for card in cards:
+            if card in special_cards:
+                return card
+        return None
+
+
+    # 获取单个文件里面抽卡结果
+    def get_single_logger_recruited_hero_count(self, path):
+        result_map = defaultdict(int)
+        target = "抽卡结果:"
+        # 逐块读取文件内容
+        for content in self.get_file_content(path):
+            # 按行分割
+            lines = content.splitlines()
+            for line in lines:
+                if target in line:
+                    # 提取目标字符串后的部分
+                    matches = re.findall(r'DEBUG.*?\[(.*?)\]', line)
+                    for match in matches:  # 遍历所有匹配项                    
+                        result_map[match] += 1  # 使用匹配项作为键
+        
+        # 混合态的卡牌
+        target = "当前卡为:"
+        worst_group_times = 0
+        # 逐块读取文件内容
+        for content in self.get_file_content(path):
+            # 按行分割
+            lines = content.splitlines()
+            for index, line in enumerate(lines):
+                if target in line:
+                    next_line = ""
+                    if index + 1 < len(lines):
+                        next_line = lines[index + 1]
+
+                    # 提取目标字符串后的部分
+                    elements = line.split(target)[-1].strip().split(',')
+                    if(self.is_worst_cards_group(elements)):
+                        worst_group_times += 1
+
+                    if(self.is_2worst_cards_and_1great_group(elements) and not ("抽卡结果:" in next_line)):
+                        greatest_card = self.get_greatest_card_in_group(elements)
+                        if(greatest_card):
+                            result_map[greatest_card] += 1
+
+        result_map["垃圾组合"] = worst_group_times
+        return dict(result_map)
+
+
+
+    #获得当天的card出现的次数
+    def get_today_recruited_hero_count_map(self):
+        files_list = self.get_recent_logs(1)
+        data = []
+        for filename in files_list:
+            path = self.logs_path  / filename
+            data = self.get_single_logger_recruited_hero_count(path)
+        return data
+     

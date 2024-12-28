@@ -155,12 +155,12 @@ def main():
 
 # TODO: 获取当前钱的数量,并放入缓存里
 if __name__ == "__main__":
-    main()
+    # main()
 
     # wechat.wake_up()
     # selectHero.dispatch_target_hero()
 
-    # webServer.run(queue)
+    webServer.run(queue)
 
     # vc.test_for_find_object_in_image()
     # print(pyautogui.position())
