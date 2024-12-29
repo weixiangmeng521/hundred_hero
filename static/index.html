@@ -288,18 +288,51 @@
         init_today_recruited_cards_data(res.data)
     })
 
-    request("system/qr_code").then((res) => {
-        const node = document.getElementById("QRcode")
-        node.innerHTML = "";
+    // 循环获取qrcdoe
+    const fetch_qr_code = async () => {
+        const node = document.getElementById("QRcode");
+        
+        // 加动画
+        const divEl = document.createElement("div");
+        divEl.setAttribute("style", "width:150px;height:150px;position:relative")
+        const svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svgNode.innerHTML = `
+        <circle fill="#363636" stroke="#363636" stroke-width="2" r="5" cx="80" cy="100">
+            <animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate>
+        </circle>
+        <circle fill="#363636" stroke="#363636" stroke-width="2" r="5" cx="100" cy="100">
+            <animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate>
+        </circle>
+        <circle fill="#363636" stroke="#363636" stroke-width="2" r="5" cx="120" cy="100">
+            <animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate>
+        </circle>`;
+        svgNode.setAttribute("viewBox", "0 0 200 200");
+        svgNode.setAttribute("style", "position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);");
+        divEl.append(svgNode);
+        node.innerHTML = ""
+        node.appendChild(divEl);
+        await new Promise(r => setTimeout(() => {r()}, 1000));
+
+
+        const res = await request("system/qr_code");
         const img = document.createElement("img");
         img.setAttribute("src", res.data.img)
         img.setAttribute("style", "width:150px;height:150px;")
+        if(Number(res.data.state) !== 0) {
+            modalOverlay.style.display = "none";
+            return
+        }
         if(Number(res.data.state) === 0){ 
+            node.innerHTML = ""
             node.appendChild(img)
             modalOverlay.style.display = "block";
         }
-        console.log(res)
-    })
+        await new Promise(r => setTimeout(() => {r()}, 6000));
+        await fetch_qr_code();
+    }
+
+    fetch_qr_code()
+
 
     // modal的关闭按钮
     closeModalBtn.addEventListener("click", () => {

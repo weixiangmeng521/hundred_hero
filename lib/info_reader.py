@@ -120,7 +120,7 @@ class InfoReader:
                 # 如果识别失败，就保存图片
                 if(is_debug):
                     self.save_task_sample_img(mat_image)
-                raise ValueError(e)
+                # raise ValueError(e)
             return num
 
 
@@ -306,25 +306,26 @@ class InfoReader:
             screenshot = sct.grab(region)
             
             mat_image = np.array(screenshot)
-            mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
             task_img_heigt = int((winHeight - 650 - 15) / 3)
-            task_img_width = int(winWidth + 80)
+            task_img_width = int(winWidth + 70)
             gutter = 30
             # start_y:end_y, start_x:end_x
             task_1_img = mat_image[20:task_img_heigt - 5 - gutter - 3 + 23, 255:task_img_width]
             task_2_img = mat_image[task_img_heigt * 2 + 38:task_img_heigt * 3 + 26 - gutter, 255:task_img_width]
             task_3_img = mat_image[task_img_heigt * 3 + 122:task_img_heigt * 3 + 179 - gutter, 255:task_img_width]
 
-            # self.v_stack_show(
-            #     self.preprocess_img(task_1_img),
-            #     self.preprocess_img(task_2_img),
-            #     self.preprocess_img(task_3_img),
-            # )
+            # 是否任务完成了
+            def is_complete_task(rgb_img):
+                bgr_img = cv2.cvtColor(rgb_img, cv2.COLOR_RGB2BGR)
+                w, h, *c = bgr_img.shape
+                slice_img =bgr_img[0:h, 0:3]
+                target_color = (137,134,130)
+                return self.is_target_area(slice_img, target_color)
 
             return {
-                self.recognize_chinese_text(task_1_img): self.is_task_complete_by_color_percent(task_1_img),
-                self.recognize_chinese_text(task_2_img): self.is_task_complete_by_color_percent(task_2_img),
-                self.recognize_chinese_text(task_3_img): self.is_task_complete_by_color_percent(task_3_img),
+                self.recognize_chinese_text(task_1_img): is_complete_task(task_1_img),
+                self.recognize_chinese_text(task_2_img): is_complete_task(task_2_img),
+                self.recognize_chinese_text(task_3_img): is_complete_task(task_3_img),
             }
 
 
@@ -363,12 +364,12 @@ class InfoReader:
 
 
 
-    # 通过颜色占比来判断是否完成任务
-    def is_task_complete_by_color_percent(self, bgr_img):
-        complete_color = (229,223,217)
-        rate = self.get_color_ratio(bgr_img, complete_color)
-        # self.print_img(bgr_img)
-        return rate <= 0.5
+    # # 通过颜色占比来判断是否完成任务
+    # def is_task_complete_by_color_percent(self, bgr_img):
+    #     complete_color = (229,223,217)
+    #     rate = self.get_color_ratio(bgr_img, complete_color)
+    #     # self.print_img(bgr_img)
+    #     return rate <= 0.5
 
 
     # 读取中文
