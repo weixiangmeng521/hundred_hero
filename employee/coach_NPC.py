@@ -4,6 +4,7 @@ import time
 
 import pyautogui
 from employee import farmer
+from employee.human import Human
 from lib.challenge_select import ChallengeSelect
 from lib.info_reader import InfoReader
 from lib.logger import init_logger
@@ -12,9 +13,10 @@ from lib.virtual_map import init_virtual_map
 from lib.visual_track import VisualTrack
 
 # 自动训练营
-class CoachNPC:
+class CoachNPC(Human):
 
     def __init__(self, config):
+        super().__init__(config)
         self.config = config
         self.vt = VisualTrack(config)
         self.logger = init_logger(config)

@@ -2,6 +2,7 @@ import time
 import cv2
 import numpy as np
 import pyautogui
+from employee.human import Human
 from exception.game_status import GameStatusError
 from instance.union_task import UnionTask
 from lib.challenge_select import ChallengeSelect
@@ -12,7 +13,7 @@ from lib.virtual_map import init_virtual_map
 from lib.visual_track import VisualTrack
 
 # 卡牌大师
-class CardsMaster:
+class CardsMaster(Human):
     color_map = {
         0: "\033[47m",  # 黑色背景
         1: "\033[44m",  # 蓝色背景
@@ -29,6 +30,7 @@ class CardsMaster:
     }
 
     def __init__(self, config):
+        super().__init__(config)
         self.config = config
         self.app_name = config["APP"]["Name"]
         self.reader = InfoReader(config)

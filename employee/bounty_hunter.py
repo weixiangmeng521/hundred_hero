@@ -1,6 +1,7 @@
 
 
 import time
+from employee.human import Human
 from instance.black_rock import CenterHall
 from instance.forest import RottenSwamp
 from instance.front_flatland import FrontFlatland
@@ -17,9 +18,10 @@ from lib.visual_track import VisualTrack
 
 
 # BOSS杀手，专业打boss
-class BountyHunter:
+class BountyHunter(Human):
 
     def __init__(self, config):
+        super().__init__(config)
         self.config = config
         self.cs = ChallengeSelect(config)
         self.reader = InfoReader(config)
