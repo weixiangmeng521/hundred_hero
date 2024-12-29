@@ -1,6 +1,7 @@
 import difflib
 import time
 from defined import IS_UNION_TASK_FINISHED
+from employee.human import Human
 from instance.union_task import UnionTask
 from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
@@ -11,10 +12,10 @@ from lib.virtual_map import init_virtual_map
 
 
 # 执行者，任务达人
-class TaskExcutor:
-
+class TaskExcutor(Human):
 
     def __init__(self, config):
+        super().__init__(config)
         self.config = config
         self.cs = ChallengeSelect(config)
         self.unionTask = UnionTask(config)
@@ -93,6 +94,12 @@ class TaskExcutor:
 
     # 刷工会副本
     def for_union_task(self):
+        # 查看是否是全员上阵
+        is_full = self.reader.is_team_member_full()
+        if(not is_full):
+            self.logger.info("全部英雄上阵。")
+            self.selectHero.dispatch_all_hero()
+                    
         while True:
             self.check_union_task_list()
             # 检测是否完成工会副本
@@ -130,12 +137,6 @@ class TaskExcutor:
         if(not self.reader.is_show_back2town_btn()):
             self.virtual_map.move2protal()
             
-        # 查看是否是全员上阵
-        is_full = self.reader.is_team_member_full()
-        if(not is_full):
-            self.logger.info("全部英雄上阵。")
-            self.selectHero.dispatch_all_hero()
-
         # 判断是否是完成了任务
         is_finished = self.cache.get(IS_UNION_TASK_FINISHED)
         # 如果完成了任务就直接结束。

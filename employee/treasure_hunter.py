@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 import pyautogui
 from defined import IS_DALIY_CASE_FINISHED
+from employee.human import Human
 from exception.game_status import GameStatusError
 from instance.two_centipede import TwoCentipede
 from lib.cache import get_cache_manager_instance
@@ -15,9 +16,10 @@ from lib.select_hero import SelectHero
 from lib.virtual_map import init_virtual_map
 
 # 每日30个箱子
-class TreasureHunt:
+class TreasureHunt(Human):
     
     def __init__(self, config):
+        super().__init__(config)
         self.config = config
         self.logger = init_logger(config)
         self.cs = ChallengeSelect(config)
@@ -151,11 +153,6 @@ class TreasureHunt:
     def work(self):
         self.logger.info("准备每日30宝箱...")
 
-        is_full = self.reader.is_team_member_full()
-        if(not is_full):
-            self.logger.info("全部英雄上阵。")
-            self.selectHero.dispatch_all_hero()
-        
         # 找到位置
         if(not self.reader.is_show_back2town_btn()):
             self.logger.debug("准备移动到传送阵.")
@@ -167,6 +164,13 @@ class TreasureHunt:
             try:                
                 # 查看是否任务已经完成
                 self.check_daliy_treasure_task_is_done()
+
+                # 全员上阵
+                is_full = self.reader.is_team_member_full()
+                if(not is_full):
+                    self.logger.info("全部英雄上阵。")
+                    self.selectHero.dispatch_all_hero()
+                
 
                 is_finished = self.cache.get(IS_DALIY_CASE_FINISHED)
                 if(is_finished and int(is_finished) == 1):

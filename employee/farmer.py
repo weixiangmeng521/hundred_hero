@@ -1,4 +1,5 @@
 import time
+from employee.human import Human
 from exception.game_status import GameStatusError
 from instance.black_rock import CenterHall
 from instance.forest import RottenSwamp
@@ -13,9 +14,10 @@ from lib.virtual_map import init_virtual_map
 
 
 # 作为苦逼的农民
-class Farmer:
+class Farmer(Human):
 
     def __init__(self, config):
+        super().__init__(config)
         self.config = config
         self.cs = ChallengeSelect(config)
         self.logger = init_logger(config)

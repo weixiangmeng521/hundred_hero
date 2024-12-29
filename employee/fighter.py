@@ -3,6 +3,7 @@ import time
 import cv2
 import pyautogui
 from defined import IS_DALIY_ARENA_FINISHED
+from employee.human import Human
 from exception.game_status import GameStatusError
 from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
@@ -12,10 +13,11 @@ from lib.move_controller import MoveControll
 from lib.virtual_map import init_virtual_map
 
 # 技术不好爱打架
-class Fighter:
+class Fighter(Human):
 
 
     def __init__(self, config):
+        super().__init__(config)
         self.config = config
         self.virtual_map = init_virtual_map(config)    
         self.reader = InfoReader(config)

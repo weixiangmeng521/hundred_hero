@@ -2,6 +2,7 @@ import time
 
 import pyautogui
 from defined import IS_DALIY_TOWER_FINISHED
+from employee.human import Human
 from exception.game_status import GameStatusError
 from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
@@ -11,9 +12,10 @@ from lib.move_controller import MoveControll
 from lib.virtual_map import init_virtual_map
 
 # 刷塔狂人
-class TowerWarrior:
+class TowerWarrior(Human):
 
     def __init__(self, config):
+        super().__init__(config)
         self.config = config
         self.logger = init_logger(config)
         self.cs = ChallengeSelect(config)

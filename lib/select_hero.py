@@ -17,34 +17,11 @@ class SelectHero:
         self.config = config
         self.reader = InfoReader(config)
         self.logger = init_logger(config)
-
-    # 获取窗口信息
-    def get_specific_window_info(self):
-        # 获取所有在屏幕上的窗口信息
-        options = Quartz.kCGWindowListOptionOnScreenOnly
-        window_list = Quartz.CGWindowListCopyWindowInfo(options, Quartz.kCGNullWindowID)
-
-        # 查找指定窗口
-        for window in window_list:
-            window_name = window.get('kCGWindowName', '')
-            if self.app_name in window_name:
-                return window  # 返回指定窗口的信息
-        return None
-    
-
-    # 获得窗口的信息
-    def get_win_info(self):
-        window = self.get_specific_window_info()
-        if(window == None): raise RuntimeError('Err', f"{self.app_name}`s window is not found.")
-        window_bounds = window.get('kCGWindowBounds', {})
-        winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
-        winWidth, winHeight = window_bounds.get('Width', 0), window_bounds.get('Height', 0)
-        return winX, winY, winWidth, winHeight
         
     
     # 显示英雄选择面板
     def show_hero_select_panel(self):
-        winX, winY, winWidth, winHeight = self.get_win_info()
+        winX, winY, winWidth, winHeight = self.reader.get_win_info()
         # 如果已经显示了，就先关闭
         if(self.is_displayed_panel()): 
             self.close_hero_select_panel()
@@ -255,8 +232,6 @@ class SelectHero:
             kakashi_condition2 = self.reader.is_target_area(right_area, kakashi_weapon_sample2_color)
             kakashi_condition3 = self.reader.is_target_area(right_area, kakashi_weapon_sample3_color)
             is_kakashi = kakashi_condition1 and kakashi_condition2 and kakashi_condition3
-
-            self.reader.save_task_sample_img(right_area)
 
             # 赛选卡牌
             if (is_red_card and is_swift_hero):
