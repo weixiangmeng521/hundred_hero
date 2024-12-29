@@ -235,10 +235,17 @@ class SelectHero:
             libai_knife_sample1_color = (105, 121, 122)
             libai_knife_sample2_color = (104, 120, 122)
             libai_knife_sample3_color = (56, 75, 86)
+            libai_knife_sample4_color = (84, 115, 117)
+            libai_knife_sample5_color = (106, 119, 121)
+            libai_knife_sample6_color = (78, 109, 113)
+
             libai_condition1 = self.reader.is_target_area(left_area, libai_knife_sample1_color)
             libai_condition2 = self.reader.is_target_area(left_area, libai_knife_sample2_color)
             libai_condition3 = self.reader.is_target_area(left_area, libai_knife_sample3_color)
-            is_libai = libai_condition1 and libai_condition2 and libai_condition3
+            libai_condition4 = self.reader.is_target_area(right_area, libai_knife_sample4_color)
+            libai_condition5 = self.reader.is_target_area(right_area, libai_knife_sample5_color)
+            libai_condition6 = self.reader.is_target_area(right_area, libai_knife_sample6_color)
+            is_libai = libai_condition1 and libai_condition2 and libai_condition3 and libai_condition4 and libai_condition5 and libai_condition6
 
             # 是不是卡卡西
             kakashi_weapon_sample1_color = (124, 111, 102)
@@ -248,6 +255,8 @@ class SelectHero:
             kakashi_condition2 = self.reader.is_target_area(right_area, kakashi_weapon_sample2_color)
             kakashi_condition3 = self.reader.is_target_area(right_area, kakashi_weapon_sample3_color)
             is_kakashi = kakashi_condition1 and kakashi_condition2 and kakashi_condition3
+
+            self.reader.save_task_sample_img(right_area)
 
             # 赛选卡牌
             if (is_red_card and is_swift_hero):
@@ -319,7 +328,7 @@ class SelectHero:
     # 读取sample里面的图片，做分析
     def analysis_sample(self):
         # 读取图片
-        sample_img = cv2.imread('./static/sample/d29f48cb1f2c192fc1a82aab6875460f.png')
+        sample_img = cv2.imread('static/sample/6a5f5b4fdf654b4e4cc5906befa5873d.png')
         # 读取图片
         # sample_img = cv2.cvtColor(sample_img, cv2.COLOR_RGBA2BGR)
         self.reader.count_colors(sample_img, 100)
