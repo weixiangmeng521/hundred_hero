@@ -79,7 +79,6 @@ class WebServer:
     async def get_login_code(self):
         code = self.controll_wechat.get_state()
         base64Img = self.get_QRcode_img_base64()
-
         return {
             "code": 1,
             "data": {
