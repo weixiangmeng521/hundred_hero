@@ -34,7 +34,7 @@ class SelectHero:
 
     # 选择阵营
     def select_camp(self):
-        winX, winY, winWidth, winHeight = self.get_win_info()
+        winX, winY, winWidth, winHeight = self.reader.get_win_info()
         # Point(x=354, y=761)
         pyautogui.click(int(winX + 354), int(winY + 761 - 35))
         time.sleep(.3)
@@ -42,7 +42,7 @@ class SelectHero:
 
     # 一件上阵
     def click_all_hero_in(self):
-        winX, winY, winWidth, winHeight = self.get_win_info()
+        winX, winY, winWidth, winHeight = self.reader.get_win_info()
         # Point(x=359, y=278)
         pyautogui.click(int(winX + 359), int(winY + 288 - 35))
         time.sleep(.3)
@@ -50,7 +50,7 @@ class SelectHero:
 
     # 让选择了的英雄进入头排
     def let_selected_hero_to_top(self):
-        winX, winY, winWidth, winHeight = self.get_win_info()
+        winX, winY, winWidth, winHeight = self.reader.get_win_info()
         # Point(x=344, y=390)
         pyautogui.click(int(winX + 344), int(winY + 390 - 35))
         time.sleep(.3)
@@ -61,7 +61,7 @@ class SelectHero:
     # 是否已经显示了窗口
     def is_displayed_panel(self):
         # Point(x=99, y=219)
-        winX, winY, winWidth, winHeight = self.get_win_info()
+        winX, winY, winWidth, winHeight = self.reader.get_win_info()
         screenshot = pyautogui.screenshot(region=(int(99 + winX), int(winY + 219 - 35), 2, 2))
         mat_image = np.array(screenshot)
         mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
@@ -73,7 +73,7 @@ class SelectHero:
     def slide_down(self, is_sleep=True):
         slide_down_duration = .1
 
-        winX, winY, winWidth, winHeight = self.get_win_info()
+        winX, winY, winWidth, winHeight = self.reader.get_win_info()
         screenshot = pyautogui.screenshot(region=(int(63 + winX), int(winY + 479 - 35), (400 - 63), 5))
         mat_image = np.array(screenshot)
         mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
@@ -88,7 +88,7 @@ class SelectHero:
     def slide_up(self):
         slide_down_duration = .1
 
-        winX, winY, winWidth, winHeight = self.get_win_info()
+        winX, winY, winWidth, winHeight = self.reader.get_win_info()
         screenshot = pyautogui.screenshot(region=(int(63 + winX), int(winY + 479 - 35), (400 - 63), 5))
         mat_image = np.array(screenshot)
         mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
@@ -101,7 +101,7 @@ class SelectHero:
 
     # 上标准线是不是空的，还是监测到了有卡片进入
     def is_top_window_baseline_empty(self):
-        winX, winY, winWidth, winHeight = self.get_win_info()
+        winX, winY, winWidth, winHeight = self.reader.get_win_info()
         screenshot = pyautogui.screenshot(region=(int(64 + winX), int(winY + 495 - 35), (398 - 64), 1))
         mat_image = np.array(screenshot)
         mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
@@ -154,7 +154,7 @@ class SelectHero:
 
     # 获得横排的英雄
     def scan_row_hero(self):
-        winX, winY, winWidth, winHeight = self.get_win_info()
+        winX, winY, winWidth, winHeight = self.reader.get_win_info()
         screenshot = pyautogui.screenshot(region=(int(64 + winX), int(winY + 495 - 35), (398 - 64), 100))
         mat_image = np.array(screenshot)
         mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGBA2BGR)
@@ -278,7 +278,7 @@ class SelectHero:
 
     # 关闭英雄选择面板
     def close_hero_select_panel(self):
-        winX, winY, winWidth, winHeight = self.get_win_info()
+        winX, winY, winWidth, winHeight = self.reader.get_win_info()
         # Point(x=37, y=794)
         pyautogui.click(int(winX + 40), int(winY + 800 - 35))
         time.sleep(.3)
@@ -286,7 +286,7 @@ class SelectHero:
 
     # 读取已经上阵的英雄数量
     def read_dispatched_hero_num(self):
-        winX, winY, winWidth, winHeight = self.get_win_info()
+        winX, winY, winWidth, winHeight = self.reader.get_win_info()
         with mss.mss() as sct:
             region = {
                 "top": int(winY + 233 - 35), 
