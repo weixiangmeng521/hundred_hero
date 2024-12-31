@@ -286,18 +286,28 @@ class SelectHero:
 
     # 读取已经上阵的英雄数量
     def read_dispatched_hero_num(self):
-        winX, winY, winWidth, winHeight = self.reader.get_win_info()
-        with mss.mss() as sct:
-            region = {
-                "top": int(winY + 233 - 35), 
-                "left": int(winX + 372),
-                "width": int(13), 
-                "height": int(15)
-            }
-            # 截取屏幕
-            screenshot = sct.grab(region)
-            mat_image = np.array(screenshot)
-            return self.reader.recognize_number_text(mat_image)     
+        hero_num = 0           
+        while True:
+            winX, winY, winWidth, winHeight = self.reader.get_win_info()
+            with mss.mss() as sct:
+                region = {
+                    "top": int(winY + 233 - 35), 
+                    "left": int(winX + 372),
+                    "width": int(13), 
+                    "height": int(15)
+                }
+                # 截取屏幕
+                screenshot = sct.grab(region)
+                mat_image = np.array(screenshot)         
+
+                try:
+                    hero_num = self.reader.recognize_number_text(mat_image)
+                except:
+                    self.logger.debug("识别上阵的英雄数量失败, 3s后再次尝试.")
+                    time.sleep(3)
+                    continue
+
+                return hero_num
 
 
     # 读取sample里面的图片，做分析

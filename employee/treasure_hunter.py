@@ -106,7 +106,7 @@ class TreasureHunt(Human):
         start_time = time.time()  # 记录开始时间
         timeout = 60 * 2  # 超时时间，单位为秒
         
-        # 如果出现五次，点击，宝箱没有消失，就说明，30次到期了
+        # 如果出现5次，点击，宝箱没有消失，就说明，30次到期了
         max_clicked_times = 5
         over_time = 0
 
@@ -117,9 +117,7 @@ class TreasureHunt(Human):
 
             # 30次宝箱完成
             if(over_time >= max_clicked_times):
-                self.check_daliy_treasure_task_is_done()
-                self.logger.debug("30次宝箱完成")
-                self.cache.set(IS_DALIY_CASE_FINISHED, 1)
+                # 直接返回，回城后判断是否完成了任务
                 return
 
             # 获取宝箱列表

@@ -50,7 +50,7 @@ class TowerWarrior(Human):
             self.reader.wait_selected_level_entered("元素之塔")
             time.sleep(1.6)
             # 战斗
-            self.mc.move_right(.3)
+            self.mc.move_right(1.2)
             self.reader.wait_fight_over("元素之塔")
             self.logger.debug("已脱离战斗, 继续挑战")
             time.sleep(.3)

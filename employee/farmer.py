@@ -29,7 +29,7 @@ class Farmer(Human):
     # 刷经验
     def for_experience(self):
         self.cs.selectExpeirenceInstance()
-        time.sleep(9)
+        self.reader.wait_tranported()
 
         instance = CenterHall(self.config)
         instance.crossRoom1()
@@ -102,19 +102,26 @@ class Farmer(Human):
         isWoodFull, isMineFull = self.reader.read_screen()
         self.logger.info(f"木头:{isWoodFull}, 蓝矿:{isMineFull}")
 
-        if(isWoodFull == False):
+        if(not isWoodFull):
             self.logger.info("刷一刷木头副本")
             self.for_wood()
 
-        elif(isMineFull == False):
+        if(not isMineFull):
             self.logger.info("刷一刷蓝矿")
             self.for_mine()
 
-        else:
-            self.logger.info("刷一刷经验")
-            self.for_experience2()
+        # else:
+        #     self.logger.info("刷一刷经验")
+        #     self.for_experience2()
 
-        self.logger.info(f"本轮打金结束。{waitSec}s 后自动进入下一轮。")
+        # 返回城镇，结束刷资源
+        if(isWoodFull and isMineFull):
+            self.logger.info("返回城镇，结束刷资源。")
+            self.cs.back2Town()
+            self.reader.wait_tranported()
+            return
+
+        self.logger.info(f"本轮刷资源已结束。{waitSec}s 后自动进入下一轮。")
         time.sleep(waitSec)
         self.work()
 

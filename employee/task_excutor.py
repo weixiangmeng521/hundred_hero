@@ -35,6 +35,9 @@ class TaskExcutor(Human):
             "击杀100只冰霜傀儡": self.unionTask.farmingSnowfield,
             "击杀100名娜迦法师": self.unionTask.farmingSnowfield,
             "击杀100名树精斥候": self.unionTask.farmingNorthRottingSwamp,
+
+            "击杀100只大雪怪": self.unionTask.farmingBigIceMonster,
+
             "击杀100名树精守卫": self.unionTask.farmingColdWindCamp,
             "击杀BOSS冰雪巨人": self.unionTask.farmingIceGiant,
             "击杀BOSS三头怪蛇": self.unionTask.farmingTwoHeadSnake,

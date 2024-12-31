@@ -33,7 +33,7 @@ class UnionTask:
         if(self.reader.is_show_back2town_btn() == False):
             # 选择副本
             self.cs.selectSnowInstance()
-            time.sleep(10)
+            self.reader.wait_tranported()
 
         # 刷副本
         instance = snow_zone.SnowZone(self.config)
@@ -66,7 +66,7 @@ class UnionTask:
         if(self.reader.is_show_back2town_btn() == False):
             # 选择并进入副本
             self.cs.selectPollutionOutpost()
-            time.sleep(10)
+            self.reader.wait_tranported()
 
         instance = forest.RottenSwamp(self.config)
 
@@ -130,6 +130,23 @@ class UnionTask:
     # 刷冰雪巨人
     def farmingIceGiant(self):
         self.bountyHunter.killSnowmanBoss()
+        # 去刷新
+        self.cs.selectIcecrownThrone()
+        self.reader.wait_tranported()
+
+
+    # 刷大雪怪
+    def farmingBigIceMonster(self):
+        # 如果在城镇，就选择副本并且进入副本
+        if(self.reader.is_show_back2town_btn() == False):
+            # 选择并进入副本
+            self.cs.selectSnowInstance()
+            self.reader.wait_tranported()
+
+        # 刷副本
+        instance = snow_zone.SnowZone(self.config)
+        instance.killBigIceMonster()
+
         # 去刷新
         self.cs.selectIcecrownThrone()
         self.reader.wait_tranported()
