@@ -311,3 +311,40 @@ class SnowZone:
         time.sleep(3)
 
 
+    # 刷大雪怪
+    def killBigIceMonster(self):
+        mc = self.mc
+        waitTime = .6
+
+        mc.move_down(.9)
+        time.sleep(waitTime)
+
+        mc.move_left(1.6)
+        time.sleep(waitTime)
+
+        mc.move_down(1.2)
+        time.sleep(waitTime)
+
+        mc.move_down(1.6)
+        time.sleep(waitTime)
+
+        mc.move_right(1)
+        time.sleep(waitTime * 5)
+
+        mc.move_right(1.3)
+        time.sleep(waitTime)
+
+        mc.move_right(.6)
+        time.sleep(waitTime)
+
+        mc.move_left(.6)
+        time.sleep(waitTime)        
+
+        mc.move_top(1.6)
+        time.sleep(waitTime)
+
+        mc.move_left(1.2)
+        time.sleep(waitTime)
+        
+        mc.move_top(1.8)
+        time.sleep(waitTime)

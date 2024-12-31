@@ -13,6 +13,7 @@ from employee.tower_warrior import TowerWarrior
 from employee.treasure_hunter import TreasureHunt
 from exception.game_status import GameStatusError
 from employee.farmer import Farmer
+from instance import snow_zone
 from instance.union_task import UnionTask
 from lib.cache import get_cache_manager_instance
 from lib.challenge_select import ChallengeSelect
@@ -123,10 +124,10 @@ def work_thread(event_queue):
         # TODO: 下面的划分为重任务，也叫体力任务。体力任务执行的时候加上检测
         # 训练营
         if(ENABLE_AUTO_ABILITY_IMPROVE): coachNPC.work()        
-        # 打钱
-        if(ENABLE_AUTO_COIN): bountyHunter.work()
         # 刷资源
         if(ENABLE_AUTO_WOOD_AND_MINE): farmer.work()
+        # 打钱
+        if(ENABLE_AUTO_COIN): bountyHunter.work()        
 
 
     except (RuntimeError, GameStatusError, TimeoutError) as e:

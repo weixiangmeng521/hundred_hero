@@ -31,7 +31,7 @@ class VirtualMap:
         self.logger = init_logger(config)
         self.cur_position = (0, 0)
         
-        # 9 是当前位置
+        # 9 初始位置
         # 0 是障碍
         # 2 是训练营NPC
         # 3 是招募大厅
@@ -71,14 +71,12 @@ class VirtualMap:
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],                                                                     
         ]
         # 人物移动matrix
-        self.map_matrix = np.full_like(self.npc_map_matrix, 1)
+        # self.map_matrix = np.full_like(self.npc_map_matrix, 1)
 
 
     # 重新设置出生地定位，在发生传送事件后，就会出现这种事情，出生地会变成传送口
     def reposition(self):
         pos = self.find_NPC_target(4)
-        self.map_matrix = np.full_like(self.npc_map_matrix, 1)
-        self.map_matrix[pos[1]][pos[0]] = 9
         self.cur_position = pos
 
 
@@ -89,16 +87,6 @@ class VirtualMap:
             raise ValueError("Err: matrix里找不到指定对象")
         self.cur_position = pos
         self.logger.debug(f"初始位置{pos}")
-
-
-    # 找到指定目标
-    def find_target(self, target_num):
-        # 遍历矩阵的每个元素及其索引
-        for i, row in enumerate(self.map_matrix):
-            for j, element in enumerate(row):
-                if element == target_num:  # 找到值为9的位置
-                    return (j, i)  # 更新当前位置
-        return None
 
 
     # 找到标记过的指定目标
@@ -180,7 +168,6 @@ class VirtualMap:
     # 更新当前的position
     def update_postion(self, cmd):
         cur_position = self.cur_position
-        self.map_matrix[cur_position[1]][cur_position[0]] = 1  # 将当前位置标记为1
 
         # 定义位置的变化：字典方式简化
         move_map = {
@@ -195,11 +182,8 @@ class VirtualMap:
             dy, dx = move_map[cmd]  # 获取位置变化
             new_position = (cur_position[0] + dx, cur_position[1] + dy)
             # 更新地图
-            self.map_matrix[new_position[1]][new_position[0]] = 9
             self.cur_position = new_position  # 更新当前位置
-
-        # self.print_matrix()
-
+            
 
     # 找到训练营NPC
     def move2training_npc(self):
@@ -209,6 +193,7 @@ class VirtualMap:
             return
 
         path = self.a_star(end)
+        self.logger.debug(f"cur:{self.cur_position} tar:{end}, path:{path}")        
         if(path == None):
             self.logger.debug(f"未找到[训练营NPC]路径, cur:{self.cur_position} tar:{end}")
             return
@@ -216,7 +201,6 @@ class VirtualMap:
         cmd_list = self.path_to_commands(path)
         for event in cmd_list:
             self.event_mappper(event)
-        self.logger.debug(f"cur:{self.cur_position} tar:{end}, path:{path}")
 
 
     # 找到传送口
@@ -227,6 +211,7 @@ class VirtualMap:
             return
 
         path = self.a_star(end)
+        self.logger.debug(f"cur:{self.cur_position} tar:{end}, path:{path}")        
         if(path == None):
             self.logger.debug("未找到[传送口]路径")
             return
@@ -234,7 +219,6 @@ class VirtualMap:
         cmd_list = self.path_to_commands(path)
         for event in cmd_list:
             self.event_mappper(event)
-        self.logger.debug(f"cur:{self.cur_position} tar:{end}, path:{path}")
 
 
     # 找到招募大厅
@@ -245,6 +229,7 @@ class VirtualMap:
             return
 
         path = self.a_star(end)
+        self.logger.debug(f"cur:{self.cur_position} tar:{end}, path:{path}")
         if(path == None):
             self.logger.debug("未找到[招募大厅]路径")       
             return
@@ -252,7 +237,6 @@ class VirtualMap:
         cmd_list = self.path_to_commands(path)
         for event in cmd_list:
             self.event_mappper(event)
-        self.logger.debug(f"cur:{self.cur_position} tar:{end}, path:{path}")
 
 
 
@@ -264,6 +248,7 @@ class VirtualMap:
             return
 
         path = self.a_star(end)
+        self.logger.debug(f"cur:{self.cur_position} tar:{end}, path:{path}")        
         if(path == None):
             self.logger.debug("未找到[竞技场]路径")       
             return
@@ -271,25 +256,24 @@ class VirtualMap:
         cmd_list = self.path_to_commands(path)
         for event in cmd_list:
             self.event_mappper(event)
-        self.logger.debug(f"cur:{self.cur_position} tar:{end}, path:{path}")
 
 
     # 找到塔
     def move2tower(self):
         end = self.find_NPC_target(6)
         if(end == None):
-            self.logger.debug("未找到[竞技场]坐标")
+            self.logger.debug("未找到[塔]坐标")
             return
 
         path = self.a_star(end)
+        self.logger.debug(f"cur:{self.cur_position} tar:{end}, path:{path}")        
         if(path == None):
-            self.logger.debug("未找到[竞技场]路径")       
+            self.logger.debug("未找到[塔]路径")       
             return
                 
         cmd_list = self.path_to_commands(path)
         for event in cmd_list:
             self.event_mappper(event)
-        self.logger.debug(f"cur:{self.cur_position} tar:{end}, path:{path}")
 
 
     # 打印matrix
