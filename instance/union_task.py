@@ -108,6 +108,19 @@ class UnionTask:
         # 等待
         self.reader.wait_tranported()
 
+    
+    # 砍树
+    def farmingTree(self):
+        self.cs.selectPollutionOutpost()
+
+        # 等待
+        self.reader.wait_tranported()
+        instance = forest.RottenSwamp(self.config)
+        instance.farmTree()
+
+        # 去刷新
+        self.cs.selectIcecrownThrone()
+        self.reader.wait_tranported()
 
     
     # 刷寒风营地

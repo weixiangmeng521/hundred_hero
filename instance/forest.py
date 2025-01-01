@@ -368,3 +368,39 @@ class RottenSwamp:
         def lamda():
             mc.move_right(5.8)
         return lamda
+    
+
+    # 砍树
+    def farmTree(self):
+        mc = self.mc
+        waitTime = 1.2
+
+        mc.move_right(1.8)
+        time.sleep(0)
+
+        mc.move_down(.6)
+        time.sleep(0)
+
+        mc.move_right(2.3)
+        time.sleep(waitTime * 5)
+
+        mc.move_left(.3)
+        time.sleep(waitTime * 5)
+
+        mc.move_top(1.2)
+        time.sleep(waitTime * 5)
+
+        mc.move_down(1.2)
+        time.sleep(0)
+
+        mc.move_left(2.3)
+        time.sleep(0)
+
+        mc.move_down(.8)
+        time.sleep(waitTime * 5)
+
+        mc.move_top(1.4)
+        time.sleep(0)       
+
+        mc.move_left(1.5)
+        time.sleep(0)   

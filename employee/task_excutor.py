@@ -35,9 +35,7 @@ class TaskExcutor(Human):
             "击杀100只冰霜傀儡": self.unionTask.farmingSnowfield,
             "击杀100名娜迦法师": self.unionTask.farmingSnowfield,
             "击杀100名树精斥候": self.unionTask.farmingNorthRottingSwamp,
-
             "击杀100只大雪怪": self.unionTask.farmingBigIceMonster,
-
             "击杀100名树精守卫": self.unionTask.farmingColdWindCamp,
             "击杀BOSS冰雪巨人": self.unionTask.farmingIceGiant,
             "击杀BOSS三头怪蛇": self.unionTask.farmingTwoHeadSnake,
@@ -46,6 +44,7 @@ class TaskExcutor(Human):
             "击杀100只剧毒黑蜂": self.unionTask.farmingPollutionOutpost,
             "击杀100只霜狼": self.unionTask.farmingMagicRing,
             "击杀100名海豹人法师": self.unionTask.farmingSnowfield,
+            "采集木头270次": self.unionTask.farmingTree,
         }
 
         # self.unionTask.farmingMagicRing()
@@ -73,7 +72,7 @@ class TaskExcutor(Human):
         self.logger.debug(f"任务列表:[{ task_map }]")
         for key, value in task_map.items():
             # 找到需要完成的任务
-            if(key.find("击杀") != -1):
+            if(key.find("击杀") != -1 or key.find("采集") != -1):
                 # 直接取值
                 task = self.task_mapping.get(key)        
                 if(task):
