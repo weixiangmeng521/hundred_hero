@@ -158,6 +158,11 @@ def main():
 if __name__ == "__main__":
     main()
 
+
+    # wechat.wake_up()
+    # unionTask.farmingTree(),
+
+
     # wechat.wake_up()
     # selectHero.dispatch_target_hero()
 
