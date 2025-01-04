@@ -515,10 +515,11 @@ class InfoReader:
         mat_image = cv2.cvtColor(mat_image, cv2.COLOR_RGB2BGR)
 
         # 定义目标颜色并转换为 BGR 格式
-        target_rgb = (112,205,242)
-        target_rgb1 = (74,166,212)
-        target_rgb2 = (217,186,76)
-        return self.is_target_area(mat_image, target_rgb, 0) and self.is_target_area(mat_image, target_rgb1, 0) and self.is_target_area(mat_image, target_rgb2, 0)
+        target_rgb = (175, 187, 172)
+        target_rgb1 = (129, 148, 159)
+        target_rgb2 = (8, 9, 8)
+        
+        return self.is_target_area(mat_image, target_rgb, 0) or self.is_target_area(mat_image, target_rgb1, 0) or self.is_target_area(mat_image, target_rgb2, 0)
 
 
     # 读取竞技场第一个按钮

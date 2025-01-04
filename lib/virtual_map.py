@@ -14,10 +14,8 @@ virtual_map_instance = None
 # 单例模式
 def init_virtual_map(config):
     global virtual_map_instance 
-    if(virtual_map_instance):
-        return virtual_map_instance
+    if(virtual_map_instance): return virtual_map_instance
     virtual_map_instance = VirtualMap(config)
-    virtual_map_instance.find_initial_position()
     return virtual_map_instance
 
 
@@ -29,7 +27,6 @@ class VirtualMap:
         self.mc = MoveControll(config)
         self.cell = 0.28
         self.logger = init_logger(config)
-        self.cur_position = (0, 0)
         
         # 9 初始位置
         # 0 是障碍
@@ -70,6 +67,8 @@ class VirtualMap:
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],                                                                     
         ]
+        self.cur_position = self.find_initial_position()
+
         # 人物移动matrix
         # self.map_matrix = np.full_like(self.npc_map_matrix, 1)
 
@@ -85,8 +84,7 @@ class VirtualMap:
         pos = self.find_NPC_target(9)
         if(pos == None):
             raise ValueError("Err: matrix里找不到指定对象")
-        self.cur_position = pos
-        self.logger.debug(f"初始位置{pos}")
+        return pos
 
 
     # 找到标记过的指定目标
