@@ -43,7 +43,7 @@ class UnionTask:
     # 刷雪原的北风营地
     def farmingSnowfield(self):
         # 如果在城镇，就选择副本并且进入副本
-        if(self.reader.is_show_back2town_btn() == False):
+        if(not self.reader.is_show_back2town_btn()):
             # 选择并进入副本
             self.cs.selectDiamondInstance()
             self.reader.wait_tranported()
@@ -63,7 +63,7 @@ class UnionTask:
     # 刷污染前哨
     def farmingPollutionOutpost(self):
         # 如果在城镇，就选择副本并且进入副本
-        if(self.reader.is_show_back2town_btn() == False):
+        if(not self.reader.is_show_back2town_btn()):
             # 选择并进入副本
             self.cs.selectPollutionOutpost()
             self.reader.wait_tranported()

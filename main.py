@@ -158,6 +158,8 @@ def main():
 if __name__ == "__main__":
     main()
 
+    # print(reader.is_show_back2town_btn())
+
 
     # wechat.wake_up()
     # unionTask.farmingTree(),

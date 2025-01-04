@@ -29,6 +29,8 @@ class TreasureHunt(Human):
         self.selectHero = SelectHero(config)        
         # 最大等待击杀怪物时间
         self.wait_max_time = 60 * 2
+        # 是不是宝箱数量大于30个
+        self.is_treasure_num_greater_than_30 = config.getboolean("TASK", "IsTreasureNumGreaterThan30")
         
     
     # 死亡处理
@@ -118,6 +120,8 @@ class TreasureHunt(Human):
             # 30次宝箱完成
             if(over_time >= max_clicked_times):
                 # 直接返回，回城后判断是否完成了任务
+                if(not self.is_treasure_num_greater_than_30):
+                    self.cache.set(IS_DALIY_CASE_FINISHED, 1)
                 return
 
             # 获取宝箱列表
@@ -155,21 +159,13 @@ class TreasureHunt(Human):
         if(not self.reader.is_show_back2town_btn()):
             self.logger.debug("准备移动到传送阵.")
             self.virtual_map.move2protal()
-        
-        # self.reader.close_30s_ads()
-        # time.sleep(20)
+
         while True:
             try:                
                 # 查看是否任务已经完成
-                self.check_daliy_treasure_task_is_done()
-
-                # 全员上阵
-                is_full = self.reader.is_team_member_full()
-                if(not is_full):
-                    self.logger.info("全部英雄上阵。")
-                    self.selectHero.dispatch_all_hero()
+                if(not self.is_treasure_num_greater_than_30):
+                    self.check_daliy_treasure_task_is_done()
                 
-
                 is_finished = self.cache.get(IS_DALIY_CASE_FINISHED)
                 if(is_finished and int(is_finished) == 1):
                     return
@@ -177,7 +173,13 @@ class TreasureHunt(Human):
                 # 设置默认值
                 if(not is_finished):
                     self.cache.set(IS_DALIY_CASE_FINISHED, 0)
-                    
+                
+                # 全员上阵
+                is_full = self.reader.is_team_member_full()
+                if(not is_full):
+                    self.logger.info("全部英雄上阵。")
+                    self.selectHero.dispatch_all_hero()
+
                 self.move_2_two_centipede()
                 self.reader.wait_tranported()
                 time.sleep(.3)
