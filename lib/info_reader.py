@@ -1085,7 +1085,7 @@ class InfoReader:
     def wait_fight_over(self, level_name = "斗兽场"):
         self.logger.debug(f"等待[{level_name}]战斗结束...")
         start_time = time.time()  # 记录开始时间
-        timeout = 60  # 超时时间，单位为秒\
+        timeout = 60 + 20  # 超时时间，单位为秒\
 
         while True:
             elapsed_time = time.time() - start_time  # 计算已过去的时间

@@ -102,6 +102,10 @@ def wake_up_window():
 
 # 工作线程
 def work_thread(event_queue):
+    # 初始化虚拟地图
+    virtual_map_instance = init_virtual_map(config)
+    virtual_map_instance.reset()
+
     try:
         # 唤醒
         if(IS_WAKE_UP_APP): wake_up_window()
