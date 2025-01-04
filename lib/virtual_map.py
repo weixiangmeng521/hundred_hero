@@ -79,6 +79,11 @@ class VirtualMap:
         self.cur_position = pos
 
 
+    # 重置
+    def reset(self):
+        self.cur_position = self.find_initial_position()
+
+        
     # 找到初始位置
     def find_initial_position(self):
         pos = self.find_NPC_target(9)
