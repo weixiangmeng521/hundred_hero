@@ -9,8 +9,7 @@ EnableDeamon = True
 RestartWaitTime = 3
 
 [WEB_SERVER]
-Enable = False
-WebServer = True
+Enable = True
 Host = 0.0.0.0
 Port = 8000
 
@@ -26,13 +25,18 @@ ToNumber =
 [TASK]
 IsWakeUpApp = True
 IsLoadingAds = True
+EnableVirtualMap = False
 EnableAutoUnionTask = True
 EnableAutoAbilityImporve = False
+EnableAutoDaliyElementTower = True
+EnableAutoFight = True
 EnableAutoGaCha = True
 EnableAutoDaliyCase = True
-EnableAutoCoin = True
 EnableAutoWoodAndMine = False
-EnableVirtualMap = False
+EnableAutoCoin = True
+GaChaCoinThreshold = 10000
+IsTreasureNumGreaterThan30 = False
+
 
 [CACHE]
 FileName = .cache
