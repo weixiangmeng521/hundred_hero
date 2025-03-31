@@ -287,6 +287,9 @@ class SelectHero:
     # 读取已经上阵的英雄数量
     def read_dispatched_hero_num(self):
         hero_num = 0           
+        max_wait_time = 30
+
+        start_time = time.time()  # 记录开始时间
         while True:
             winX, winY, winWidth, winHeight = self.reader.get_win_info()
             with mss.mss() as sct:
@@ -299,12 +302,17 @@ class SelectHero:
                 # 截取屏幕
                 screenshot = sct.grab(region)
                 mat_image = np.array(screenshot)         
-
+                
                 try:
                     hero_num = self.reader.recognize_number_text(mat_image)
                 except:
+                    elapsed_time = time.time() - start_time  # 计算已运行的时间
                     self.logger.debug("识别上阵的英雄数量失败, 3s后再次尝试.")
                     time.sleep(3)
+
+                    if elapsed_time > max_wait_time:
+                        raise TimeoutError(f"识别英雄数量超时（超过{max_wait_time}秒）。")   
+                                     
                     continue
 
                 return hero_num

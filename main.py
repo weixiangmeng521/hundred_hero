@@ -162,6 +162,12 @@ def main():
 if __name__ == "__main__":
     main()
 
+
+    # wechat.wake_up()
+    # while True:
+    #     unionTask.farmingMammoth()
+
+
     # print(reader.is_show_back2town_btn())
 
 

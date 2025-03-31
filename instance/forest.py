@@ -188,7 +188,7 @@ class RottenSwamp:
         waitTime = 1.5
 
         mc.move_right(1.8)
-        time.sleep(waitTime * 0)
+        time.sleep(waitTime * .1)
 
         mc.move_down(.6)
         time.sleep(waitTime)

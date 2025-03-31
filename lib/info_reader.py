@@ -696,7 +696,7 @@ class InfoReader:
         start_time = time.time()  # 记录开始时间
         timeout = wait_max_time # 超时时间，单位为秒
         # 如果有爆宝箱，却达不到treasure_num的标准，就降低标准
-        tolerate_timeout = 30
+        tolerate_timeout = 10
 
         while True:
             window = self.get_specific_window_info()

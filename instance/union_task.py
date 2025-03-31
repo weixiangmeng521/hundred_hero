@@ -71,7 +71,7 @@ class UnionTask:
         instance = forest.RottenSwamp(self.config)
 
         # 走到圈内
-        if(self.loop_lock == False):
+        if(not self.loop_lock):
             instance.crossRoom3Begin()
             self.loop_lock = True
         
@@ -150,11 +150,9 @@ class UnionTask:
 
     # 刷大雪怪
     def farmingBigIceMonster(self):
-        # 如果在城镇，就选择副本并且进入副本
-        if(self.reader.is_show_back2town_btn() == False):
-            # 选择并进入副本
-            self.cs.selectSnowInstance()
-            self.reader.wait_tranported()
+        # 选择并进入副本
+        self.cs.selectSnowInstance()
+        self.reader.wait_tranported()
 
         # 刷副本
         instance = snow_zone.SnowZone(self.config)

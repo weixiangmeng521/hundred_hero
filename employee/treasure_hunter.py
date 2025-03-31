@@ -28,7 +28,7 @@ class TreasureHunt(Human):
         self.virtual_map = init_virtual_map(config)
         self.selectHero = SelectHero(config)        
         # 最大等待击杀怪物时间
-        self.wait_max_time = 60 * 2
+        self.wait_max_time = 60
         # 是不是宝箱数量大于30个
         self.is_treasure_num_greater_than_30 = config.getboolean("TASK", "IsTreasureNumGreaterThan30")
         
@@ -131,12 +131,17 @@ class TreasureHunt(Human):
                 # 点击第一个宝箱
                 btn = treasure_list[0]
                 pyautogui.click(btn[0], btn[1] + 20)
+                time.sleep(.1)
+                pyautogui.click(btn[0], btn[1] + 20)
                 
                 # 判断是否点击成功并处理弹窗
                 self.logger.debug("等待弹出宝箱内容...")
                 self.reader.wait_treasure_pop_up()
                 self.logger.debug("宝箱内容已弹出。等待2s")
                 time.sleep(2) # 因为有缓动动画，所以等2s
+                
+                self.reader.click_rewards()
+                time.sleep(.1)
                 self.reader.click_rewards()
                 # self.cs.clearAds(3)
 

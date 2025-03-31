@@ -62,7 +62,7 @@ fireMineLandTabPos = [121, 260]
 twoCentipedePos = [302, 360]
 
 # 任务列表
-taskListBtnPos = [445, 385 - 50]
+taskListBtnPos = [445, 385 - 60]
 unionTaskTabPos = [390 , 840]
 completeUnionTaskTabPos = [370 , 385]
 
@@ -86,7 +86,7 @@ class ChallengeSelect:
         self.logger = init_logger(config)
         self.wechat = init_controll_wechat(self.config)
         self.virtual_map = init_virtual_map(config)
-        self.waitTime = .1
+        self.waitTime = 1
 
 
     # 获取窗口信息
@@ -307,7 +307,7 @@ class ChallengeSelect:
     def openTaskList(self):
         self.check_window_handler()
         pyautogui.click(taskListBtnPos[0], taskListBtnPos[1])
-        time.sleep(self.waitTime)
+        time.sleep(1)
         pyautogui.click(unionTaskTabPos[0], unionTaskTabPos[1])
         # self.logger.info("进入[工会任务列表]")
 
