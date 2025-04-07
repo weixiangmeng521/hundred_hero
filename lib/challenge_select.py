@@ -9,6 +9,7 @@ import cv2
 from PIL import Image
 import numpy as np
 import math
+from lib.cache import get_cache_manager_instance
 from lib.controll_wechat import init_controll_wechat
 from lib.logger import init_logger
 from lib.virtual_map import init_virtual_map
@@ -87,6 +88,7 @@ class ChallengeSelect:
         self.wechat = init_controll_wechat(self.config)
         self.virtual_map = init_virtual_map(config)
         self.waitTime = 1
+        self.cache = get_cache_manager_instance(config)
 
 
     # 获取窗口信息
@@ -388,7 +390,9 @@ class ChallengeSelect:
 
 
     # 把窗口移动到（0，0）
-    def move2LeftTop(self, waitFn, isContainAds):
+    def move2LeftTop(self, waitFn):
+        isContainAds = self.cache.get('IS_LOADING_ADS')
+
         # 没启动游戏
         win = self.get_specific_window_info()
 

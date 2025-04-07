@@ -1,3 +1,4 @@
+import math
 import queue
 import time
 import traceback
@@ -93,11 +94,16 @@ ENABLE_AUTO_COIN = config.getboolean('TASK', 'EnableAutoCoin')
 ENABLE_AUTO_WOOD_AND_MINE = config.getboolean('TASK', 'EnableAutoWoodAndMine')
 # 虚拟地图
 ENABLE_VIRTUAL_MAP = config.getboolean('TASK', 'EnableVirtualMap')
+# 刷无限经验
+ENABLE_AUTO_EXP = config.getboolean('TASK', 'EnableAutoExp')
+# 缓存
+cache = get_cache_manager_instance(config)
+cache.set("IS_LOADING_ADS", IS_LOADING_ADS, 7)
 
 # wake up
 def wake_up_window():
     # 把窗口拖动到桌面顶端
-    cs.move2LeftTop(reader.wait_game_loaded, IS_LOADING_ADS)
+    cs.move2LeftTop(reader.wait_game_loaded)
 
 
 # 工作线程
@@ -132,7 +138,8 @@ def work_thread(event_queue):
         if(ENABLE_AUTO_WOOD_AND_MINE): farmer.work()
         # 打钱
         if(ENABLE_AUTO_COIN): bountyHunter.work()        
-
+        # # 刷经验
+        # if(ENABLE_AUTO_EXP): farmer.for_experience2()
 
     except (RuntimeError, GameStatusError, TimeoutError) as e:
         stack_info = traceback.format_exc()
@@ -158,10 +165,35 @@ def main():
     if(not ENABLE_DEAMON):
         work_thread(event_queue)
 
+
+def auto_teams():
+    while True:
+        # 画圆参数
+        radius = 100  # 圆的半径
+        center_x, center_y = pyautogui.position()  # 获取当前鼠标位置作为圆心
+        steps = 100  # 画圆的精细度，值越大越平滑
+        duration = 0.01  # 每次移动的时间间隔
+
+        # 延迟 2 秒，确保用户有时间切换到正确的窗口
+        time.sleep(2)
+
+        # 画圆
+        for i in range(steps + 1):
+            angle = 2 * math.pi * i / steps  # 计算角度（弧度）
+            x = center_x + radius * math.cos(angle)  # 计算 x 坐标
+            y = center_y + radius * math.sin(angle)  # 计算 y 坐标
+            pyautogui.moveTo(x, y, duration=duration)  # 移动鼠标到新位置
+            
+        # 等待 10 秒后再次执行
+        time.sleep(10)
+
+
+
 # TODO: 获取当前钱的数量,并放入缓存里
 if __name__ == "__main__":
     main()
 
+    # auto_teams()
 
     # wechat.wake_up()
     # while True:

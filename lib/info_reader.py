@@ -945,6 +945,7 @@ class InfoReader:
         while True:
             elapsed_time = time.time() - start_time  # 计算已过去的时间
             if elapsed_time > timeout:
+                self.cache.set("IS_LOADING_ADS", not is_contains_ads, 0)
                 raise TimeoutError("加载超时: 游戏未在1分钟内加载完成。")
 
             window = self.get_specific_window_info()

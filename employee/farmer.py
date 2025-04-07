@@ -110,9 +110,9 @@ class Farmer(Human):
             self.logger.info("刷一刷蓝矿")
             self.for_mine()
 
-        # else:
-        #     self.logger.info("刷一刷经验")
-        #     self.for_experience2()
+        else:
+            self.logger.info("刷一刷经验")
+            self.for_experience2()
 
         # 返回城镇，结束刷资源
         if(isWoodFull and isMineFull):
