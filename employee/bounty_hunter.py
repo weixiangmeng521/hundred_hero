@@ -263,19 +263,26 @@ class BountyHunter(Human):
         # 找到位置
         self.virtual_map.move2protal()
 
+        flag = self.config.getboolean("TASK", "IsEnableKill4Boss")
+
+        # 是否挑战黑石的一次性4个BOSS
+        if flag:
+            self.logger.info("挑战黑石4个BOSS！")
+            is_full = self.reader.is_team_member_full()
+            if(not is_full):
+                self.selectHero.dispatch_target_hero()
+            self.general_mode_for_kill_4_boss()
+            return
+
+
         self.logger.info("进入极速模式打金！")
         is_full = self.reader.is_team_member_full()
         if(is_full):
             self.selectHero.dispatch_target_hero()
         
+        self.logger.debug("匹配[极速刷金]模式")
         self.fast_mode()
 
 
-        # if(is_full):
-        #     self.logger.debug("匹配[普通刷金]模式")
-        #     self.general_mode_for_kill_4_boss()
-
-        # if(not is_full):
-        #     self.logger.debug("匹配[极速刷金]模式")
-        #     self.fast_mode()
-        
+    
+            

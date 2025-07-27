@@ -331,9 +331,9 @@ class ControllWechat:
         winX, winY = window_bounds.get('X', 0), window_bounds.get('Y', 0)
         winHeight = window_bounds.get('Height', 0)
         pyautogui.click(winX + 25, winY + winHeight - 150)
-        time.sleep(.3)
+        time.sleep(1)
         pyautogui.click(winX + 25 + 85, winY + winHeight - 150 - 70)
-        time.sleep(.3)
+        time.sleep(1)
 
 
 

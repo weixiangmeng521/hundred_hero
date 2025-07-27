@@ -65,9 +65,11 @@ class TaskExcutor(Human):
 
     # 截取图片，取样
     def check_union_task_list(self):
+        time.sleep(2)        
         # 打开list
         self.cs.openTaskList()
-        time.sleep(.6)
+        # 现在游戏加载越来越慢，我们就只能等了
+        time.sleep(2)
         # 读取list
         task_map = self.reader.read_task_list()
         self.logger.debug(f"任务列表:[{ task_map }]")

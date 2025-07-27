@@ -161,7 +161,7 @@ class InfoReader:
     # 判断工会任务是否完成, false的情况下是完成了，true的情况下是没完成
     def is_task_complete(self, task_name):
         if(len(task_name) == 0):
-            raise ValueError("Err: task_name cannot not be empty.")
+            raise GameStatusError("Err: task_name cannot not be empty.")
         
         # 获取三个位置，如果是变绿了，就点击。
         isClicked = False
